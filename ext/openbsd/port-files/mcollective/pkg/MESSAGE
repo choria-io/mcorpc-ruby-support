@@ -1,3 +1,0 @@
-If you wish to have mcollective started automatically at boot time,
-update your pkg_scripts variable, e.g. in /etc/rc.conf.local.
-See rc.d(8) for details.

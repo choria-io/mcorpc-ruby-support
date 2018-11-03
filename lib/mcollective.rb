@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'json'
-require 'stomp'
 require 'timeout'
 require 'digest/md5'
 require 'optparse'
@@ -15,6 +14,7 @@ require 'tmpdir'
 require 'mcollective/monkey_patches'
 require 'mcollective/cache'
 require 'mcollective/exceptions'
+require 'systemu'
 
 # == The Marionette Collective
 #
@@ -47,7 +47,6 @@ module MCollective
   require "mcollective/generators"
   require "mcollective/pluginmanager"
   require "mcollective/pluginpackager"
-  require "mcollective/registration"
   require "mcollective/rpc"
   require "mcollective/runnerstats"
   require "mcollective/security"
@@ -55,9 +54,6 @@ module MCollective
   require "mcollective/ssl"
   require "mcollective/util"
   require "mcollective/validator"
-  require "mcollective/vendor"
-
-  MCollective::Vendor.load_vendored
 
   VERSION="2.12.0"
 

@@ -13,8 +13,10 @@ describe OpenSSL::SSL::SSLContext do
   end
 
   it 'explicitly disable SSLv2 ciphers using the ! prefix so they cannot be re-added' do
-    cipher_str = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
-    cipher_str.split(':').should include('!SSLv2')
+    if OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
+      cipher_str = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
+      cipher_str.split(':').should include('!SSLv2')
+    end
   end
 
   it 'has no ciphers with version SSLv2 enabled' do

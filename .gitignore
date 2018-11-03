@@ -1,4 +1,3 @@
-doc
 build
 etc/*cfg
 etc/*yaml
@@ -7,9 +6,6 @@ etc/ssl/clients/*pem
 plugins/mcollective/security/none.rb
 tags
 pkg
-.localeapp
 Gemfile.lock
 .bundle
-ext/packaging
-.idea
-Gemfile.local
+.ruby-version
