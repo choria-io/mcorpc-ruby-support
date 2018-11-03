@@ -164,8 +164,6 @@ module MCollective
         PluginManager.loadclass("Mcollective::Facts::#{@factsource}_facts")
         PluginManager.loadclass("Mcollective::Connector::#{@connector}")
         PluginManager.loadclass("Mcollective::Security::#{@securityprovider}")
-        PluginManager.loadclass("Mcollective::Registration::#{@registration}")
-        PluginManager.loadclass("Mcollective::Audit::#{@rpcauditprovider}") if @rpcaudit
         PluginManager << {:type => "global_stats", :class => RunnerStats.new}
 
         Log.info("The Marionette Collective version #{MCollective::VERSION} started by #{$0} using config file #{configfile}")
@@ -178,11 +176,11 @@ module MCollective
       @stomp = Hash.new
       @subscribe = Array.new
       @pluginconf = Hash.new
-      @connector = "activemq"
-      @securityprovider = "Psk"
+      @connector = "base"
+      @securityprovider = "Base"
       @factsource = "Yaml"
       @identity = Socket.gethostname
-      @registration = "Agentlist"
+      @registration = "Base"
       @registerinterval = 0
       @registration_collective = nil
       @registration_splay = false
