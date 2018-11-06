@@ -8,4 +8,7 @@ and `mco` CLI
 It's not possible to run the old MCollective daemon using this code or the
 resulting gem.
 
+This fork was made off version `2.12.0` of The Marionette Collective and have
+diverged since then, the changes made are not compatible with legacy MCollective.
+
 For further information please see [https://choria.io](https://choria.io/)
