@@ -55,7 +55,7 @@ module MCollective
   require "mcollective/util"
   require "mcollective/validator"
 
-  VERSION="2.12.0"
+  VERSION="2.20.0"
 
   def self.version
     VERSION
