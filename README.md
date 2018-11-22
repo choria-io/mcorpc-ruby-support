@@ -1,6 +1,6 @@
 # Choria MCollective RPC Ruby Support Libraries
 
-These are stripped down versions of the legacy MCollective libraries that
+These are stripped down versions of the [legacy Marionette Collective libraries](https://github.com/choria-legacy/marionette-collective) that
 are used to facilitate hosting Ruby based MCollective Agents within the
 Golang daemon as well as interact with a Choria network from the Ruby API
 and `mco` CLI
