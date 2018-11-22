@@ -17,7 +17,6 @@ spec = Gem::Specification.new do |s|
   s.bindir = "bin"
   s.executables = ["mco"]
   s.add_dependency "systemu", "~> 2.6", ">= 2.6.4"
-  s.add_dependency "json", "~> 2.1", ">= 2.1.0"
 end
 
 Gem::PackageTask.new(spec) do |pkg|
