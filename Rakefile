@@ -1,7 +1,7 @@
 require "rubygems"
 require "rubygems/package_task"
 
-PROJ_VERSION = "0.0.1"
+PROJ_VERSION = "2.20.2"
 
 spec = Gem::Specification.new do |s|
   s.name = "choria-mcorpc-support"
