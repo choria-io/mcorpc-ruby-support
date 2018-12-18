@@ -5,7 +5,7 @@ module MCollective
     attr_accessor :headers, :agent, :collective, :filter
     attr_accessor :requestid, :discovered_hosts, :options, :ttl
 
-    VALIDTYPES = [:message, :request, :direct_request, :reply]
+    VALIDTYPES = [:message, :request, :direct_request, :reply].freeze
 
     # payload                  - the message body without headers etc, just the text
     # message                  - the original message received from the middleware
@@ -20,7 +20,7 @@ module MCollective
     # options[:ttl]            - the maximum amount of seconds this message can be valid for
     # options[:expected_msgid] - in the case of replies this is the msgid it is expecting in the replies
     # options[:requestid]      - specific request id to use else one will be generated
-    def initialize(payload, message, options = {})
+    def initialize(payload, message, options={})
       options = {:base64 => false,
                  :agent => nil,
                  :headers => {},
@@ -140,41 +140,43 @@ module MCollective
 
     def encode!
       case type
-        when :reply
-          raise "Cannot encode a reply message if no request has been associated with it" unless request
-          raise 'callerid in original request is not valid, surpressing reply to potentially forged request' unless PluginManager["security_plugin"].valid_callerid?(request.payload[:callerid])
+      when :reply
+        raise "Cannot encode a reply message if no request has been associated with it" unless request
 
-          @requestid = request.payload[:requestid]
-          @payload = PluginManager["security_plugin"].encodereply(agent, payload, requestid, request.payload[:callerid])
-        when :request, :direct_request
-          validate_compound_filter(@filter["compound"]) unless @filter["compound"].empty?
+        unless PluginManager["security_plugin"].valid_callerid?(request.payload[:callerid])
+          raise "callerid in original request is not valid, surpressing reply to potentially forged request"
+        end
 
-          @requestid = create_reqid unless @requestid
-          @payload = PluginManager["security_plugin"].encoderequest(Config.instance.identity, payload, requestid, filter, agent, collective, ttl)
-        else
-          raise "Cannot encode #{type} messages"
+        @requestid = request.payload[:requestid]
+        @payload = PluginManager["security_plugin"].encodereply(agent, payload, requestid, request.payload[:callerid])
+      when :request, :direct_request
+        validate_compound_filter(@filter["compound"]) unless @filter["compound"].empty?
+
+        @requestid ||= create_reqid
+        @payload = PluginManager["security_plugin"].encoderequest(Config.instance.identity, payload, requestid, filter, agent, collective, ttl)
+      else
+        raise "Cannot encode #{type} messages"
       end
     end
 
     def validate_compound_filter(compound_filter)
       compound_filter.each do |filter|
         filter.each do |statement|
-          if statement["fstatement"]
-            functionname = statement["fstatement"]["name"]
-            pluginname = Data.pluginname(functionname)
-            value = statement["fstatement"]["value"]
+          next unless statement["fstatement"]
+          functionname = statement["fstatement"]["name"]
+          pluginname = Data.pluginname(functionname)
+          value = statement["fstatement"]["value"]
 
-            ddl = DDL.new(pluginname, :data)
+          ddl = DDL.new(pluginname, :data)
 
-            # parses numbers and booleans entered as strings into proper
-            # types of data so that DDL validation will pass
-            statement["fstatement"]["params"] = Data.ddl_transform_input(ddl, statement["fstatement"]["params"])
+          # parses numbers and booleans entered as strings into proper
+          # types of data so that DDL validation will pass
+          statement["fstatement"]["params"] = Data.ddl_transform_input(ddl, statement["fstatement"]["params"])
 
-            Data.ddl_validate(ddl, statement["fstatement"]["params"])
+          Data.ddl_validate(ddl, statement["fstatement"]["params"])
 
-            unless value && Data.ddl_has_output?(ddl, value)
-              DDL.validation_fail!(:PLMC41, "Data plugin '%{functionname}()' does not return a '%{value}' value", :error, {:functionname => functionname, :value => value})
-            end
+          unless value && Data.ddl_has_output?(ddl, value)
+            raise(DDLValidationError, "Data plugin '%s()' does not return a '%s' value" % [functionname, value])
           end
         end
       end
@@ -185,7 +187,7 @@ module MCollective
 
       begin
         @payload = PluginManager["security_plugin"].decodemsg(self)
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         if type == :request
           # If we're a server receiving a request, reraise
           raise(e)
@@ -194,13 +196,13 @@ module MCollective
 
           # Note: mc_sender is unverified.  The verified identity is in the
           # payload we just failed to decode
-          Log.warn("Failed to decode a message from '#{headers["mc_sender"]}': #{e}")
+          Log.warn("Failed to decode a message from '#{headers['mc_sender']}': #{e}")
           return
         end
       end
 
       if type == :request
-        raise 'callerid in request is not valid, surpressing reply to potentially forged request' unless PluginManager["security_plugin"].valid_callerid?(payload[:callerid])
+        raise "callerid in request is not valid, surpressing reply to potentially forged request" unless PluginManager["security_plugin"].valid_callerid?(payload[:callerid])
       end
 
       [:collective, :agent, :filter, :requestid, :ttl, :msgtime].each do |prop|
@@ -235,7 +237,7 @@ module MCollective
         Log.debug("Handling #{requestid} as a direct request")
       end
 
-      PluginManager['connector_plugin'].publish(self)
+      PluginManager["connector_plugin"].publish(self)
     end
 
     def create_reqid

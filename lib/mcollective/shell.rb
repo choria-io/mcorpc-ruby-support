@@ -36,33 +36,33 @@ module MCollective
 
       options.each do |opt, val|
         case opt.to_s
-          when "stdout"
-            raise "stdout should support <<" unless val.respond_to?("<<")
-            @stdout = val
+        when "stdout"
+          raise "stdout should support <<" unless val.respond_to?("<<")
+          @stdout = val
 
-          when "stderr"
-            raise "stderr should support <<" unless val.respond_to?("<<")
-            @stderr = val
+        when "stderr"
+          raise "stderr should support <<" unless val.respond_to?("<<")
+          @stderr = val
 
-          when "stdin"
-            raise "stdin should be a String" unless val.is_a?(String)
-            @stdin = val
+        when "stdin"
+          raise "stdin should be a String" unless val.is_a?(String)
+          @stdin = val
 
-          when "cwd"
-            raise "Directory #{val} does not exist" unless File.directory?(val)
-            @cwd = val
+        when "cwd"
+          raise "Directory #{val} does not exist" unless File.directory?(val)
+          @cwd = val
 
-          when "environment"
-            if val.nil?
-              @environment = {}
-            else
-              @environment.merge!(val.dup)
-              @environment = @environment.delete_if { |k,v| v.nil? }
-            end
+        when "environment"
+          if val.nil?
+            @environment = {}
+          else
+            @environment.merge!(val.dup)
+            @environment = @environment.delete_if { |_k, v| v.nil? }
+          end
 
-          when "timeout"
-            raise "timeout should be a positive integer or the symbol :on_thread_exit symbol" unless val.eql?(:on_thread_exit) || ( val.is_a?(Integer) && val>0 )
-            @timeout = val
+        when "timeout"
+          raise "timeout should be a positive integer or the symbol :on_thread_exit symbol" unless val.eql?(:on_thread_exit) || (val.is_a?(Integer) && val > 0)
+          @timeout = val
         end
       end
     end
@@ -75,7 +75,6 @@ module MCollective
               "cwd"    => @cwd}
 
       opts["stdin"] = @stdin if @stdin
-
 
       thread = Thread.current
       # Start a double fork and exec with systemu which implies a guard thread.
@@ -90,32 +89,30 @@ module MCollective
             sleep timeout
           else
             # sleep while the agent thread is still alive
-            while(thread.alive?)
-              sleep 0.1
-            end
+            sleep 0.1 while thread.alive?
           end
 
           # if the process is still running
-          if (Process.kill(0, cid))
+          if Process.kill(0, cid)
             # and a timeout was specified
             if timeout
               if Util.windows?
-                Process.kill('KILL', cid)
+                Process.kill("KILL", cid)
               else
                 # Kill the process
-                Process.kill('TERM', cid)
+                Process.kill("TERM", cid)
                 sleep 2
-                Process.kill('KILL', cid) if (Process.kill(0, cid))
+                Process.kill("KILL", cid) if Process.kill(0, cid) # rubocop:disable Metrics/BlockNesting
               end
             end
             # only wait if the parent thread is dead
             Process.waitpid(cid) unless thread.alive?
           end
-        rescue SystemExit
-        rescue Errno::ESRCH
+        rescue SystemExit # rubocop:disable Lint/HandleExceptions
+        rescue Errno::ESRCH # rubocop:disable Lint/HandleExceptions
         rescue Errno::ECHILD
           Log.warn("Could not reap process '#{cid}'.")
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           Log.info("Unexpected exception received while waiting for child process: #{e.class}: #{e}")
         end
       end

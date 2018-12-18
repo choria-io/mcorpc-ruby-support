@@ -10,7 +10,7 @@ module MCollective
     end
 
     def self.[](klass)
-      const_get("#{klass}")
+      const_get(klass.to_s)
     end
 
     # Fetch and return metadata from plugin DDL
@@ -19,12 +19,12 @@ module MCollective
 
       begin
         ddl_file = File.read(Dir.glob(File.join(path, type, "*.ddl")).first)
-      rescue Exception
+      rescue Exception # rubocop:disable Lint/RescueException
         raise "failed to load ddl file in plugin directory : #{File.join(path, type)}"
       end
       ddl.instance_eval ddl_file
 
-      return ddl.meta, ddl.requirements[:mcollective]
+      [ddl.meta, ddl.requirements[:mcollective]]
     end
 
     # Checks if a directory is present and not empty
@@ -34,19 +34,19 @@ module MCollective
 
     # Quietly calls a block if verbose parameter is false
     def self.execute_verbosely(verbose, &block)
-      unless verbose
+      if verbose
+        block.call
+      else
         old_stdout = $stdout.clone
         $stdout.reopen(File.new("/dev/null", "w"))
         begin
           block.call
-        rescue Exception => e
+        rescue Exception # rubocop:disable Lint/RescueException
           $stdout.reopen old_stdout
-          raise e
+          raise
         ensure
           $stdout.reopen old_stdout
         end
-      else
-        block.call
       end
     end
 
@@ -54,15 +54,13 @@ module MCollective
     def self.command_available?(build_tool)
       ENV["PATH"].split(File::PATH_SEPARATOR).each do |path|
         builder = File.join(path, build_tool)
-        if File.exists?(builder)
-          return true
-        end
+        return true if File.exist?(builder)
       end
       false
     end
 
     def self.safe_system(*args)
-      raise(RuntimeError, "Failed: #{args.join(' ')}") unless system *args
+      raise("Failed: #{args.join(' ')}") unless system(*args)
     end
 
     # Filter out platform specific dependencies
@@ -77,22 +75,20 @@ module MCollective
           if prefix == $1
             dependency[:name] = $2
             dependency
-          else
-            nil
           end
         else
           dependency
         end
-      end.reject{ |dependency| dependency == nil }
+      end.reject(&:nil?)
     end
 
     # Return the path to a plugin's core directories
     def self.get_plugin_path(target)
-      if (File.exists?(File.join(target, "lib", "mcollective")))
+      if File.exist?(File.join(target, "lib", "mcollective"))
         return File.join(target, "lib", "mcollective")
       end
 
-      return target
+      target
     end
   end
 end

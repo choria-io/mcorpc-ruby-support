@@ -1,19 +1,17 @@
 module MCollective
   module Validator
     @last_load = nil
-    @@validator_mutex = Mutex.new
+    @@validator_mutex = Mutex.new # rubocop:disable Style/ClassVars
 
     # Loads the validator plugins. Validators will only be loaded every 5 minutes
     def self.load_validators
-      begin
-        @@validator_mutex.lock
-        if load_validators?
-          @last_load = Time.now.to_i
-          PluginManager.find_and_load("validator")
-        end
-      ensure
-        @@validator_mutex.unlock
+      @@validator_mutex.lock
+      if load_validators?
+        @last_load = Time.now.to_i
+        PluginManager.find_and_load("validator")
       end
+    ensure
+      @@validator_mutex.unlock
     end
 
     # Returns and instance of the Plugin class from which objects can be created.
@@ -24,7 +22,7 @@ module MCollective
     def self.[](klass)
       if klass.is_a?(Symbol)
         klass = validator_class(klass)
-      elsif !(klass.match(/.*Validator$/))
+      elsif !klass.match(/.*Validator$/)
         klass = validator_class(klass)
       end
 
@@ -32,9 +30,9 @@ module MCollective
     end
 
     # Allows validation plugins to be called like module methods : Validator.validate()
-    def self.method_missing(method, *args, &block)
+    def self.method_missing(method, *args, &block) # rubocop:disable Style/MethodMissing
       if has_validator?(method)
-        validator = Validator[method].validate(*args)
+        Validator[method].validate(*args)
       else
         raise ValidatorError, "Unknown validator: '#{method}'."
       end
@@ -64,17 +62,17 @@ module MCollective
 
         else
           case validation
-            when Regexp,String
-              Validator.regex(validator, validation)
+          when Regexp, String
+            Validator.regex(validator, validation)
 
-            when Symbol
-              Validator.send(validation, validator)
+          when Symbol
+            Validator.send(validation, validator)
 
-            when Array
-              Validator.array(validator, validation)
+          when Array
+            Validator.array(validator, validation)
 
-            when Class
-              Validator.typecheck(validator, validation)
+          when Class
+            Validator.typecheck(validator, validation)
           end
         end
       rescue => e

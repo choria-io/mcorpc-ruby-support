@@ -10,17 +10,17 @@ module MCollective
 
       begin
         load_application(appname)
-      rescue Exception => e
+      rescue Exception # rubocop:disable Lint/RescueException
         e.backtrace.first << Util.colorize(:red, "  <----")
-        STDERR.puts "Application '#{appname}' failed to load:"
+        STDERR.puts "Application '%s' failed to load:" % appname
         STDERR.puts
-        STDERR.puts Util.colorize(:red, "   #{e} (#{e.class})")
+        STDERR.puts Util.colorize(:red, "   %s (%s)" % [$!, $!.class])
         STDERR.puts
-        STDERR.puts "       %s" % [e.backtrace.join("\n       ")]
+        STDERR.puts "       %s" % [$!.backtrace.join("\n       ")]
         exit 1
       end
 
-      PluginManager["#{appname}_application"].run
+      PluginManager["%s_application" % appname].run
     end
 
     def self.load_application(appname)
@@ -39,17 +39,16 @@ module MCollective
       PluginManager.find("application")
     rescue SystemExit
       exit 1
-    rescue Exception => e
-      STDERR.puts "Failed to generate application list: #{e.class}: #{e}"
+    rescue Exception # rubocop:disable Lint/RescueException
+      STDERR.puts("Failed to generate application list: %s: %s" % [$!.class, $!])
       exit 1
     end
 
     # Filters a string of opts out using Shellwords
     # keeping only things related to --config and -c
     def self.filter_extra_options(opts)
-      res = ""
       words = Shellwords.shellwords(opts)
-      words.each_with_index do |word,idx|
+      words.each_with_index do |word, idx|
         if word == "-c"
           return "--config=#{words[idx + 1]}"
         elsif word == "--config"
@@ -61,7 +60,7 @@ module MCollective
         end
       end
 
-      return ""
+      ""
     end
 
     # We need to know the config file in order to know the libdir
@@ -110,8 +109,8 @@ module MCollective
           # am done with it
           ENV["MCOLLECTIVE_EXTRA_OPTS"] = filter_extra_options(ENV["MCOLLECTIVE_EXTRA_OPTS"].clone)
           parser.environment("MCOLLECTIVE_EXTRA_OPTS")
-        rescue Exception => e
-          Log.error("Failed to parse MCOLLECTIVE_EXTRA_OPTS: #{e}")
+        rescue Exception # rubocop:disable Lint/RescueException
+          Log.error("Failed to parse MCOLLECTIVE_EXTRA_OPTS: %s" % $!)
         end
 
         ENV["MCOLLECTIVE_EXTRA_OPTS"] = original_extra_opts.clone
@@ -119,14 +118,14 @@ module MCollective
 
       begin
         parser.parse!
-      rescue OptionParser::InvalidOption => e
+      rescue OptionParser::InvalidOption
         retry
       end
 
       ARGV.clear
       original_argv.each {|a| ARGV << a}
 
-      configfile = Util.config_file_for_user unless configfile
+      configfile ||= Util.config_file_for_user
 
       Config.instance.loadconfig(configfile)
     end

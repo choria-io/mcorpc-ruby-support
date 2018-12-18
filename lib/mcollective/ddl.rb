@@ -85,7 +85,7 @@ module MCollective
         ddl = Cache.write(:ddl, path, klass.new(*args))
       end
 
-      return ddl
+      ddl
     end
 
     # As we're taking arguments on the command line we need a

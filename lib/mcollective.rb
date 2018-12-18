@@ -1,20 +1,20 @@
-require 'rubygems'
-require 'json'
-require 'timeout'
-require 'digest/md5'
-require 'optparse'
-require 'singleton'
-require 'socket'
-require 'erb'
-require 'shellwords'
-require 'stringio'
-require 'rbconfig'
-require 'tempfile'
-require 'tmpdir'
-require 'mcollective/monkey_patches'
-require 'mcollective/cache'
-require 'mcollective/exceptions'
-require 'systemu'
+require "rubygems"
+require "json"
+require "timeout"
+require "digest/md5"
+require "optparse"
+require "singleton"
+require "socket"
+require "erb"
+require "shellwords"
+require "stringio"
+require "rbconfig"
+require "tempfile"
+require "tmpdir"
+require "mcollective/monkey_patches"
+require "mcollective/cache"
+require "mcollective/exceptions"
+require "systemu"
 
 # == The Marionette Collective
 #
@@ -26,7 +26,6 @@ require 'systemu'
 # For an overview of the idea behind this and what it enables please see:
 #   http://www.devco.net/archives/2009/10/18/middleware_for_systems_administration.php
 module MCollective
-
   require "mcollective/agent"
   require "mcollective/agents"
   require "mcollective/aggregate"
@@ -55,7 +54,7 @@ module MCollective
   require "mcollective/util"
   require "mcollective/validator"
 
-  VERSION="2.20.3"
+  VERSION = "2.20.3".freeze
 
   def self.version
     VERSION

@@ -351,8 +351,9 @@ module MCollective
 
       it "should fail if an invalid value is queries" do
         Data.stubs(:ddl_has_output?).with(ddl, "rspec_value").returns(false)
-        DDL.expects(:validation_fail!).with(:PLMC41, "Data plugin '%{functionname}()' does not return a '%{value}' value", :error, {:functionname => "rspec", :value => "rspec_value"})
-        message.validate_compound_filter([statement])
+        expect {
+          message.validate_compound_filter([statement])
+        }.to raise_error(DDLValidationError, "Data plugin 'rspec()' does not return a 'rspec_value' value")
       end
     end
 

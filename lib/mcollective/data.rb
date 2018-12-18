@@ -12,8 +12,8 @@ module MCollective
             Log.debug("Disabling data plugin %s due to plugin activation policy" % plugin)
             PluginManager.delete(plugin)
           end
-        rescue Exception => e
-          Log.debug("Disabling data plugin %s due to exception #{e.class}: #{e}" % plugin)
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          Log.debug("Disabling data plugin %s due to exception %s: %s" % [plugin, e.class, e])
           PluginManager.delete(plugin)
         end
       end
@@ -28,7 +28,7 @@ module MCollective
     end
 
     # Data.package("httpd").architecture
-    def self.method_missing(method, *args)
+    def self.method_missing(method, *args) # rubocop:disable Style/MethodMissing:
       super unless PluginManager.include?(pluginname(method))
 
       PluginManager[pluginname(method)].lookup(args.first)
@@ -76,16 +76,16 @@ module MCollective
         type = ddl.entities[:data][:input][:query][:type]
 
         case type
-          when :boolean
-            return DDL.string_to_boolean(input)
+        when :boolean
+          return DDL.string_to_boolean(input)
 
-          when :number, :integer, :float
-            return DDL.string_to_number(input)
+        when :number, :integer, :float
+          return DDL.string_to_number(input)
         end
-      rescue
+      rescue # rubocop:disable Lint/HandleExceptions
       end
 
-      return input
+      input
     end
   end
 end

@@ -36,7 +36,6 @@ module MCollective
 
       raise("Plugin #{type} already loaded") if @plugins.include?(type)
 
-
       # If we get a string then store 'nil' as the instance, signalling that we'll
       # create the class later on demand.
       if klass.is_a?(String)
@@ -76,7 +75,7 @@ module MCollective
 
       if @plugins[plugin][:single]
         # Create an instance of the class if one hasn't been done before
-        if @plugins[plugin][:instance] == nil
+        if @plugins[plugin][:instance].nil?
           Log.debug("Returning new plugin #{plugin} with class #{klass}")
           @plugins[plugin][:instance] = create_instance(klass)
         else
@@ -92,11 +91,9 @@ module MCollective
 
     # use eval to create an instance of a class
     def self.create_instance(klass)
-      begin
-        eval("#{klass}.new")
-      rescue Exception => e
-        raise("Could not create instance of plugin #{klass}: #{e}")
-      end
+      eval("#{klass}.new") # rubocop:disable Security/Eval
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      raise("Could not create instance of plugin #{klass}: #{e}")
     end
 
     # Finds plugins in all configured libdirs
@@ -114,7 +111,7 @@ module MCollective
     # Will return the same list but only of files with extension .ddl
     # in the agent subdirectory
     def self.find(type, extension="rb")
-      extension = ".#{extension}" unless extension.match(/^\./)
+      extension = ".#{extension}" unless extension =~ /^\./
 
       plugins = []
 
@@ -146,14 +143,14 @@ module MCollective
     #
     # This will load only plugins matching /puppet/
     def self.find_and_load(type, extension="rb")
-      extension = ".#{extension}" unless extension.match(/^\./)
+      extension = ".#{extension}" unless extension =~ /^\./
 
       klasses = find(type, extension).map do |plugin|
         if block_given?
           next unless yield(plugin)
         end
 
-        "%s::%s::%s" % [ "MCollective", type.capitalize, plugin.capitalize ]
+        "%s::%s::%s" % ["MCollective", type.capitalize, plugin.capitalize]
       end.compact
 
       klasses.sort.uniq.each {|klass| loadclass(klass, true)}
@@ -167,7 +164,7 @@ module MCollective
       Log.debug("Loading #{klass} from #{fname}")
 
       load fname
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       Log.error("Failed to load #{klass}: #{e}")
       raise unless squash_failures
     end

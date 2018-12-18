@@ -11,7 +11,7 @@ module MCollective
         Util.expects(:absolute_path?).with("/three").returns(true)
         Util.expects(:absolute_path?).with("four").returns(false)
 
-        File.stubs(:exists?).with("/nonexisting").returns(true)
+        File.stubs(:exist?).with("/nonexisting").returns(true)
 
         ["/one#{File::PATH_SEPARATOR}/two", "/three"].each do |path|
           File.expects(:readlines).with("/nonexisting").returns(["libdir = #{path}"])
@@ -29,7 +29,7 @@ module MCollective
       it 'should prepend $libdir to $LOAD_PATH' do
         Util.expects(:absolute_path?).with('/test').returns(true)
 
-        File.stubs(:exists?).with("/nonexisting").returns(true)
+        File.stubs(:exist?).with("/nonexisting").returns(true)
 
         File.expects(:readlines).with('/nonexisting').returns(['libdir = /test'])
 
@@ -50,7 +50,7 @@ module MCollective
           "//?/c:/foo"
         ].each do |input|
           File.expects(:readlines).with("/nonexisting").returns(["identity = #{input}", "libdir=/nonexistinglib"])
-          File.expects(:exists?).with("/nonexisting").returns(true)
+          File.expects(:exist?).with("/nonexisting").returns(true)
 
           expect {
             Config.instance.loadconfig("/nonexisting")
@@ -59,7 +59,7 @@ module MCollective
       end
 
       it "should strip whitespaces from config keys" do
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         File.expects(:readlines).with("/nonexisting").returns([" identity= your.example.com  ", "libdir=/nonexisting"])
 
         config = Config.instance
@@ -70,7 +70,7 @@ module MCollective
       it "should allow valid identities" do
         ["foo", "foo_bar", "foo-bar", "foo-bar-123", "foo.bar", "foo_bar_123"].each do |input|
           File.expects(:readlines).with("/nonexisting").returns(["identity = #{input}", "libdir=/nonexistinglib"])
-          File.expects(:exists?).with("/nonexisting").returns(true)
+          File.expects(:exist?).with("/nonexisting").returns(true)
           PluginManager.stubs(:loadclass)
           PluginManager.stubs("<<")
 
@@ -80,7 +80,7 @@ module MCollective
 
       it "should set direct_addressing to true by default" do
         File.expects(:readlines).with("/nonexisting").returns(["libdir=/nonexistinglib"])
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
@@ -90,7 +90,7 @@ module MCollective
 
       it "should allow direct_addressing to be disabled in the config file" do
         File.expects(:readlines).with("/nonexisting").returns(["libdir=/nonexistinglib", "direct_addressing=n"])
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
@@ -101,7 +101,7 @@ module MCollective
       it "should not allow the syslog logger type on windows" do
         Util.expects("windows?").returns(true).twice
         File.expects(:readlines).with("/nonexisting").returns(["libdir=/nonexistinglib", "logger_type=syslog"])
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
@@ -110,7 +110,7 @@ module MCollective
 
       it "should support multiple default_discovery_options" do
         File.expects(:readlines).with("/nonexisting").returns(["default_discovery_options = 1", "default_discovery_options = 2", "libdir=/nonexistinglib"])
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
@@ -125,7 +125,7 @@ module MCollective
         ["registerinterval", "max_log_size", "direct_addressing_threshold", "publish_timeout",
          "fact_cache_time", "ttl"].each do |key|
           File.expects(:readlines).with("/nonexisting").returns(["#{key} = nan"])
-          File.expects(:exists?).with("/nonexisting").returns(true)
+          File.expects(:exist?).with("/nonexisting").returns(true)
 
           expect{
             Config.instance.loadconfig("/nonexisting")
@@ -138,7 +138,7 @@ module MCollective
         PluginManager.stubs("<<")
 
         ["topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir"].each do |key|
-          File.expects(:exists?).with("/nonexisting").returns(true)
+          File.expects(:exist?).with("/nonexisting").returns(true)
           File.expects(:readlines).with("/nonexisting").returns(["#{key} = nan", "libdir = /nonexistinglib"])
 
           Log.stubs(:warn)
@@ -149,7 +149,7 @@ module MCollective
 
       it 'should enable agents by default' do
         File.expects(:readlines).with("/nonexisting").returns(["libdir=/nonexistinglib"])
-        File.expects(:exists?).with("/nonexisting").returns(true)
+        File.expects(:exist?).with("/nonexisting").returns(true)
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
@@ -207,9 +207,9 @@ module MCollective
 
         PluginManager.stubs(:loadclass)
 
-        File.stubs(:exists?).returns(true)
+        File.stubs(:exist?).returns(true)
         File.stubs(:directory?).with(@plugindir).returns(true)
-        File.stubs(:exists?).with(servercfg).returns(true)
+        File.stubs(:exist?).with(servercfg).returns(true)
         File.expects(:readlines).with(servercfg).returns(["plugin.rspec.key = default", "libdir=/nonexisting"])
         File.stubs(:directory?).with("/nonexisting").returns(true)
 

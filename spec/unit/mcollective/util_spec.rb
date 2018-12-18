@@ -58,7 +58,7 @@ module MCollective
 
       it "should support regular expression searches" do
         File.stubs(:readlines).returns(["test_class_test"])
-        String.any_instance.expects(:match).with("^/").returns(true)
+        String.any_instance.expects(:start_with?).with("/").returns(true)
         String.any_instance.expects(:match).with(Regexp.new("class")).returns(true)
 
         Util.has_cf_class?("/class/").should == true
@@ -66,7 +66,7 @@ module MCollective
 
       it "should support exact string matches" do
         File.stubs(:readlines).returns(["test_class_test"])
-        String.any_instance.expects(:match).with("^/").returns(false)
+        String.any_instance.expects(:start_with?).with("/").returns(false)
         String.any_instance.expects(:match).with(Regexp.new("test_class_test")).never
 
         Util.has_cf_class?("test_class_test").should == true
@@ -668,13 +668,13 @@ module MCollective
         Config.stubs(:instance).returns(config)
       end
       it "should look for a template in the config dir" do
-        File.stubs(:exists?).with("/rspec/test-help.erb").returns(true)
+        File.stubs(:exist?).with("/rspec/test-help.erb").returns(true)
         Util.templatepath("test-help.erb").should == "/rspec/test-help.erb"
       end
 
       it "should look for a template in the default dir" do
-        File.stubs(:exists?).with("/rspec/test-help.erb").returns(false)
-        File.stubs(:exists?).with("/etc/mcollective/test-help.erb").returns(true)
+        File.stubs(:exist?).with("/rspec/test-help.erb").returns(false)
+        File.stubs(:exist?).with("/etc/mcollective/test-help.erb").returns(true)
         Util.templatepath("test-help.erb").should == "/etc/mcollective/test-help.erb"
 
       end

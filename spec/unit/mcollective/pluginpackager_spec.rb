@@ -101,7 +101,7 @@ module MCollective
     describe "#command_available?" do
       it "should return true if the given build tool is present on the system" do
         File.expects(:join).returns("foo")
-        File.expects(:exists?).with("foo").returns(true)
+        File.expects(:exist?).with("foo").returns(true)
         result = PluginPackager.command_available?("foo")
         result.should == true
       end
