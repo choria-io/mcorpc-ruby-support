@@ -149,13 +149,14 @@ module MCollective
       File.join(Dir::COMMON_APPDATA, "PuppetLabs", "mcollective")
     end
 
-    # Picks a config file defaults to ~/.mcollective
-    # else /etc/mcollective/client.cfg
-    def self.config_file_for_user
-      # the set of acceptable config files
+    def self.choria_windows_prefix
+      require "win32/dir"
+      File.join(Dir::COMMON_APPDATA, "ChoriaIO", "choria")
+    end
+
+    def self.mcollective_config_paths_for_user
       config_paths = []
 
-      # user dotfile
       begin
         # File.expand_path will raise if HOME isn't set, catch it
         user_path = File.expand_path("~/.mcollective")
@@ -163,7 +164,6 @@ module MCollective
       rescue Exception # rubocop:disable Lint/RescueException, Lint/HandleExceptions
       end
 
-      # standard locations
       if windows?
         config_paths << File.join(windows_prefix, "etc", "client.cfg")
       else
@@ -171,21 +171,57 @@ module MCollective
         config_paths << "/etc/mcollective/client.cfg"
       end
 
-      # use the first readable config file, or if none are the first listed
+      config_paths
+    end
+
+    def self.choria_config_paths_for_user
+      config_paths = []
+
+      begin
+        # File.expand_path will raise if HOME isn't set, catch it
+        user_path = File.expand_path("~/.choriarc")
+        config_paths << user_path
+      rescue Exception # rubocop:disable Lint/RescueException, Lint/HandleExceptions
+      end
+
+      if windows?
+        config_paths << File.join(choria_windows_prefix, "etc", "client.conf")
+      else
+        config_paths << "/etc/choria/client.conf"
+      end
+
+      config_paths
+    end
+
+    # Picks the default user config file, pririties are first Choria ones then old MCollective ones
+    #
+    # In roughly this order, first to exist is used:
+    #
+    # - ~/.choriarc
+    # - APPData/ChoriaIO/choria/etc/client.conf on windows
+    # - /etc/choria/client.conf on unix
+    # - ~/.mcollective
+    # - APPData/PuppetLabs/mcollective/etc/client.cfg on windows
+    # - /etc/puppetlabs/mcollective/client.cfg
+    # - /etc/mcollective/client.cfg
+    def self.config_file_for_user
+      config_paths = choria_config_paths_for_user + mcollective_config_paths_for_user
       found = config_paths.find_index { |file| File.readable?(file) } || 0
       config_paths[found]
     end
 
     # Creates a standard options hash
     def self.default_options
-      {:verbose           => false,
-       :disctimeout       => nil,
-       :timeout           => 5,
-       :config            => config_file_for_user,
-       :collective        => nil,
-       :discovery_method  => nil,
-       :discovery_options => Config.instance.default_discovery_options,
-       :filter            => empty_filter}
+      {
+        :verbose           => false,
+        :disctimeout       => nil,
+        :timeout           => 5,
+        :config            => config_file_for_user,
+        :collective        => nil,
+        :discovery_method  => nil,
+        :discovery_options => Config.instance.default_discovery_options,
+        :filter            => empty_filter
+      }
     end
 
     def self.make_subscriptions(agent, type, collective=nil)
@@ -276,12 +312,14 @@ module MCollective
     def self.color(code)
       colorize = Config.instance.color
 
-      colors = {:red => "[31m",
-                :green => "[32m",
-                :yellow => "[33m",
-                :cyan => "[36m",
-                :bold => "[1m",
-                :reset => "[0m"}
+      colors = {
+        :red => "[31m",
+        :green => "[32m",
+        :yellow => "[33m",
+        :cyan => "[36m",
+        :bold => "[1m",
+        :reset => "[0m"
+      }
 
       if colorize
         return colors[code] || ""
