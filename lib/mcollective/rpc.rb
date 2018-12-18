@@ -1,4 +1,4 @@
-require 'pp'
+require "pp"
 
 module MCollective
   # Toolset to create a standard interface of client and agent using
@@ -21,15 +21,13 @@ module MCollective
     def rpcoptions
       oparser = MCollective::Optionparser.new({:verbose => false, :progress_bar => true}, "filter")
 
-      options = oparser.parse do |parser, options|
-        if block_given?
-          yield(parser, options)
-        end
+      options = oparser.parse do |parser, opts|
+        yield(parser, opts) if block_given?
 
-        Helpers.add_simplerpc_options(parser, options)
+        Helpers.add_simplerpc_options(parser, opts)
       end
 
-      return options
+      options
     end
 
     # Wrapper to create clients, supposed to be used as
@@ -57,7 +55,7 @@ module MCollective
     # :exit_on_failure is true by default, and causes the application to
     # exit if there is a failure constructing the RPC client. Set this flag
     # to false to cause an Exception to be raised instead.
-    def rpcclient(agent, flags = {})
+    def rpcclient(agent, flags={})
       configfile = flags[:configfile] || Util.config_file_for_user
       options = flags[:options] || nil
 
@@ -71,12 +69,12 @@ module MCollective
       begin
         if options
           rpc = Client.new(agent, :configfile => options[:config], :options => options)
-          @options = rpc.options
         else
           rpc = Client.new(agent, :configfile => configfile)
-          @options = rpc.options
         end
-      rescue Exception => e
+
+        @options = rpc.options
+      rescue Exception => e # rubocop:disable Lint/RescueException:
         if exit_on_failure
           puts("Could not create RPC client: #{e}")
           exit!
@@ -97,7 +95,7 @@ module MCollective
     # printrpcstats can easily get access to it without
     # users having to pass it around in params.
     def self.stats(stats)
-      @@stats = stats
+      @@stats = stats # rubocop:disable Style/ClassVars
     end
 
     # means for other classes to drop discovered hosts into this module
@@ -105,7 +103,7 @@ module MCollective
     # printrpcstats can easily get access to it without
     # users having to pass it around in params.
     def self.discovered(discovered)
-      @@discovered = discovered
+      @@discovered = discovered # rubocop:disable Style/ClassVars
     end
 
     # Prints stats, requires stats to be saved from elsewhere
@@ -125,7 +123,7 @@ module MCollective
 
       flags = {:summarize => false, :caption => "rpc stats"}.merge(flags)
 
-      verbose = @options[:verbose] rescue verbose = false
+      verbose = !!@options[:verbose]
 
       begin
         stats = @@stats
@@ -143,17 +141,17 @@ module MCollective
     # that produce an error will be printed
     #
     # To get details of each result run with the -v command line option.
-    def printrpc(result, flags = {})
-      verbose = @options[:verbose] rescue verbose = false
+    def printrpc(result, flags={})
+      verbose = !!@options[:verbose]
       verbose = flags[:verbose] || verbose
       flatten = flags[:flatten] || false
       format = @options[:output_format]
       forced_mode = @options[:force_display_mode] || false
 
-      result_text =  Helpers.rpcresults(result, {:verbose => verbose, :flatten => flatten, :format => format, :force_display_mode => forced_mode})
+      result_text = Helpers.rpcresults(result, :verbose => verbose, :flatten => flatten, :format => format, :force_display_mode => forced_mode)
 
       if result.is_a?(Array) && format == :console
-        puts "\n%s\n" % [ result_text ]
+        puts "\n%s\n" % [result_text]
       else
         # when we get just one result to print dont pad them all with
         # blank spaces etc, just print the individual result with no

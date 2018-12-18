@@ -33,7 +33,7 @@ module MCollective
         raise "Custom discovery methods require direct addressing mode" unless Config.instance.direct_addressing
       end
 
-      return method
+      method
     end
 
     def discovery_class
@@ -53,7 +53,7 @@ module MCollective
         @ddl = DDL.new(discovery_method, :discovery)
       end
 
-      return @ddl
+      @ddl
     end
 
     # Agent filters are always present no matter what, so we cant raise an error if the capabilities
@@ -90,7 +90,7 @@ module MCollective
         end
       end
 
-      return false
+      false
     end
 
     # if a compound filter is specified and it has any function
@@ -103,11 +103,11 @@ module MCollective
 
       compound_filter.each do |filter|
         filter.each do |statement|
-          if statement["fstatement"]
-            pluginname = Data.pluginname(statement["fstatement"]["name"])
-            ddl = DDL.new(pluginname, :data)
-            timeout += ddl.meta[:timeout]
-          end
+          next unless statement["fstatement"]
+
+          pluginname = Data.pluginname(statement["fstatement"]["name"])
+          ddl = DDL.new(pluginname, :data)
+          timeout += ddl.meta[:timeout]
         end
       end
 
@@ -115,12 +115,12 @@ module MCollective
     end
 
     def discovery_timeout(timeout, filter)
-      timeout = ddl.meta[:timeout] unless timeout
+      timeout ||= ddl.meta[:timeout]
 
-      unless (filter["compound"] && filter["compound"].empty?)
-        timeout + timeout_for_compound_filter(filter["compound"])
-      else
+      if filter["compound"] && filter["compound"].empty?
         timeout
+      else
+        timeout + timeout_for_compound_filter(filter["compound"])
       end
     end
 
@@ -134,7 +134,7 @@ module MCollective
       discovered = discovery_class.discover(filter, discovery_timeout(timeout, filter), limit, @client)
 
       if limit > 0
-        return discovered[0,limit]
+        return discovered[0, limit]
       else
         return discovered
       end

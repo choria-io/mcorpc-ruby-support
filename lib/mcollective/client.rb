@@ -32,7 +32,7 @@ module MCollective
       # connection_timeout defaults to nil which means it will try forever if
       # not specified
       begin
-        Timeout::timeout(@connection_timeout, ClientTimeoutError) do
+        Timeout.timeout(@connection_timeout, ClientTimeoutError) do
           @connection.connect
         end
       rescue ClientTimeoutError => e
@@ -41,7 +41,8 @@ module MCollective
       end
     end
 
-    @@request_sequence = 0
+    @@request_sequence = 0 # rubocop:disable Style/ClassVars
+
     def self.request_sequence
       @@request_sequence
     end
@@ -64,23 +65,23 @@ module MCollective
 
     # Sends a request and returns the generated request id, doesn't wait for
     # responses and doesn't execute any passed in code blocks for responses
-    def sendreq(msg, agent, filter = {})
+    def sendreq(msg, agent, filter={})
       request = createreq(msg, agent, filter)
       publish(request)
       request.requestid
     end
 
-    def createreq(msg, agent, filter ={})
+    def createreq(msg, agent, filter={})
       if msg.is_a?(Message)
         request = msg
         agent = request.agent
       else
         ttl = @options[:ttl] || @config.ttl
-        request = Message.new(msg, nil, {:agent => agent, :type => :request, :collective => collective, :filter => filter, :ttl => ttl})
+        request = Message.new(msg, nil, :agent => agent, :type => :request, :collective => collective, :filter => filter, :ttl => ttl)
         request.reply_to = @options[:reply_to] if @options[:reply_to]
       end
 
-      @@request_sequence += 1
+      @@request_sequence += 1 # rubocop:disable Style/ClassVars
 
       request.encode!
       subscribe(agent, :reply) unless request.reply_to
@@ -106,13 +107,14 @@ module MCollective
         @subscriptions.delete(agent)
       end
     end
+
     # Blocking call that waits for ever for a message to arrive.
     #
     # If you give it a requestid this means you've previously send a request
     # with that ID and now you just want replies that matches that id, in that
     # case the current connection will just ignore all messages not directed at it
     # and keep waiting for more till it finds a matching message.
-    def receive(requestid = nil)
+    def receive(requestid=nil)
       reply = nil
 
       begin
@@ -145,7 +147,7 @@ module MCollective
     # of the discovery being cancelled soon as it reached the
     # requested limit of hosts
     def discover(filter, timeout, limit=0)
-      @discoverer.discover(filter.merge({'collective' => collective}), timeout, limit)
+      @discoverer.discover(filter.merge("collective" => collective), timeout, limit)
     end
 
     # Send a request, performs the passed block for each response
@@ -178,12 +180,12 @@ module MCollective
         else
           hosts_responded = unthreaded_req(request, publish_timeout, timeout, waitfor, &block)
         end
-      rescue Interrupt => e
+      rescue Interrupt # rubocop:disable Lint/HandleExceptions
       ensure
         unsubscribe(agent, :reply)
       end
 
-      return update_stat(stat, hosts_responded, request.requestid)
+      update_stat(stat, hosts_responded, request.requestid)
     end
 
     # Starts the client receiver and publisher unthreaded.
@@ -198,7 +200,7 @@ module MCollective
     # option is set.
     def threaded_req(request, publish_timeout, timeout, waitfor, &block)
       Log.debug("Starting threaded client")
-      publisher = Thread.new do
+      Thread.new do
         start_publisher(request, publish_timeout)
       end
 
@@ -223,7 +225,7 @@ module MCollective
         Timeout.timeout(publish_timeout) do
           publish(request)
         end
-      rescue Timeout::Error => e
+      rescue Timeout::Error
         Log.warn("Could not publish all messages. Publishing timed out.")
       end
     end
@@ -239,7 +241,7 @@ module MCollective
       Log.debug("Starting response receiver with timeout of #{timeout}")
       hosts_responded = 0
 
-      if (waitfor.is_a?(Array))
+      if waitfor.is_a?(Array)
         unfinished = Hash.new(0)
         waitfor.each {|w| unfinished[w] += 1}
       else
@@ -259,7 +261,7 @@ module MCollective
 
             hosts_responded += 1
 
-            if (waitfor.is_a?(Array))
+            if waitfor.is_a?(Array)
               sender = resp.payload[:senderid]
               if unfinished[sender] <= 1
                 unfinished.delete(sender)
@@ -273,12 +275,12 @@ module MCollective
             end
           end
         end
-      rescue Timeout::Error => e
+      rescue Timeout::Error
         if waitfor.is_a?(Array)
-          if !unfinished.empty?
+          unless unfinished.empty?
             Log.warn("Could not receive all responses. Did not receive responses from #{unfinished.keys.join(', ')}")
           end
-        elsif (waitfor > hosts_responded)
+        elsif waitfor > hosts_responded
           Log.warn("Could not receive all responses. Expected : #{waitfor}. Received : #{hosts_responded}")
         end
       end
@@ -303,7 +305,7 @@ module MCollective
 
     # Prints out the stats returns from req and discovered_req in a nice way
     def display_stats(stats, options=false, caption="stomp call summary")
-      options = @options unless options
+      options ||= @options
 
       if options[:verbose]
         puts("\n---- #{caption} ----")
@@ -319,15 +321,13 @@ module MCollective
         printf("      Agent Time: %.2fms\n", stats[:blocktime] * 1000)
         printf("      Total Time: %.2fms\n", stats[:totaltime] * 1000)
 
+      elsif stats[:discovered]
+        printf("\nFinished processing %d / %d hosts in %.2f ms\n\n", stats[:responses], stats[:discovered], stats[:blocktime] * 1000)
       else
-        if stats[:discovered]
-          printf("\nFinished processing %d / %d hosts in %.2f ms\n\n", stats[:responses], stats[:discovered], stats[:blocktime] * 1000)
-        else
-          printf("\nFinished processing %d hosts in %.2f ms\n\n", stats[:responses], stats[:blocktime] * 1000)
-        end
+        printf("\nFinished processing %d hosts in %.2f ms\n\n", stats[:responses], stats[:blocktime] * 1000)
       end
 
-      if stats[:noresponsefrom].size > 0
+      unless stats[:noresponsefrom].empty?
         puts("\nNo response from:\n")
 
         stats[:noresponsefrom].each do |c|
@@ -338,7 +338,7 @@ module MCollective
         puts
       end
 
-      if stats[:unexpectedresponsefrom].size > 0
+      unless stats[:unexpectedresponsefrom].empty?
         puts("\nUnexpected response from:\n")
 
         stats[:unexpectedresponsefrom].each do |c|

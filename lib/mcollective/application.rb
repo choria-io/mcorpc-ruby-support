@@ -1,4 +1,4 @@
-require 'mcollective/rpc'
+require "mcollective/rpc"
 
 module MCollective
   class Application
@@ -70,9 +70,9 @@ module MCollective
                :arguments => [],
                :type => String,
                :required => false,
-               :validate => Proc.new { true }}
+               :validate => proc { true }}
 
-        arguments.each_pair{|k,v| opt[k] = v}
+        arguments.each_pair {|k, v| opt[k] = v}
 
         self[:cli_arguments] << opt
       end
@@ -93,9 +93,7 @@ module MCollective
     end
 
     # The active options hash used for MC::Client and other configuration
-    def options
-      @options
-    end
+    attr_reader :options
 
     # Calls the supplied block in an option for validation, an error raised
     # will log to STDERR and exit the application
@@ -113,12 +111,10 @@ module MCollective
     def clioptions(help)
       oparser = Optionparser.new({:verbose => false, :progress_bar => true}, "filter", application_options[:exclude_arg_sections])
 
-      options = oparser.parse do |parser, options|
-        if block_given?
-          yield(parser, options)
-        end
+      options = oparser.parse do |parser, opts|
+        yield(parser, opts) if block_given?
 
-        RPC::Helpers.add_simplerpc_options(parser, options) unless application_options[:exclude_arg_sections].include?("rpc")
+        RPC::Helpers.add_simplerpc_options(parser, opts) unless application_options[:exclude_arg_sections].include?("rpc")
       end
 
       return oparser.parser.help if help
@@ -128,8 +124,8 @@ module MCollective
       post_option_parser(configuration) if respond_to?(:post_option_parser)
 
       return options
-    rescue Exception => e
-      application_failure(e)
+    rescue Exception # rubocop:disable Lint/RescueException
+      application_failure($!)
     end
 
     # Builds an ObjectParser config, parse the CLI options and validates based
@@ -137,7 +133,7 @@ module MCollective
     def application_parse_options(help=false)
       @options ||= {:verbose => false}
 
-      @options = clioptions(help) do |parser, options|
+      @options = clioptions(help) do |parser, _options|
         parser.define_head application_description if application_description
         parser.banner = ""
 
@@ -156,16 +152,13 @@ module MCollective
         parser.define_tail ""
         parser.define_tail "The Marionette Collective #{MCollective.version}"
 
-
         application_cli_arguments.each do |carg|
           opts_array = []
 
           opts_array << :on
 
           # if a default is set from the application set it up front
-          if carg.include?(:default)
-            configuration[carg[:name]] = carg[:default]
-          end
+          configuration[carg[:name]] = carg[:default] if carg.include?(:default)
 
           # :arguments are multiple possible ones
           if carg[:arguments].is_a?(Array)
@@ -211,11 +204,10 @@ module MCollective
       validation_passed = true
       application_cli_arguments.each do |carg|
         # Check for required arguments
-        if carg[:required]
-          unless configuration[ carg[:name] ]
-            validation_passed = false
-            STDERR.puts "The #{carg[:name]} option is mandatory"
-          end
+        next unless carg[:required]
+        unless configuration[carg[:name]]
+          validation_passed = false
+          STDERR.puts "The #{carg[:name]} option is mandatory"
         end
       end
 
@@ -223,8 +215,6 @@ module MCollective
         STDERR.puts "\nPlease run with --help for detailed help"
         exit 1
       end
-
-
     end
 
     # Retrieves the full hash of application options
@@ -260,15 +250,15 @@ module MCollective
       end
 
       if options[:verbose]
-        err_dest.puts "\nThe %s application failed to run: %s\n" % [ Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
+        err_dest.puts "\nThe %s application failed to run: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
       else
-        err_dest.puts "\nThe %s application failed to run, use -v for full error backtrace details: %s\n" % [ Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
+        err_dest.puts "\nThe %s application failed to run, use -v for full error backtrace details: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
       end
 
       if options.nil? || options[:verbose]
         e.backtrace.first << Util.colorize(:red, "  <----")
-        err_dest.puts "\n%s %s" % [ Util.colorize(:red, e.to_s), Util.colorize(:bold, "(#{e.class.to_s})")]
-        e.backtrace.each{|l| err_dest.puts "\tfrom #{l}"}
+        err_dest.puts "\n%s %s" % [Util.colorize(:red, e.to_s), Util.colorize(:bold, "(#{e.class})")]
+        e.backtrace.each {|l| err_dest.puts "\tfrom #{l}"}
       end
 
       disconnect
@@ -293,14 +283,13 @@ module MCollective
       main
 
       disconnect
-
-    rescue Exception => e
-      application_failure(e)
+    rescue Exception # rubocop:disable Lint/RescueException
+      application_failure($!)
     end
 
     def disconnect
       MCollective::PluginManager["connector_plugin"].disconnect
-    rescue
+    rescue # rubocop:disable Lint/HandleExceptions
     end
 
     # Fake abstract class that logs if the user tries to use an application without
@@ -316,27 +305,27 @@ module MCollective
                        :okcount => 0,
                        :failcount => 0}.merge(stats.to_hash)
 
-      if (request_stats[:discoverytime] == 0 && request_stats[:responses] == 0)
+      if request_stats[:discoverytime] == 0 && request_stats[:responses] == 0
         return 4
       end
 
-      if (request_stats[:discovered] > 0)
-        if (request_stats[:responses] == 0)
+      if request_stats[:discovered] > 0
+        if request_stats[:responses] == 0
           return 3
-        elsif (request_stats[:failcount] > 0)
+        elsif request_stats[:failcount] > 0
           return 2
         end
       end
 
-      if (request_stats[:discovered] == 0)
-        if (request_stats[:responses] && request_stats[:responses] > 0)
+      if request_stats[:discovered] == 0
+        if request_stats[:responses] && request_stats[:responses] > 0
           return 0
         else
           return 1
         end
       end
 
-      return 0
+      0
     end
 
     # A helper that creates a consistent exit code for applications by looking at an
@@ -355,7 +344,7 @@ module MCollective
     # Wrapper around MC::RPC#rpcclient that forcably supplies our options hash
     # if someone forgets to pass in options in an application the filters and other
     # cli options wouldnt take effect which could have a disasterous outcome
-    def rpcclient(agent, flags = {})
+    def rpcclient(agent, flags={})
       flags[:options] = options unless flags.include?(:options)
       flags[:exit_on_failure] = false
 

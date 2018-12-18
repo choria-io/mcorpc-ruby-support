@@ -1,6 +1,6 @@
-require 'openssl'
-require 'base64'
-require 'digest/sha1'
+require "openssl"
+require "base64"
+require "digest/sha1"
 
 module MCollective
   # A class that assists in encrypting and decrypting data using a
@@ -161,7 +161,7 @@ module MCollective
       cipher.decrypt
       cipher.key = key
       cipher.pkcs5_keyivgen(key)
-      decrypted_data = cipher.update(crypt_string) + cipher.final
+      cipher.update(crypt_string) + cipher.final
     end
 
     # Signs a string using the private key
@@ -195,9 +195,7 @@ module MCollective
     def self.base64_decode(string)
       # The Base 64 character set is A-Z a-z 0-9 + / =
       # Also allow for whitespace, but raise if we get anything else
-      if string !~ /^[A-Za-z0-9+\/=\s]+$/
-        raise ArgumentError, 'invalid base64'
-      end
+      raise(ArgumentError, "invalid base64") if string !~ /^[A-Za-z0-9+\/=\s]+$/
       Base64.decode64(string)
     end
 
@@ -216,9 +214,9 @@ module MCollective
     #    https://github.com/kwilczynski/puppet-functions/blob/master/lib/puppet/parser/functions/uuid.rb
     #
     def self.uuid(string=nil)
-      string ||= OpenSSL::Random.random_bytes(16).unpack('H*').shift
+      string ||= OpenSSL::Random.random_bytes(16).unpack("H*").shift
 
-      uuid_name_space_dns = [0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8].map {|b| b.chr}.join
+      uuid_name_space_dns = [0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8].map(&:chr).join
 
       sha1 = Digest::SHA1.new
       sha1.update(uuid_name_space_dns)
@@ -236,10 +234,10 @@ module MCollective
       bytes[8] |= 0x80
 
       bytes = [4, 2, 2, 2, 6].collect do |i|
-        bytes.slice!(0, i).pack('C*').unpack('H*')
+        bytes.slice!(0, i).pack("C*").unpack("H*")
       end
 
-      bytes.join('-')
+      bytes.join("-")
     end
 
     # Reads either a :public or :private key from disk, uses an
@@ -280,6 +278,5 @@ module MCollective
         raise "Can only load :public or :private keys"
       end
     end
-
   end
 end

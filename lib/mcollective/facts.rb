@@ -19,11 +19,11 @@ module MCollective
   module Facts
     require "mcollective/facts/base"
 
-    @@config = nil
+    @@config = nil # rubocop:disable Style/ClassVars
 
     # True if we know of a specific fact else false
     def self.has_fact?(fact, value)
-      PluginManager["facts_plugin"].get_fact(fact) == value ? true : false
+      PluginManager["facts_plugin"].get_fact(fact) == value
     end
 
     # Get the value of a fact

@@ -60,27 +60,31 @@ module MCollective
 
     # Returns a hash with all stats
     def to_hash
-      stats = {:validated => @validated,
+      stats = {
+        :validated => @validated,
         :unvalidated => @unvalidated,
         :passed => @passed,
         :filtered => @filtered,
         :starttime => @starttime,
         :total => @total,
         :ttlexpired => @ttlexpired,
-        :replies => @replies}
+        :replies => @replies
+      }
 
-      reply = {:stats => stats,
+      reply = {
+        :stats => stats,
         :threads => [],
         :pid => Process.pid,
-        :times => {} }
+        :times => {}
+      }
 
-      ::Process.times.each_pair{|k,v|
+      ::Process.times.each_pair {|k, v|
         k = k.to_sym
         reply[:times][k] = v
       }
 
       Thread.list.each do |t|
-        reply[:threads] << "#{t.inspect}"
+        reply[:threads] << t.inspect.to_s
       end
 
       reply[:agents] = Agents.agentlist

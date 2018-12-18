@@ -46,9 +46,7 @@ module MCollective
 
       # reopen log files
       def reopen
-        if @configured
-          @logger.reopen
-        end
+        @logger.reopen if @configured
       end
 
       # logs a message at a certain level
@@ -67,7 +65,7 @@ module MCollective
       end
 
       # sets the logger class to use
-      def set_logger(logger)
+      def set_logger(logger) # rubocop:disable Naming/AccessorMethodName
         @logger = logger
       end
 
@@ -77,7 +75,10 @@ module MCollective
       # the logger till we eventually get a logging preference from the config
       # module
       def configure(logger=nil)
-        unless logger
+        if logger
+          set_logger(logger)
+          @configured = true
+        else
           logger_type = "console"
 
           config = Config.instance
@@ -92,13 +93,10 @@ module MCollective
           logger_class = MCollective::Logger.const_get("#{logger_type.capitalize}_logger")
 
           set_logger(logger_class.new)
-        else
-          set_logger(logger)
-          @configured = true
         end
 
         @logger.start
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         @configured = false
         STDERR.puts "Could not start logger: #{e.class} #{e}"
       end

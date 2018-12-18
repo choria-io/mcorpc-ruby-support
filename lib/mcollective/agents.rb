@@ -2,11 +2,11 @@ module MCollective
   # A collection of agents, loads them, reloads them and dispatches messages to them.
   # It uses the PluginManager to store, load and manage instances of plugins.
   class Agents
-    def initialize(agents = {})
+    def initialize(agents={})
       @config = Config.instance
-      raise ("Configuration has not been loaded, can't load agents") unless @config.configured
+      raise "Configuration has not been loaded, can't load agents" unless @config.configured
 
-      @@agents = agents
+      @@agents = agents # rubocop:disable Style/ClassVars
 
       loadagents
     end
@@ -18,7 +18,7 @@ module MCollective
         Util.unsubscribe(Util.make_subscriptions(agent, :broadcast))
       end
 
-      @@agents = {}
+      @@agents = {} # rubocop:disable Style/ClassVars
     end
 
     # Loads all agents from disk
@@ -67,9 +67,10 @@ module MCollective
           Log.debug("Not activating agent #{agentname} due to agent policy in activate? method")
           return false
         end
-      rescue Exception => e
-        Log.error("Loading agent #{agentname} failed: #{e}")
-        PluginManager.delete("#{agentname}_agent")
+      rescue Exception # rubocop:disable Lint/RescueException
+        Log.error("Loading agent %s failed: %s" % [agentname, $!])
+        PluginManager.delete("%s_agent" % agentname)
+
         return false
       end
     end
@@ -91,8 +92,8 @@ module MCollective
         Log.debug("#{klass} does not have an activate? method, activating as default")
         return true
       end
-    rescue Exception => e
-      Log.warn("Agent activation check for #{agent} failed: #{e.class}: #{e}")
+    rescue Exception # rubocop:disable Lint/RescueException
+      Log.warn("Agent activation check for %s #{agent} failed: %s: %s" % [agent, $!.class, $!])
       return false
     end
 
@@ -105,7 +106,7 @@ module MCollective
           return agentfile
         end
       end
-      return false
+      false
     end
 
     # Determines if we have an agent with a certain name
@@ -122,20 +123,18 @@ module MCollective
         begin
           agent = PluginManager["#{request.agent}_agent"]
 
-          Timeout::timeout(agent.timeout) do
+          Timeout.timeout(agent.timeout) do
             replies = agent.handlemsg(request.payload, connection)
 
             # Agents can decide if they wish to reply or not,
             # returning nil will mean nothing goes back to the
             # requestor
-            unless replies == nil
-              yield(replies)
-            end
+            yield(replies) unless replies.nil?
           end
-        rescue Timeout::Error => e
-          Log.warn("Timeout while handling message for #{request.agent}")
-        rescue Exception => e
-          Log.error("Execution of #{request.agent} failed: #{e}")
+        rescue Timeout::Error
+          Log.warn("Timeout while handling message for %s" % request.agent)
+        rescue Exception # rubocop:disable Lint/RescueException
+          Log.error("Execution of %s failed: %s" % [request.agent, $!])
           Log.error(e.backtrace.join("\n\t\t"))
         end
       end

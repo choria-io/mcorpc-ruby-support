@@ -23,7 +23,7 @@ module MCollective
       func = func_parts.join
 
       # Deal with dots in function parameters and functions without dot values
-      if func.match(/^.+\(.*\)$/)
+      if func =~ /^.+\(.*\)$/
         f = func
       else
         func_parts = func.split(".")
@@ -55,14 +55,14 @@ module MCollective
         func_quotes = func_hash["params"].split(/('|")/)
 
         func_quotes.each_with_index do |item, i|
-          if item.match(/'|"/)
+          if item =~ /'|"/
             func_quotes.delete_at(i)
             break
           end
         end
 
-        func_quotes.reverse.each_with_index do |item,i|
-          if item.match(/'|"/)
+        func_quotes.reverse.each_with_index do |item, i|
+          if item =~ /'|"/
             func_quotes.delete_at(func_quotes.size - i - 1)
             break
           end
@@ -107,47 +107,43 @@ module MCollective
         return result
       end
     rescue NoMethodError
-      Log.debug("cannot execute discovery function '#{function_hash["name"]}'. data plugin not found")
+      Log.debug("cannot execute discovery function '#{function_hash['name']}'. data plugin not found")
       raise DDLValidationError
     end
 
     # Evaluates a compound statement
     def self.eval_compound_statement(expression)
       if expression.values.first =~ /^\//
-        return Util.has_cf_class?(expression.values.first)
+        Util.has_cf_class?(expression.values.first)
       elsif expression.values.first =~ />=|<=|=|<|>/
         optype = expression.values.first.match(/>=|<=|=|<|>/)
         name, value = expression.values.first.split(optype[0])
-        unless value.split("")[0] == "/"
-          optype[0] == "=" ? optype = "==" : optype = optype[0]
-        else
+        if value.split("")[0] == "/"
           optype = "=~"
+        else
+          optype[0] == "=" ? optype = "==" : optype = optype[0]
         end
 
-        return Util.has_fact?(name,value, optype).to_s
+        Util.has_fact?(name, value, optype).to_s
       else
-        return Util.has_cf_class?(expression.values.first)
+        Util.has_cf_class?(expression.values.first)
       end
     end
 
     # Returns the result of an evaluated compound statement that
     # includes a function
-    def self.eval_compound_fstatement(function_hash)
+    def self.eval_compound_fstatement(function_hash) # rubocop:disable Metrics/MethodLength
       l_compare = execute_function(function_hash)
       r_compare = function_hash["r_compare"]
       operator = function_hash["operator"]
 
       # Break out early and return false if the function returns nil
-      if l_compare.nil?
-        return false
-      end
+      return false if l_compare.nil?
 
       # Prevent unwanted discovery by limiting comparison operators
       # on Strings and Booleans
-      if((l_compare.is_a?(String) || l_compare.is_a?(TrueClass) ||
-          l_compare.is_a?(FalseClass)) && function_hash["operator"].match(/<|>/))
-        Log.debug("Cannot do > and < comparison on Booleans and Strings " +
-                  "'#{l_compare} #{function_hash["operator"]} #{function_hash["r_compare"]}'")
+      if (l_compare.is_a?(String) || l_compare.is_a?(TrueClass) || l_compare.is_a?(FalseClass)) && function_hash["operator"].match(/<|>/)
+        Log.debug("Cannot do > and < comparison on Booleans and Strings '#{l_compare} #{function_hash['operator']} #{function_hash['r_compare']}'")
         return false
       end
 
@@ -158,12 +154,9 @@ module MCollective
       end
 
       # Do a regex comparison if right compare string is a regex
-      if operator=~ /(=~|!=~)/
+      if operator =~ /(=~|!=~)/
         # Fail if left compare value isn't a string
-        unless l_compare.is_a?(String)
-          Log.debug("Cannot do a regex check on a non string value.")
-          return false
-        else
+        if l_compare.is_a?(String)
           result = l_compare.match(r_compare)
           # Flip return value for != operator
           if function_hash["operator"] == "!=~"
@@ -171,6 +164,9 @@ module MCollective
           else
             return !!result
           end
+        else
+          Log.debug("Cannot do a regex check on a non string value.")
+          return false
         end
         # Otherwise do a normal comparison while taking the type into account
       else
@@ -181,21 +177,21 @@ module MCollective
             r_compare = r_compare.strip
             begin
               r_compare = Integer(r_compare)
-            rescue ArgumentError
+            rescue ArgumentError # rubocop:disable Metrics/BlockNesting
               begin
                 r_compare = Float(r_compare)
-              rescue ArgumentError
-                raise ArgumentError, "invalid numeric value: #{r_compare}"
+              rescue ArgumentError # rubocop:disable Metrics/BlockNesting
+                raise(ArgumentError, "invalid numeric value: #{r_compare}")
               end
             end
-          elsif l_compare.is_a? TrueClass or l_compare.is_a? FalseClass
+          elsif l_compare.is_a?(TrueClass) || l_compare.is_a?(FalseClass)
             r_compare = r_compare.strip
-            if r_compare == true.to_s
+            if r_compare == true.to_s # rubocop:disable Metrics/BlockNesting
               r_compare = true
-            elsif r_compare == false.to_s
+            elsif r_compare == false.to_s # rubocop:disable Metrics/BlockNesting
               r_compare = false
             else
-              raise ArgumentError, "invalid boolean value: #{r_compare}"
+              raise(ArgumentError, "invalid boolean value: #{r_compare}")
             end
           end
         end
@@ -203,7 +199,7 @@ module MCollective
         if operator =~ /(?:(!=|<=|>=|<|>)|==?)/
           operator = $1 ? $1.to_sym : :==
         else
-          raise ArgumentError, "invalid operator: #{operator}"
+          raise(ArgumentError, "invalid operator: #{operator}")
         end
         result = l_compare.send(operator, r_compare)
         return result

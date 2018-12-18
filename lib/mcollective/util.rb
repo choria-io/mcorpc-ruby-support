@@ -6,10 +6,10 @@ module MCollective
     # If the passed name starts with a / it's assumed to be regex
     # and will use regex to match
     def self.has_agent?(agent)
-      agent = Regexp.new(agent.gsub("\/", "")) if agent.match("^/")
+      agent = Regexp.new(agent.gsub("\/", "")) if agent.start_with?("/")
 
       if agent.is_a?(Regexp)
-        if Agents.agentlist.grep(agent).size > 0
+        if !Agents.agentlist.grep(agent).empty?
           return true
         else
           return false
@@ -17,8 +17,6 @@ module MCollective
       else
         return Agents.agentlist.include?(agent)
       end
-
-      false
     end
 
     # On windows ^c can't interrupt the VM if its blocking on
@@ -36,7 +34,7 @@ module MCollective
     # If the passed name starts with a / it's assumed to be regex
     # and will use regex to match
     def self.has_cf_class?(klass)
-      klass = Regexp.new(klass.gsub("\/", "")) if klass.match("^/")
+      klass = Regexp.new(klass.gsub("\/", "")) if klass.start_with?("/")
       cfile = Config.instance.classesfile
 
       Log.debug("Looking for configuration management classes in #{cfile}")
@@ -45,11 +43,11 @@ module MCollective
         File.readlines(cfile).each do |k|
           if klass.is_a?(Regexp)
             return true if k.chomp.match(klass)
-          else
-            return true if k.chomp == klass
+          elsif k.chomp == klass
+            return true
           end
         end
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         Log.warn("Parsing classes file '#{cfile}' failed: #{e.class}: #{e}")
       end
 
@@ -67,7 +65,6 @@ module MCollective
     # If the passed value starts with a / it's assumed to be regex
     # and will use regex to match
     def self.has_fact?(fact, value, operator)
-
       Log.debug("Comparing #{fact} #{operator} #{value}")
       Log.debug("where :fact = '#{fact}', :operator = '#{operator}', :value = '#{value}'")
 
@@ -86,30 +83,28 @@ module MCollective
     end
 
     def self.test_fact_value(fact, value, operator)
-      if operator == '=~'
+      if operator == "=~"
         # to maintain backward compat we send the value
         # as /.../ which is what 1.0.x needed.  this strips
         # off the /'s which is what we need here
-        if value =~ /^\/(.+)\/$/
-          value = $1
-        end
+        value = $1 if value =~ /^\/(.+)\/$/
 
         return true if fact.match(Regexp.new(value))
 
       elsif operator == "=="
         return true if fact == value
 
-      elsif ['<=', '>=', '<', '>', '!='].include?(operator)
+      elsif ["<=", ">=", "<", ">", "!="].include?(operator)
         # Yuk - need to type cast, but to_i and to_f are overzealous
         if value =~ /^[0-9]+$/ && fact =~ /^[0-9]+$/
-          fact = Integer(fact)
-          value = Integer(value)
+          fact = Integer(fact) # rubocop:disable Lint/UselessAssignment
+          value = Integer(value) # rubocop:disable Lint/UselessAssignment
         elsif value =~ /^[0-9]+.[0-9]+$/ && fact =~ /^[0-9]+.[0-9]+$/
-          fact = Float(fact)
-          value = Float(value)
+          fact = Float(fact) # rubocop:disable Lint/UselessAssignment
+          value = Float(value) # rubocop:disable Lint/UselessAssignment
         end
 
-        return true if eval("fact #{operator} value")
+        return true if eval("fact #{operator} value") # rubocop:disable Security/Eval
       end
 
       false
@@ -121,12 +116,12 @@ module MCollective
     # If the passed name starts with a / it's assumed to be regex
     # and will use regex to match
     def self.has_identity?(identity)
-      identity = Regexp.new(identity.gsub("\/", "")) if identity.match("^/")
+      identity = Regexp.new(identity.gsub("\/", "")) if identity.start_with?("/")
 
       if identity.is_a?(Regexp)
         return Config.instance.identity.match(identity)
-      else
-        return true if Config.instance.identity == identity
+      elsif Config.instance.identity == identity
+        return true
       end
 
       false
@@ -139,17 +134,19 @@ module MCollective
 
     # Creates an empty filter
     def self.empty_filter
-      {"fact"     => [],
-       "cf_class" => [],
-       "agent"    => [],
-       "identity" => [],
-       "compound" => []}
+      {
+        "fact"     => [],
+        "cf_class" => [],
+        "agent"    => [],
+        "identity" => [],
+        "compound" => []
+      }
     end
 
     # Returns the PuppetLabs mcollective path for windows
     def self.windows_prefix
-      require 'win32/dir'
-      prefix = File.join(Dir::COMMON_APPDATA, "PuppetLabs", "mcollective")
+      require "win32/dir"
+      File.join(Dir::COMMON_APPDATA, "PuppetLabs", "mcollective")
     end
 
     # Picks a config file defaults to ~/.mcollective
@@ -163,20 +160,20 @@ module MCollective
         # File.expand_path will raise if HOME isn't set, catch it
         user_path = File.expand_path("~/.mcollective")
         config_paths << user_path
-      rescue Exception
+      rescue Exception # rubocop:disable Lint/RescueException, Lint/HandleExceptions
       end
 
       # standard locations
-      if self.windows?
-        config_paths << File.join(self.windows_prefix, 'etc', 'client.cfg')
+      if windows?
+        config_paths << File.join(windows_prefix, "etc", "client.cfg")
       else
-        config_paths << '/etc/puppetlabs/mcollective/client.cfg'
-        config_paths << '/etc/mcollective/client.cfg'
+        config_paths << "/etc/puppetlabs/mcollective/client.cfg"
+        config_paths << "/etc/mcollective/client.cfg"
       end
 
       # use the first readable config file, or if none are the first listed
       found = config_paths.find_index { |file| File.readable?(file) } || 0
-      return config_paths[found]
+      config_paths[found]
     end
 
     # Creates a standard options hash
@@ -237,15 +234,15 @@ module MCollective
     # Parse a fact filter string like foo=bar into the tuple hash thats needed
     def self.parse_fact_string(fact)
       if fact =~ /^([^ ]+?)[ ]*=>[ ]*(.+)/
-        return {:fact => $1, :value => $2, :operator => '>=' }
+        {:fact => $1, :value => $2, :operator => ">="}
       elsif fact =~ /^([^ ]+?)[ ]*=<[ ]*(.+)/
-        return {:fact => $1, :value => $2, :operator => '<=' }
+        {:fact => $1, :value => $2, :operator => "<="}
       elsif fact =~ /^([^ ]+?)[ ]*(<=|>=|<|>|!=|==|=~)[ ]*(.+)/
-        return {:fact => $1, :value => $3, :operator => $2 }
+        {:fact => $1, :value => $3, :operator => $2}
       elsif fact =~ /^(.+?)[ ]*=[ ]*\/(.+)\/$/
-        return {:fact => $1, :value => "/#{$2}/", :operator => '=~' }
+        {:fact => $1, :value => "/#{$2}/", :operator => "=~"}
       elsif fact =~ /^([^= ]+?)[ ]*=[ ]*(.+)/
-        return {:fact => $1, :value => $2, :operator => '==' }
+        {:fact => $1, :value => $2, :operator => "=="}
       else
         raise "Could not parse fact #{fact} it does not appear to be in a valid format"
       end
@@ -267,11 +264,11 @@ module MCollective
       # combo is regarded as line continuation and simply ignored.
       str.gsub!(/\n/, "'\n'")
 
-      return str
+      str
     end
 
     def self.windows?
-      !!(RbConfig::CONFIG['host_os'] =~ /mswin|win32|dos|mingw|cygwin/i)
+      !!(RbConfig::CONFIG["host_os"] =~ /mswin|win32|dos|mingw|cygwin/i)
     end
 
     # Return color codes, if the config color= option is false
@@ -295,7 +292,7 @@ module MCollective
 
     # Helper to return a string in specific color
     def self.colorize(code, msg)
-      "%s%s%s" % [ color(code), msg, color(:reset) ]
+      "%s%s%s" % [color(code), msg, color(:reset)]
     end
 
     # Returns the current ruby version as per RUBY_VERSION, mostly
@@ -316,7 +313,7 @@ module MCollective
     # The terminal size is detected by default, but custom line widths can
     # passed. All strings will also be left aligned with 5 whitespace characters
     # by default.
-    def self.align_text(text, console_cols = nil, preamble = 5)
+    def self.align_text(text, console_cols=nil, preamble=5)
       unless console_cols
         console_cols = terminal_dimensions[0]
 
@@ -334,40 +331,36 @@ module MCollective
       console_cols = 80 if console_cols <= 0
 
       text = text.split("\n")
-      piece = ''
+      piece = ""
       whitespace = 0
 
       text.each_with_index do |line, i|
         whitespace = 0
 
-        while whitespace < line.length && line[whitespace].chr == ' '
+        while whitespace < line.length && line[whitespace].chr == " "
           whitespace += 1
         end
 
         # If the current line is empty, indent it so that a snippet
         # from the previous line is aligned correctly.
-        if line == ""
-          line = (" " * whitespace)
-        end
+        line = (" " * whitespace) if line == ""
 
         # If text was snipped from the previous line, prepend it to the
         # current line after any current indentation.
-        if piece != ''
+        if piece != ""
           # Reset whitespaces to 0 if there are more whitespaces than there are
           # console columns
           whitespace = 0 if whitespace >= console_cols
 
           # If the current line is empty and being prepended to, create a new
           # empty line in the text so that formatting is preserved.
-          if text[i + 1] && line == (" " * whitespace)
-            text.insert(i + 1, "")
-          end
+          text.insert(i + 1, "") if text[i + 1] && line == (" " * whitespace)
 
           # Add the snipped text to the current line
           line.insert(whitespace, "#{piece} ")
         end
 
-        piece = ''
+        piece = ""
 
         # Compare the line length to the allowed line length.
         # If it exceeds it, snip the offending text from the line
@@ -375,9 +368,7 @@ module MCollective
         if line.length > (console_cols + preamble)
           reverse = console_cols
 
-          while line[reverse].chr != ' '
-            reverse -= 1
-          end
+          reverse -= 1 while line[reverse].chr != " "
 
           piece = line.slice!(reverse, (line.length - 1)).lstrip
         end
@@ -385,13 +376,13 @@ module MCollective
         # If a snippet exists when all the columns in the text have been
         # updated, create a new line and append the snippet to it, using
         # the same left alignment as the last line in the text.
-        if piece != '' && text[i+1].nil?
-          text[i+1] = "#{' ' * (whitespace)}#{piece}"
-          piece = ''
+        if piece != "" && text[i + 1].nil?
+          text[i + 1] = "#{' ' * whitespace}#{piece}"
+          piece = ""
         end
 
         # Add the preamble to the line and add it to the text
-        line = ((' ' * preamble) + line)
+        line = ((" " * preamble) + line)
         text[i] = line
       end
 
@@ -402,7 +393,7 @@ module MCollective
     #
     # Returns [0, 0] if it can't figure it out or if you're
     # not running on a tty
-    def self.terminal_dimensions(stdout = STDOUT, environment = ENV)
+    def self.terminal_dimensions(stdout=STDOUT, environment=ENV)
       return [0, 0] unless stdout.tty?
 
       return [80, 40] if Util.windows?
@@ -413,8 +404,8 @@ module MCollective
       elsif environment["TERM"] && command_in_path?("tput")
         return [`tput cols`.to_i, `tput lines`.to_i]
 
-      elsif command_in_path?('stty')
-        return `stty size`.scan(/\d+/).map {|s| s.to_i }
+      elsif command_in_path?("stty")
+        return `stty size`.scan(/\d+/).map(&:to_i)
       else
         return [0, 0]
       end
@@ -444,28 +435,26 @@ module MCollective
       ax = version_a.scan(vre)
       bx = version_b.scan(vre)
 
-      while (ax.length>0 && bx.length>0)
+      while !ax.empty? && !bx.empty?
         a = ax.shift
         b = bx.shift
 
-        if( a == b )                 then next
-        elsif (a == '-' && b == '-') then next
-        elsif (a == '-')             then return -1
-        elsif (b == '-')             then return 1
-        elsif (a == '.' && b == '.') then next
-        elsif (a == '.' )            then return -1
-        elsif (b == '.' )            then return 1
-        elsif (a =~ /^\d+$/ && b =~ /^\d+$/) then
-          if( a =~ /^0/ or b =~ /^0/ ) then
-            return a.to_s.upcase <=> b.to_s.upcase
-          end
+        if a == b then next
+        elsif a == "-" && b == "-" then next
+        elsif a == "-"             then return -1
+        elsif b == "-"             then return 1
+        elsif a == "." && b == "." then next
+        elsif a == "."            then return -1
+        elsif b == "."            then return 1
+        elsif a =~ /^\d+$/ && b =~ /^\d+$/
+          return a.to_s.upcase <=> b.to_s.upcase if a =~ /^0/ || b =~ /^0/
           return a.to_i <=> b.to_i
         else
           return a.upcase <=> b.upcase
         end
       end
 
-      version_a <=> version_b;
+      version_a <=> version_b
     end
 
     # we should really use Pathname#absolute? but it's not in all the
@@ -486,7 +475,7 @@ module MCollective
     def self.str_to_bool(val)
       clean_val = val.to_s.strip
       if clean_val =~ /^(1|yes|true|y|t)$/i
-        return  true
+        return true
       elsif clean_val =~ /^(0|no|false|n|f)$/i
         return false
       else
@@ -498,10 +487,10 @@ module MCollective
     def self.templatepath(template_file)
       config_dir = File.dirname(Config.instance.configfile)
       template_path = File.join(config_dir, template_file)
-      return template_path if File.exists?(template_path)
+      return template_path if File.exist?(template_path)
 
       template_path = File.join("/etc/mcollective", template_file)
-      return template_path
+      template_path
     end
 
     # subscribe to the direct addressing queue
@@ -511,68 +500,66 @@ module MCollective
 
     # Get field size for printing
     def self.field_size(elements, min_size=40)
-      max_length = elements.max_by { |e| e.length }.length
+      max_length = elements.max_by(&:length).length
       max_length > min_size ? max_length : min_size
     end
 
     # Calculate number of fields for printing
     def self.field_number(field_size, max_size=90)
-      number = (max_size/field_size).to_i
-      (number == 0) ? 1 : number
+      number = (max_size / field_size).to_i
+      number == 0 ? 1 : number
     end
-    
-    def self.get_hidden_input_on_windows()
-      require 'Win32API'
+
+    def self.get_hidden_input_on_windows # rubocop:disable Naming/AccessorMethodName
+      require "Win32API"
+
       # Hook into getch from crtdll. Keep reading all keys till return
       # or newline is hit.
       # If key is backspace or delete, then delete the character and update
       # the buffer.
-      input = ''
-      while char = Win32API.new("crtdll", "_getch", [ ], "I").Call do
-        break if char == 10 || char == 13 # return or newline
-        if char == 127 || char == 8 # backspace and delete
-          if input.length > 0
-            input.slice!(-1, 1)
-          end
+      input = ""
+
+      while char = Win32API.new("crtdll", "_getch", [], "I").Call
+        break if [10, 13].include?(char) # return or newline
+        if [127, 8].include?(char) # backspace and delete
+          input.slice!(-1, 1) unless input.empty?
         else
           input << char.chr
         end
       end
-      char = ''
+
       input
     end
 
-    def self.get_hidden_input_on_unix()
+    def self.get_hidden_input_on_unix # rubocop:disable Naming/AccessorMethodName
       unless $stdin.tty?
-        raise 'Could not hook to stdin to hide input. If using SSH, try using -t flag while connecting to server.'
+        raise "Could not hook to stdin to hide input. If using SSH, try using -t flag while connecting to server."
       end
-      unless system 'stty -echo -icanon'
-        raise 'Could not hide input using stty command.'
+      unless system "stty -echo -icanon"
+        raise "Could not hide input using stty command."
       end
       input = $stdin.gets
-      ensure
-        unless system 'stty echo icanon'
-          raise 'Could not enable echoing of input. Try executing `stty echo icanon` to debug.'
-        end
+    ensure
+      unless system "stty echo icanon"
+        raise "Could not enable echoing of input. Try executing `stty echo icanon` to debug."
+      end
       input
     end
 
-    def self.get_hidden_input(message='Please enter data: ')
-      unless message.nil?
-        print message
-      end
-      if versioncmp(ruby_version, '1.9.3') >= 0
-        require 'io/console'
+    def self.get_hidden_input(message="Please enter data: ")
+      print message unless message.nil?
+
+      if versioncmp(ruby_version, "1.9.3") >= 0
+        require "io/console"
         input = $stdin.noecho(&:gets)
+      elsif windows? # Use hacks to get hidden input on Ruby <1.9.3
+        input = get_hidden_input_on_windows
       else
-        # Use hacks to get hidden input on Ruby <1.9.3
-        if self.windows?
-          input = self.get_hidden_input_on_windows()
-        else
-          input = self.get_hidden_input_on_unix()
-        end
+        input = get_hidden_input_on_unix
       end
+
       input.chomp! if input
+
       input
     end
   end
