@@ -193,25 +193,64 @@ module MCollective
       end
     end
 
-    describe '#config_file_for_user' do
-      before :each do
-        File.stubs(:expand_path).raises
-        File.stubs(:readable?).returns(false)
+    describe "#mcollective_config_paths_for_user" do
+      it "should support unix" do
         Util.stubs(:windows?).returns(false)
+
+        expect(Util.mcollective_config_paths_for_user).to eq([
+          File.expand_path("~/.mcollective"),
+          "/etc/puppetlabs/mcollective/client.cfg",
+          "/etc/mcollective/client.cfg"
+        ])
       end
 
-      it 'should default to /etc/puppetlabs/mcollective/client.cfg if ~/.mcollective can not be expanded' do
-        Util.config_file_for_user.should == '/etc/puppetlabs/mcollective/client.cfg'
+      if Util.windows?
+        it "should support windows" do
+          Util.stubs(:windows?).returns(true)
+          Util.stubs(:choria_windows_prefix).returns("C:/temp")
+
+          expect(Util.choria_config_paths_for_user).to eq([
+            File.expand_path("~/.mcollective"),
+            File.join("c:/temp", "etc", "client.cfg")
+          ])
+        end
+      end
+    end
+
+    describe "#choria_config_paths_for_user" do
+      it "should support unix" do
+        Util.stubs(:windows?).returns(false)
+
+        expect(Util.choria_config_paths_for_user).to eq([
+          File.expand_path("~/.choriarc"),
+          "/etc/choria/client.conf"
+        ])
       end
 
-      it 'should default to ~/.mcollective if it can be expanded' do
-        File.expects(:expand_path).with('~/.mcollective').returns('/home/mco/.mcollective')
-        Util.config_file_for_user.should == '/home/mco/.mcollective'
-      end
+      if Util.windows?
+        it "should support windows" do
+          Util.stubs(:windows?).returns(true)
+          Util.stubs(:choria_windows_prefix).returns("C:/temp")
 
-      it 'should choose /etc/mcollective/client.cfg if it is readable' do
-        File.expects(:readable?).with('/etc/mcollective/client.cfg').returns(true)
-        Util.config_file_for_user.should == '/etc/mcollective/client.cfg'
+          expect(Util.choria_config_paths_for_user).to eq([
+            File.expand_path("~/.choriarc"),
+            File.join("c:/temp", "etc", "client.conf")
+          ])
+        end
+      end
+    end
+
+    describe '#config_file_for_user' do
+      it "should pick the first path that exist" do
+        Util.expects(:choria_config_paths_for_user).returns(["choria1", "choria2"])
+        Util.expects(:mcollective_config_paths_for_user).returns(["mcollective1", "mcollective2"])
+
+        File.expects(:readable?).with("choria1").returns(false)
+        File.expects(:readable?).with("choria2").returns(false)
+        File.expects(:readable?).with("mcollective1").returns(false)
+        File.expects(:readable?).with("mcollective2").returns(true)
+
+        expect(Util.config_file_for_user).to eq("mcollective2")
       end
     end
 
