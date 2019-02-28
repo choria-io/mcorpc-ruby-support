@@ -36,8 +36,9 @@ class MCollective::Application::Facts<MCollective::Application
 
     rpcutil.get_fact(:fact => configuration[:fact]) do |resp|
       begin
-        value = resp[:body][:data][:value]
-        if value
+        value = resp[:body][:data][:value].to_s
+
+        if resp[:body][:data].include?(:value)
           if facts.include?(value)
             facts[value] << resp[:senderid]
           else
