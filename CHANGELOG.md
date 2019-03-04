@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/03/04|      |Release 2.20.5                                                                                           |
+|2019/02/28|22    |Fix fact summaries for complex data types                                                                |
 |2018/11/30|      |Release 2.20.4                                                                                           |
 |2018/12/18|19    |Support ~/.choriarc and /etc/choria/client.conf                                                          |
 |2018/11/30|      |Release 2.20.3                                                                                           |
