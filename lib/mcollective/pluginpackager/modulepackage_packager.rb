@@ -22,6 +22,7 @@ module MCollective
 
           @tmpdir = Dir.mktmpdir('mcollective_packager')
           make_module
+          generate_agent_json_ddls
           run_build
           move_package
 
@@ -37,6 +38,36 @@ module MCollective
       end
 
       private
+
+      def generate_agent_json_ddls
+        agent_dir = File.expand_path(File.join(@tmpdir, "files", "mcollective", "agent"))
+
+        if File.directory?(agent_dir)
+          Dir.glob(File.join(agent_dir, "*.ddl")) do |file|
+            agent_name = File.basename(file, ".ddl")
+            json_file = File.join(agent_dir, "%s.json" % agent_name)
+
+            ddl = DDL.new(agent_name, :agent, false)
+            ddl.instance_eval(File.read(file))
+
+            data = {
+                "$schema" => "https://choria.io/schemas/mcorpc/ddl/v1/agent.json",
+                "metadata" => ddl.meta,
+                "actions" => [],
+            }
+
+            ddl.actions.sort.each do |action|
+              data["actions"] << ddl.action_interface(action)
+            end
+
+            File.open(json_file, "w") do |jddl|
+              jddl.print(JSON.pretty_generate(data))
+            end
+
+            @plugin.packagedata[:common][:files] << "agent/%s.json" % agent_name
+          end
+        end
+      end
 
       def assert_new_enough_puppet
         unless PluginPackager.command_available?('puppet')
