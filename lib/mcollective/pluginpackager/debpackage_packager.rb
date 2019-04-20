@@ -35,6 +35,8 @@ module MCollective
           @build_dir = File.join(@tmpdir, "#{@package_name}_#{@plugin.metadata[:version]}")
           Dir.mkdir(@build_dir)
 
+          PluginPackager.generate_agent_json_ddls(@plugin, File.join(@build_dir, @libdir))
+
           create_debian_dir
           @plugin.packagedata.each do |type, data|
             prepare_tmpdirs(data)

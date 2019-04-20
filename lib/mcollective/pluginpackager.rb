@@ -1,5 +1,8 @@
 module MCollective
   module PluginPackager
+
+    class GenerateJsonDirNotFoundError < EncodingError
+    end
     # Plugin definition classes
     require "mcollective/pluginpackager/agent_definition"
     require "mcollective/pluginpackager/standard_definition"
@@ -11,6 +14,39 @@ module MCollective
 
     def self.[](klass)
       const_get(klass.to_s)
+    end
+
+    def self.generate_agent_json_ddls(plugin, tmpdir)
+      agent_dir = File.expand_path(File.join(tmpdir, "agent"))
+
+      if File.directory?(agent_dir)
+        Dir.glob(File.join(agent_dir, "*.ddl")) do |file|
+          agent_name = File.basename(file, ".ddl")
+          json_file = File.join(agent_dir, "%s.json" % agent_name)
+
+          ddl = DDL.new(agent_name, :agent, false)
+          ddl.instance_eval(File.read(file))
+
+          data = {
+              "$schema" => "https://choria.io/schemas/mcorpc/ddl/v1/agent.json",
+              "metadata" => ddl.meta,
+              "actions" => [],
+          }
+
+          ddl.actions.sort.each do |action|
+            data["actions"] << ddl.action_interface(action)
+          end
+
+          File.open(json_file, "w") do |jddl|
+            jddl.print(JSON.pretty_generate(data))
+          end
+
+          plugin.packagedata[:common][:files] << "agent/%s.json" % agent_name
+        end
+      # else
+      #  raise(GenerateJsonDirNotFoundError) # Need to Mock this out
+      end
+
     end
 
     # Fetch and return metadata from plugin DDL

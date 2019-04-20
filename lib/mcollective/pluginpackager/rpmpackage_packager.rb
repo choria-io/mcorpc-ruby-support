@@ -50,7 +50,10 @@ module MCollective
           puts "Building packages for #{@package_name} plugin."
 
           @tmpdir = Dir.mktmpdir('mcollective_packager')
+
           prepare_tmpdirs
+
+          PluginPackager.generate_agent_json_ddls(@plugin, File.join(@tmpdir, @package_name_and_version, @libdir))
 
           make_spec_file
           run_build

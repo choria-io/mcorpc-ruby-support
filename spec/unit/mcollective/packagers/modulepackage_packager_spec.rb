@@ -63,6 +63,7 @@ module MCollective
         it 'should run through the complete build process' do
           Dir.expects(:mktmpdir).with('mcollective_packager').returns('rspec_tmp')
           @packager.expects(:make_module)
+          @packager.expects(:generate_agent_json_ddls)
           @packager.expects(:run_build)
           @packager.expects(:move_package)
           @packager.expects(:cleanup_tmpdirs)

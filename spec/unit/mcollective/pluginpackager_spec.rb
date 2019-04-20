@@ -151,5 +151,6 @@ module MCollective
                           {:name => 'rspec_debian', :version => '2.0'}]
       end
     end
+
   end
 end
