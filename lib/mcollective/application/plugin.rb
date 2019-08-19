@@ -213,7 +213,7 @@ mco plugin package [options] <directory>
     def load_plugin_ddl(plugin, type)
       [plugin, "#{plugin}_#{type}"].each do |p|
         ddl = DDL.new(p, type, false)
-        if ddl.findddlfile(p, type)
+        if ddl.client_activated? && ddl.findddlfile(p, type)
           ddl.loadddlfile
           return ddl
         end
@@ -224,9 +224,14 @@ mco plugin package [options] <directory>
 
     # Show application list and plugin help
     def doc_command
-      known_plugin_types = [["Agents", :agent], ["Aggregate", :aggregate],
-                            ["Connectors", :connector], ["Data Queries", :data],
-                            ["Discovery Methods", :discovery], ["Validator Plugins", :validator]]
+      known_plugin_types = [
+        ["Agents", :agent],
+        ["Aggregate", :aggregate],
+        ["Connectors", :connector],
+        ["Data Queries", :data],
+        ["Discovery Methods", :discovery],
+        ["Validator Plugins", :validator]
+      ]
 
       if configuration.include?(:target) && configuration[:target] != "."
         if configuration[:target] =~ /^(.+?)\/(.+)$/
@@ -265,7 +270,11 @@ mco plugin package [options] <directory>
 
           PluginManager.find(plugin_type[1], "ddl").each do |ddl|
             begin
-              help = DDL.new(ddl, plugin_type[1])
+              help = DDL.new(ddl, plugin_type[1], false)
+
+              next unless help.client_activated?
+
+              help.loadddlfile
               pluginname = ddl.gsub(/_#{plugin_type[1]}$/, "")
               puts "  %-25s %s" % [pluginname, help.meta[:description]]
             rescue => e

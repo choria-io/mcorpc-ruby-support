@@ -44,6 +44,10 @@ module MCollective
         super
       end
 
+      def client_activated?
+        Util.str_to_bool(@config.pluginconf.fetch("%s.activate_client" % @pluginname, ACTIVATION_DEFAULT.to_s))
+      end
+
       def input(argument, properties)
         raise "Input needs a :optional property" unless properties.include?(:optional)
 
