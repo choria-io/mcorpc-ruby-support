@@ -19,6 +19,8 @@ module MCollective
     class Base
       attr_reader :meta, :entities, :pluginname, :plugintype, :usage, :requirements
 
+      ACTIVATION_DEFAULT = true
+
       def initialize(plugin, plugintype=:agent, loadddl=true)
         @entities = {}
         @meta = {}
@@ -77,6 +79,10 @@ module MCollective
       end
 
       def loadddlfile
+        if @config.mode == :client && !client_activated?
+          raise("%s/%s is disabled, cannot load DDL file" % [@plugintype, @pluginname])
+        end
+
         if ddlfile = findddlfile
           instance_eval(File.read(ddlfile), ddlfile, 1)
         else
@@ -95,7 +101,12 @@ module MCollective
             return ddlfile
           end
         end
-        return false
+
+        false
+      end
+
+      def client_activated?
+        ACTIVATION_DEFAULT
       end
 
       def validate_requirements
