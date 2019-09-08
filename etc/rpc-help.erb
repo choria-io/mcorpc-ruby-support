@@ -39,6 +39,9 @@ ACTIONS:
 %        if entities[action][:output][output][:default]
             Default Value: <%= entities[action][:output][output][:default] %>
 %        end
+%        if entities[action][:output][output][:type]
+                     Type: <%= entities[action][:output][output][:type] %>
+%        end
 
 %    end
 % end
