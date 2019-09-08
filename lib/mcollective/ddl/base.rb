@@ -197,6 +197,8 @@ module MCollective
         @entities[action][:output][argument] = {:description => properties[:description],
                                                 :display_as  => properties[:display_as],
                                                 :default     => properties[:default]}
+
+        @entities[action][:output][argument][:type] = properties[:type] if properties[:type]
       end
 
       def requires(requirement)
