@@ -298,7 +298,7 @@ mco plugin package [options] <directory>
     # Creates the correct package plugin object.
     def prepare_plugin
       plugintype = set_plugin_type unless configuration[:plugintype]
-      configuration[:format] = "ospackage" unless configuration[:format]
+      configuration[:format] = "forge" unless configuration[:format]
       PluginPackager.load_packagers
       plugin_class = PluginPackager[configuration[:plugintype]]
 
@@ -308,7 +308,10 @@ mco plugin package [options] <directory>
         configuration[:dependency].map!{|dep| {:name => dep, :version => nil}}
       end
 
-      mcdependency = {:mcname => configuration[:mcname], :mcversion => configuration[:mcversion]}
+      mcdependency = {
+        :mcname => configuration[:mcname],
+        :mcversion => configuration[:mcversion]
+      }
 
       # Deprecation warning for --iteration
       if configuration[:iteration]
