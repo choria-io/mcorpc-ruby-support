@@ -12,7 +12,7 @@ module MCollective
         @revision = configuration[:revision] || 1
         @preinstall = configuration[:preinstall]
         @postinstall = configuration[:postinstall]
-        @vendor = configuration[:vendor] || "Puppet Labs"
+        @vendor = configuration[:vendor] || "Choria.IO User"
         @dependencies = configuration[:dependency] || []
         @target_path = File.expand_path(@path)
         @metadata, mcversion = PluginPackager.get_metadata(@path, "agent")
@@ -36,9 +36,11 @@ module MCollective
 
       # Obtain Agent package files and dependencies.
       def agent
-        agent = {:files => [],
-                 :dependencies => @dependencies.clone,
-                 :description => "Agent plugin for #{@metadata[:name]}"}
+        agent = {
+          :files => [],
+          :dependencies => @dependencies.clone,
+          :description => "Agent plugin for #{@metadata[:name]}"
+        }
 
         agentdir = File.join(@path, "agent")
 
@@ -69,9 +71,11 @@ module MCollective
 
       # Obtain common package files and dependencies.
       def common
-        common = {:files =>[],
-                  :dependencies => @dependencies.clone,
-                  :description => "Common libraries for #{@metadata[:name]}"}
+        common = {
+          :files =>[],
+          :dependencies => @dependencies.clone,
+          :description => "Common libraries for #{@metadata[:name]}"
+        }
 
         datadir = File.join(@path, "data", "**")
         utildir = File.join(@path, "util", "**", "**")
