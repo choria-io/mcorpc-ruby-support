@@ -1,5 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/09/19|      |Release 2.20.6                                                                                           |
+|2019/09/18|30    |Move the aiomodule package into this module, retire others                                               |
+|2019/09/08|34    |Add support for type in outputs                                                                          |
+|2019/08/19|31    |Check client_activated property when loading DDLs                                                        |
 |2019/03/04|      |Release 2.20.5                                                                                           |
 |2019/02/28|22    |Fix fact summaries for complex data types                                                                |
 |2018/11/30|      |Release 2.20.4                                                                                           |
