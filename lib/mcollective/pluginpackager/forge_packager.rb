@@ -142,6 +142,11 @@ module MCollective
             agent_name = File.basename(file, ".ddl")
             json_file = File.join(agent_dir, "%s.json" % agent_name)
 
+            if File.exist?(json_file)
+              Log.warn("JSON DDL %s already exist, not regenerating from the %s" % [json_file, agent_name])
+              next
+            end
+
             ddl = DDL.new(agent_name, :agent, false)
             ddl.instance_eval(File.read(file))
 
