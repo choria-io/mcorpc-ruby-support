@@ -45,7 +45,7 @@ module MCollective
         agentdir = File.join(@path, "agent")
 
         if (PluginPackager.check_dir_present(agentdir))
-          ddls = Dir.glob(File.join(agentdir, "*.ddl"))
+          ddls = Dir.glob(File.join(agentdir, "*.{ddl,json}"))
           agent[:files] = (Dir.glob(File.join(agentdir, "**", "**")) - ddls)
         else
           return nil
@@ -79,7 +79,7 @@ module MCollective
 
         datadir = File.join(@path, "data", "**")
         utildir = File.join(@path, "util", "**", "**")
-        ddldir = File.join(@path, "agent", "*.ddl")
+        ddldir = File.join(@path, "agent", "*.{ddl,json}")
         validatordir = File.join(@path, "validator", "**")
 
         [datadir, utildir, validatordir, ddldir].each do |directory|
@@ -90,6 +90,8 @@ module MCollective
         if common[:files].grep(/^.*\.ddl$/).empty?
           raise "cannot create package - No ddl file found in #{File.join(@path, "agent")}"
         end
+
+        common[:files].uniq!
 
         common[:files].empty? ? nil : common
       end
