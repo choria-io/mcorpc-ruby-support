@@ -81,7 +81,7 @@ module MCollective
       def filelist(type)
         @plugin.packagedata[type][:files].map do |file|
           file.gsub(/^\.\//, "") unless File.directory?(file)
-        end.compact
+        end.compact.uniq
       rescue
         []
       end
