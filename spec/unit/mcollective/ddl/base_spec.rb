@@ -20,7 +20,7 @@ module MCollective
           @ddl.instance_variable_set("@plugintype", :data)
           @ddl.stubs(:helptemplatedir).returns("/etc/mcollective")
           Util.stubs(:templatepath).with("data-help.erb").returns("/etc/mcollective/data-help.erb")
-          File.expects(:exists?).with("/etc/mcollective/data-help.erb").returns(true)
+          File.expects(:exist?).with("/etc/mcollective/data-help.erb").returns(true)
           @ddl.template_for_plugintype.should == "data-help.erb"
         end
       end

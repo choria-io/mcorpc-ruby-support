@@ -37,7 +37,7 @@ module MCollective
     #         aggregate summary(:value)
     #     end
     # end
-    class AgentDDL<Base
+    class AgentDDL < Base
       def initialize(plugin, plugintype=:agent, loadddl=true)
         @process_aggregate_functions = nil
 
@@ -65,18 +65,18 @@ module MCollective
       def summarize(&block)
         unless @config.mode == :server
           @process_aggregate_functions = true
-          block.call
+          yield
           @process_aggregate_functions = nil
         end
       end
 
       # Sets the aggregate array for the given action
-      def aggregate(function, format = {:format => nil})
+      def aggregate(function, format={:format => nil})
         raise(DDLValidationError, "Formats supplied to aggregation functions should be a hash") unless format.is_a?(Hash)
         raise(DDLValidationError, "Formats supplied to aggregation functions must have a :format key") unless format.keys.include?(:format)
         raise(DDLValidationError, "Functions supplied to aggregate should be a hash") unless function.is_a?(Hash)
 
-        unless (function.keys.include?(:args)) && function[:args]
+        unless function.keys.include?(:args) && function[:args]
           raise DDLValidationError, "aggregate method for action '%s' missing a function parameter" % entities[@current_entity][:action]
         end
 
@@ -133,7 +133,7 @@ module MCollective
         # we set @current_entity so the input block can know what its talking
         # to, this is probably an epic hack, need to improve.
         @current_entity = name
-        block.call if block_given?
+        yield if block_given?
         @current_entity = nil
       end
 
@@ -141,11 +141,13 @@ module MCollective
       # with args as a hash.  This will only be active if the @process_aggregate_functions
       # is set to true which only happens in the #summarize block
       def method_missing(name, *args, &block)
-        unless @process_aggregate_functions || is_function?(name)
-          raise NoMethodError, "undefined local variable or method `#{name}'", caller
-        end
+        super unless @process_aggregate_functions || is_function?(name)
 
-        return {:function => name, :args => args}
+        {:function => name, :args => args}
+      end
+
+      def respond_to_missing?(method, *)
+        @process_aggregate_functions || is_function?(name) || super
       end
 
       # Checks if a method name matches a aggregate plugin.
@@ -169,7 +171,7 @@ module MCollective
 
         return unless input
 
-        input.keys.each do |key|
+        input.each_key do |key|
           if key.is_a?(Symbol) && arguments.include?(key.to_s) && !input.include?(key.to_s)
             compat_arg = key.to_s
           else
@@ -228,7 +230,7 @@ module MCollective
         input = action_interface(action)[:input] || {}
         compatible_args = symbolize_basic_input_arguments(input, arguments)
 
-        input.keys.each do |key|
+        input.each_key do |key|
           unless input[key][:optional]
             unless compatible_args.include?(key)
               raise DDLValidationError, "Action #{action} needs a #{key} argument"

@@ -27,17 +27,17 @@ module MCollective
     #              :display_as => item.to_s.capitalize
     #     end
     # end
-    class DataDDL<Base
+    class DataDDL < Base
       def dataquery(input, &block)
         raise "Data queries need a :description" unless input.include?(:description)
         raise "Data queries can only have one definition" if @entities[:data]
 
-        @entities[:data]  = {:description => input[:description],
-                             :input => {},
-                             :output => {}}
+        @entities[:data] = {:description => input[:description],
+                            :input => {},
+                            :output => {}}
 
         @current_entity = :data
-        block.call if block_given?
+        yield if block_given?
         @current_entity = nil
       end
 
