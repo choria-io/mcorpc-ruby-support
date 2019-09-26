@@ -86,6 +86,14 @@ module MCollective
         []
       end
 
+      def executablelist(type)
+        @plugin.packagedata[type][:executable_files].map do |file|
+          file.gsub(/^\.\//, "") unless File.directory?(file)
+        end.compact.uniq
+      rescue
+        []
+      end
+
       def hierakey(var)
         "%s::%s" % [module_name, var]
       end
@@ -100,6 +108,7 @@ module MCollective
         {
           hierakey(:config_name) => @plugin.metadata[:name].downcase,
           hierakey(:common_files) => filelist(:common),
+          hierakey(:executable_files) => executablelist(:agent),
           hierakey(:common_directories) => dirlist(:common),
           hierakey(:server_files) => filelist(:agent),
           hierakey(:server_directories) => dirlist(:agent),
