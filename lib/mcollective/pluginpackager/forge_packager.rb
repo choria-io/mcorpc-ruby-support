@@ -22,7 +22,7 @@ module MCollective
       end
 
       def create_packages
-        assert_new_enough_puppet
+        assert_new_enough_pdk
         validate_environment
 
         begin
@@ -207,20 +207,21 @@ module MCollective
         raise("Vendor names may not have a space in them, please specify a valid vendor using --vendor") if @plugin.vendor.match(" ")
       end
 
-      def assert_new_enough_puppet
-        puppet_bin = which("puppet")
-        puppet_bin = "/opt/puppetlabs/bin/puppet" if !puppet_bin
-        if !puppet_bin
-          raise("Cannot build package. 'puppet' not found on path, and '/opt/puppetlabs/bin/puppet' is not present on the system.")
-        end
+      def pdk_path
+        pdk_bin = which("pdk")
+        pdk_bin = "/opt/puppetlabs/pdk/bin/pdk" unless pdk_bin
 
-        s = Shell.new("#{puppet_bin} --version")
+        pdk_bin
+      end
+
+      def assert_new_enough_pdk
+        s = Shell.new("#{pdk_path} --version")
         s.runcommand
         actual_version = s.stdout.chomp
-        required_version = '4.5.1'
+        required_version = "1.12.0"
 
         if Util.versioncmp(actual_version, required_version) < 0
-          raise("Cannot build package. puppet #{required_version} or greater required.  We have #{actual_version}.")
+          raise("Cannot build package. pdk #{required_version} or greater required.  We have #{actual_version}.")
         end
       end
 
@@ -228,7 +229,7 @@ module MCollective
         begin
           PluginPackager.execute_verbosely(@verbose) do
             Dir.chdir(@tmpdir) do
-              PluginPackager.safe_system('pdk build --force')
+              PluginPackager.safe_system("#{pdk_path} build --force")
             end
           end
         rescue
