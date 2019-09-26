@@ -38,19 +38,23 @@ module MCollective
       def agent
         agent = {
           :files => [],
+          :executable_files => [],
           :dependencies => @dependencies.clone,
           :description => "Agent plugin for #{@metadata[:name]}"
         }
 
         agentdir = File.join(@path, "agent")
 
-        if (PluginPackager.check_dir_present(agentdir))
-          ddls = Dir.glob(File.join(agentdir, "*.{ddl,json}"))
-          agent[:files] = (Dir.glob(File.join(agentdir, "**", "**")) - ddls)
-        else
-          return nil
-        end
+        return nil unless PluginPackager.check_dir_present(agentdir)
+
+        ddls = Dir.glob(File.join(agentdir, "*.{ddl,json}"))
+        agent[:files] = (Dir.glob(File.join(agentdir, "**", "**")) - ddls)
         agent[:plugindependency] = {:name => "#{@mcname}-#{@metadata[:name]}-common", :version => @metadata[:version], :revision => @revision}
+
+        if @metadata[:provider] == "external"
+          agent[:executable_files] << File.join(agentdir, @metadata[:name])
+        end
+
         agent
       end
 
