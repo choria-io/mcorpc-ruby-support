@@ -1,5 +1,10 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/09/19|      |Release 2.20.7                                                                                           |
+|2019/09/25|46    |Ensure a valid version of PDK is available when building packages                                        |
+|2019/09/25|43    |Ensure external agents are executable                                                                    |
+|2019/09/25|40    |Only generate JSON DDls when they do not already exist                                                   |
+|2019/09/25|39    |Avoid duplicate resources for packaged plugins wrt to JSON DDL files                                     |
 |2019/09/19|      |Release 2.20.6                                                                                           |
 |2019/09/18|30    |Move the aiomodule package into this module, retire others                                               |
 |2019/09/08|34    |Add support for type in outputs                                                                          |
