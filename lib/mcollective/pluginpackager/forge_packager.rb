@@ -3,11 +3,11 @@ require "yaml"
 module MCollective
   module PluginPackager
     class ForgePackager
-      def initialize(plugin, pluginpath = nil, signature = nil, verbose = false, keep_artifacts = nil, module_template = nil)
+      def initialize(plugin, pluginpath=nil, signature=nil, verbose=false, keep_artifacts=nil, module_template=nil)
         @plugin = plugin
         @verbose = verbose
         @keep_artifacts = keep_artifacts
-        @module_template = module_template || File.join(File.dirname(__FILE__), 'templates', 'forge')
+        @module_template = module_template || File.join(File.dirname(__FILE__), "templates", "forge")
       end
 
       def which(cmd)
@@ -18,7 +18,7 @@ module MCollective
             return exe if File.executable?(exe) && !File.directory?(exe)
           end
         end
-        return nil
+        nil
       end
 
       def create_packages
@@ -44,7 +44,7 @@ module MCollective
         ensure
           if @keep_artifacts
             puts("Keeping build artifacts")
-            puts("Build artifacts saved in %s" %  @tmpdir)
+            puts("Build artifacts saved in %s" % @tmpdir)
           else
             cleanup_tmpdirs
           end
@@ -113,7 +113,7 @@ module MCollective
           hierakey(:server_files) => filelist(:agent),
           hierakey(:server_directories) => dirlist(:agent),
           hierakey(:client_files) => filelist(:client),
-          hierakey(:client_directories) => dirlist(:client),
+          hierakey(:client_directories) => dirlist(:client)
         }.merge(module_override_data)
       end
 
@@ -132,7 +132,7 @@ module MCollective
       end
 
       def copy_module_files
-        @plugin.packagedata.each do |klass, data|
+        @plugin.packagedata.each_value do |data|
           data[:files].each do |file|
             clean_dest_file = file.gsub("./lib/mcollective", "")
             dest_dir = File.expand_path(File.join(@tmpdir, "files", "mcollective", File.dirname(clean_dest_file)))
@@ -162,7 +162,7 @@ module MCollective
             data = {
               "$schema" => "https://choria.io/schemas/mcorpc/ddl/v1/agent.json",
               "metadata" => ddl.meta,
-              "actions" => [],
+              "actions" => []
             }
 
             ddl.actions.sort.each do |action|
@@ -179,7 +179,7 @@ module MCollective
       end
 
       def render_templates
-        templates = Dir.chdir(@module_template) do |path|
+        templates = Dir.chdir(@module_template) do |_path|
           Dir.glob("**/*.erb")
         end
 
@@ -191,25 +191,23 @@ module MCollective
       end
 
       def render_template(infile, outfile)
-        begin
-          erb = ERB.new(File.read(infile), nil, "-")
-          File.open(outfile, "w") do |f|
-            f.puts erb.result(binding)
-          end
-        rescue
-          STDERR.puts("Could not render template %s to %s" % [infile, outfile])
-          raise
+        erb = ERB.new(File.read(infile), nil, "-")
+        File.open(outfile, "w") do |f|
+          f.puts erb.result(binding)
         end
+      rescue
+        STDERR.puts("Could not render template %s to %s" % [infile, outfile])
+        raise
       end
 
       def validate_environment
         raise("Supplying a vendor is required, please use --vendor") if @plugin.vendor == "Puppet Labs"
-        raise("Vendor names may not have a space in them, please specify a valid vendor using --vendor") if @plugin.vendor.match(" ")
+        raise("Vendor names may not have a space in them, please specify a valid vendor using --vendor") if @plugin.vendor.include?(" ")
       end
 
       def pdk_path
         pdk_bin = which("pdk")
-        pdk_bin = "/opt/puppetlabs/pdk/bin/pdk" unless pdk_bin
+        pdk_bin ||= "/opt/puppetlabs/pdk/bin/pdk"
 
         pdk_bin
       end
@@ -226,35 +224,29 @@ module MCollective
       end
 
       def run_build
-        begin
-          PluginPackager.execute_verbosely(@verbose) do
-            Dir.chdir(@tmpdir) do
-              PluginPackager.safe_system("#{pdk_path} build --force")
-            end
+        PluginPackager.execute_verbosely(@verbose) do
+          Dir.chdir(@tmpdir) do
+            PluginPackager.safe_system("#{pdk_path} build --force")
           end
-        rescue
-          STDERR.puts("Build process has failed")
-          raise
         end
+      rescue
+        STDERR.puts("Build process has failed")
+        raise
       end
 
       def move_package
-        begin
-          package_file = File.join(@tmpdir, "pkg", module_file_name)
-          FileUtils.cp(package_file, ".")
-        rescue
-          STDERR.puts("Could not copy package to working directory")
-          raise
-        end
+        package_file = File.join(@tmpdir, "pkg", module_file_name)
+        FileUtils.cp(package_file, ".")
+      rescue
+        STDERR.puts("Could not copy package to working directory")
+        raise
       end
 
       def cleanup_tmpdirs
-        begin
-          FileUtils.rm_r(@tmpdir) if File.directory?(@tmpdir)
-        rescue
-          STDERR.puts("Could not remove temporary build directory %s" % [@tmpdir])
-          raise
-        end
+        FileUtils.rm_r(@tmpdir) if File.directory?(@tmpdir)
+      rescue
+        STDERR.puts("Could not remove temporary build directory %s" % [@tmpdir])
+        raise
       end
     end
   end

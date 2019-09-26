@@ -16,7 +16,7 @@ module MCollective
         @dependencies = configuration[:dependency] || []
         @target_path = File.expand_path(@path)
         @metadata, mcversion = PluginPackager.get_metadata(@path, "agent")
-        @mcname = mcdependency[:mcname] ||  "mcollective"
+        @mcname = mcdependency[:mcname] || "mcollective"
         @mcversion = mcdependency[:mcversion] || mcversion
         @metadata[:version] = (configuration[:version] || @metadata[:version])
         @dependencies << {:name => "#{@mcname}-common", :version => @mcversion}
@@ -76,7 +76,7 @@ module MCollective
       # Obtain common package files and dependencies.
       def common
         common = {
-          :files =>[],
+          :files => [],
           :dependencies => @dependencies.clone,
           :description => "Common libraries for #{@metadata[:name]}"
         }
@@ -92,7 +92,7 @@ module MCollective
 
         # We fail if there is no ddl file present
         if common[:files].grep(/^.*\.ddl$/).empty?
-          raise "cannot create package - No ddl file found in #{File.join(@path, "agent")}"
+          raise "cannot create package - No ddl file found in #{File.join(@path, 'agent')}"
         end
 
         common[:files].uniq!

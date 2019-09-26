@@ -13,7 +13,7 @@ module MCollective
     # discovery do
     #     capabilities [:classes, :facts, :identity, :agents, :compound]
     # end
-    class DiscoveryDDL<Base
+    class DiscoveryDDL < Base
       def discovery_interface
         @entities[:discovery]
       end
@@ -44,7 +44,7 @@ module MCollective
         @entities[:discovery] = {:capabilities => []}
 
         @current_entity = :discovery
-        block.call if block_given?
+        yield if block_given?
         @current_entity = nil
       end
     end

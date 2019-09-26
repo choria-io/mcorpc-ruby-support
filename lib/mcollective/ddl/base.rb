@@ -42,7 +42,7 @@ module MCollective
       # the config dir and if that does not exist, default to
       # /etc/mcollective
       def help(template=nil)
-        template = template_for_plugintype unless template
+        template ||= template_for_plugintype
         template = Util.templatepath(template) unless Util.absolute_path?(template)
 
         template = File.read(template)
@@ -52,14 +52,15 @@ module MCollective
         unless template == "metadata-help.erb"
           metadata_template = Util.templatepath("metadata-help.erb")
           metadata_template = File.read(metadata_template)
-          metastring = ERB.new(metadata_template, 0, '%')
+          metastring = ERB.new(metadata_template, 0, "%")
           metastring = metastring.result(binding)
         end
 
-        erb = ERB.new(template, 0, '%')
+        erb = ERB.new(template, 0, "%")
         erb.result(binding)
       end
 
+      # rubocop:disable Lint/DuplicateMethods, Style/TrivialAccessors
       def usage(usage_text)
         @usage = usage_text
       end
@@ -67,13 +68,13 @@ module MCollective
       def template_for_plugintype
         case @plugintype
         when :agent
-          return "rpc-help.erb"
+          "rpc-help.erb"
         else
-          if File.exists?(Util.templatepath("#{@plugintype}-help.erb"))
-            return "#{@plugintype}-help.erb"
+          if File.exist?(Util.templatepath("#{@plugintype}-help.erb"))
+            "#{@plugintype}-help.erb"
           else
             # Default help template gets loaded if plugintype-help does not exist.
-            return "metadata-help.erb"
+            "metadata-help.erb"
           end
         end
       end
@@ -91,8 +92,8 @@ module MCollective
       end
 
       def findddlfile(ddlname=nil, ddltype=nil)
-        ddlname = @pluginname unless ddlname
-        ddltype = @plugintype unless ddltype
+        ddlname ||= @pluginname
+        ddltype ||= @plugintype
 
         @config.libdir.each do |libdir|
           ddlfile = File.join([libdir, "mcollective", ddltype.to_s, "#{ddlname}.ddl"])
@@ -170,17 +171,17 @@ module MCollective
                                                :optional => properties[:optional]}
 
         case properties[:type]
-          when :string
-            raise "Input type :string needs a :validation argument" unless properties.include?(:validation)
-            raise "Input type :string needs a :maxlength argument" unless properties.include?(:maxlength)
+        when :string
+          raise "Input type :string needs a :validation argument" unless properties.include?(:validation)
+          raise "Input type :string needs a :maxlength argument" unless properties.include?(:maxlength)
 
-            @entities[entity][:input][argument][:validation] = properties[:validation]
-            @entities[entity][:input][argument][:maxlength] = properties[:maxlength]
+          @entities[entity][:input][argument][:validation] = properties[:validation]
+          @entities[entity][:input][argument][:maxlength] = properties[:maxlength]
 
-          when :list
-            raise "Input type :list needs a :list argument" unless properties.include?(:list)
+        when :list
+          raise "Input type :list needs a :list argument" unless properties.include?(:list)
 
-            @entities[entity][:input][argument][:list] = properties[:list]
+          @entities[entity][:input][argument][:list] = properties[:list]
         end
       end
 
@@ -206,7 +207,7 @@ module MCollective
 
         valid_requirements = [:mcollective]
 
-        requirement.keys.each do |key|
+        requirement.each_key do |key|
           unless valid_requirements.include?(key)
             raise "Requirement %s is not a valid requirement, only %s is supported" % [key, valid_requirements.join(", ")]
           end
