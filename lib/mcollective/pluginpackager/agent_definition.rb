@@ -20,7 +20,9 @@ module MCollective
         @mcversion = mcdependency[:mcversion] || mcversion
         @metadata[:version] = (configuration[:version] || @metadata[:version])
         @dependencies << {:name => "#{@mcname}-common", :version => @mcversion}
+        @agent_name = @metadata[:name].downcase
         @metadata[:name] = (configuration[:pluginname] || @metadata[:name]).downcase.gsub(/\s+|_/, "-")
+
         identify_packages
       end
 
@@ -52,7 +54,7 @@ module MCollective
         agent[:plugindependency] = {:name => "#{@mcname}-#{@metadata[:name]}-common", :version => @metadata[:version], :revision => @revision}
 
         if @metadata[:provider] == "external"
-          agent[:executable_files] << File.join(agentdir, @metadata[:name])
+          agent[:executable_files] << File.join(agentdir, @agent_name)
         end
 
         agent
@@ -60,9 +62,11 @@ module MCollective
 
       # Obtain client package files and dependencies.
       def client
-        client = {:files => [],
-                  :dependencies => @dependencies.clone,
-                  :description => "Client plugin for #{@metadata[:name]}"}
+        client = {
+          :files => [],
+          :dependencies => @dependencies.clone,
+          :description => "Client plugin for #{@metadata[:name]}"
+        }
 
         clientdir = File.join(@path, "application")
         aggregatedir = File.join(@path, "aggregate")
