@@ -98,6 +98,7 @@ module MCollective
 
       # avoid option parsers own internal version handling that sux
       parser.on("-v", "--verbose")
+      parser.on("--version")
 
       if original_extra_opts
         begin
