@@ -10,7 +10,7 @@ module MCollective
 
       begin
         load_application(appname)
-      rescue Exception # rubocop:disable Lint/RescueException
+      rescue Exception => e # rubocop:disable Lint/RescueException
         e.backtrace.first << Util.colorize(:red, "  <----")
         STDERR.puts "Application '%s' failed to load:" % appname
         STDERR.puts
