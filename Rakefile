@@ -17,7 +17,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = "bin"
   s.executables = ["mco"]
   s.add_dependency "systemu", "~> 2.6", ">= 2.6.4"
-  s.add_dependency "nats-pure", "~> 0.5.0"
+  s.add_dependency "nats-pure", "~> 0.6"
 end
 
 Gem::PackageTask.new(spec) do |pkg|
