@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/11/26|      |Release 2.20.8                                                                                           |
+|2019/11/03|52    |Improve handling `--version` in applications                                                             |
 |2019/09/19|      |Release 2.20.7                                                                                           |
 |2019/09/25|46    |Ensure a valid version of PDK is available when building packages                                        |
 |2019/09/25|43    |Ensure external agents are executable                                                                    |
