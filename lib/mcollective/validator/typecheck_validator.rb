@@ -19,6 +19,8 @@ module MCollective
           validator.is_a?(String)
         when :boolean
           [TrueClass, FalseClass].include?(validator.class)
+        when :array
+          validator.is_a?(Array)
         else
           false
         end

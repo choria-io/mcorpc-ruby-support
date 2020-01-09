@@ -57,7 +57,7 @@ module MCollective
       Validator.load_validators
 
       begin
-        if [:integer, :boolean, :float, :number, :string].include?(validation)
+        if [:integer, :boolean, :float, :number, :string, :array].include?(validation)
           Validator.typecheck(validator, validation)
 
         else
@@ -76,7 +76,7 @@ module MCollective
           end
         end
       rescue => e
-        raise ValidatorError, e.to_s
+        raise ValidatorError, e.to_s, e.backtrace
       end
     end
   end

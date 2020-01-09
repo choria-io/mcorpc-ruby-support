@@ -177,6 +177,18 @@ module MCollective
           @ddl.validate_input_argument(@ddl.entities[:test][:input], :number, 1)
           @ddl.validate_input_argument(@ddl.entities[:test][:input], :number, 1.1)
         end
+
+        it "should validate array arguments correctly" do
+          @ddl.action(:test, :description => "rspec")
+          @ddl.instance_variable_set("@current_entity", :test)
+          @ddl.input(:array, :prompt => "prompt", :description => "descr",
+                      :type => :array, :default => [], :optional => true)
+          expect {
+            @ddl.validate_input_argument(@ddl.entities[:test][:input], :array, "1")
+          }.to raise_error("Cannot validate input array: value should be a array")
+          @ddl.validate_input_argument(@ddl.entities[:test][:input], :array, [1])
+          @ddl.validate_input_argument(@ddl.entities[:test][:input], :array, [])
+        end
       end
 
       describe "#requires" do
