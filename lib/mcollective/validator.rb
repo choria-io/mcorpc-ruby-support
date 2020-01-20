@@ -57,7 +57,7 @@ module MCollective
       Validator.load_validators
 
       begin
-        if [:integer, :boolean, :float, :number, :string, :array].include?(validation)
+        if [:integer, :boolean, :float, :number, :string, :array, :hash].include?(validation)
           Validator.typecheck(validator, validation)
 
         else

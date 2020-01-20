@@ -189,6 +189,18 @@ module MCollective
           @ddl.validate_input_argument(@ddl.entities[:test][:input], :array, [1])
           @ddl.validate_input_argument(@ddl.entities[:test][:input], :array, [])
         end
+
+        it "should validate hash arguments correctly" do
+          @ddl.action(:test, :description => "rspec")
+          @ddl.instance_variable_set("@current_entity", :test)
+          @ddl.input(:hash, :prompt => "prompt", :description => "descr",
+                      :type => :hash, :default => {}, :optional => true)
+          expect {
+            @ddl.validate_input_argument(@ddl.entities[:test][:input], :hash, "1")
+          }.to raise_error("Cannot validate input hash: value should be a hash")
+          @ddl.validate_input_argument(@ddl.entities[:test][:input], :hash, {:a => 1})
+          @ddl.validate_input_argument(@ddl.entities[:test][:input], :hash, {})
+        end
       end
 
       describe "#requires" do
