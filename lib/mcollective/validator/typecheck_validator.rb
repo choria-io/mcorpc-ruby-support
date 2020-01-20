@@ -21,6 +21,8 @@ module MCollective
           [TrueClass, FalseClass].include?(validator.class)
         when :array
           validator.is_a?(Array)
+        when :hash
+          validator.is_a?(Hash)
         else
           false
         end
