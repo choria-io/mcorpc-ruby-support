@@ -1,5 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/01/21|      |Release 2.21.0                                                                                           |
+|2019/10/01|50    |Fix executable names when building modules of external agents                                            |
+|2020/01/20|60    |Support :hash DDL validations                                                                            |
+|2020/01/09|58    |Support :array DDL validations                                                                           |
 |2019/11/26|      |Release 2.20.8                                                                                           |
 |2019/11/03|52    |Improve handling `--version` in applications                                                             |
 |2019/09/19|      |Release 2.20.7                                                                                           |
