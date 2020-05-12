@@ -12,6 +12,8 @@ class MCollective::Application::Facts<MCollective::Application
   def show_single_fact_report(fact, facts, verbose=false)
     puts("Report for fact: #{fact}\n\n")
 
+    facts = stringify_facts_hash(facts)
+
     field_size = MCollective::Util.field_size(facts.keys)
     facts.keys.sort.each do |k|
       printf("        %-#{field_size}s found %d times\n", k, facts[k].size)
@@ -26,6 +28,12 @@ class MCollective::Application::Facts<MCollective::Application
         puts
       end
     end
+  end
+
+  def stringify_facts_hash(facts)
+    res = Hash.new([])
+    facts.each { |k, v| res[k.to_s] += v }
+    res
   end
 
   def main
