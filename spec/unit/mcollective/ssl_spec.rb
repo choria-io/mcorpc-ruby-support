@@ -167,15 +167,7 @@ module MCollective
         key = @ssl.base64_decode("VEma3a/R7fjw2M4d0NIctA==")
         data = @ssl.base64_decode("FkH6qLvKTn7a+uNPe8ciHA==")
 
-        # the default aes-256-cbc should fail here, the key above is 128 bit
-        # the exception classes changed mid-1.9.2 and again later in 2.4 :(
-        if OpenSSL.constants.include?("CipherError")
-          expect { @ssl.aes_decrypt(key, data) }.to raise_error(OpenSSL::CipherError)
-        elsif RUBY_VERSION =~ /^2\.4/
-          expect { @ssl.aes_decrypt(key, data) }.to raise_error(ArgumentError)
-        else
-          expect { @ssl.aes_decrypt(key, data) }.to raise_error(OpenSSL::Cipher::CipherError)
-        end
+        expect { @ssl.aes_decrypt(key, data) }.to raise_error(ArgumentError)
 
         # new ssl instance configured for aes-128-cbc, should work
         @ssl = SSL.new("#{@rootdir}/../../fixtures/test-public.pem", "#{@rootdir}/../../fixtures/test-private.pem", nil, "aes-128-cbc")
