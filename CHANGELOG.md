@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/07/07|      |Release 2.21.1                                                                                           |
+|2020/05/11|65    |Fix facts application when querying non-string facts                                                     |
 |2020/01/21|      |Release 2.21.0                                                                                           |
 |2019/10/01|50    |Fix executable names when building modules of external agents                                            |
 |2020/01/20|60    |Support :hash DDL validations                                                                            |
