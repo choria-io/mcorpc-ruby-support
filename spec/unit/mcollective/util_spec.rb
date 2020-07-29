@@ -200,7 +200,8 @@ module MCollective
         expect(Util.mcollective_config_paths_for_user).to eq([
           File.expand_path("~/.mcollective"),
           "/etc/puppetlabs/mcollective/client.cfg",
-          "/etc/mcollective/client.cfg"
+          "/etc/mcollective/client.cfg",
+          "/usr/local/etc/mcollective/client.cfg"
         ])
       end
 
@@ -223,7 +224,8 @@ module MCollective
 
         expect(Util.choria_config_paths_for_user).to eq([
           File.expand_path("~/.choriarc"),
-          "/etc/choria/client.conf"
+          "/etc/choria/client.conf",
+          "/usr/local/etc/choria/client.conf"
         ])
       end
 
