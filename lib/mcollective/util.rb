@@ -169,6 +169,7 @@ module MCollective
       else
         config_paths << "/etc/puppetlabs/mcollective/client.cfg"
         config_paths << "/etc/mcollective/client.cfg"
+        config_paths << "/usr/local/etc/mcollective/client.cfg"
       end
 
       config_paths
@@ -188,22 +189,25 @@ module MCollective
         config_paths << File.join(choria_windows_prefix, "etc", "client.conf")
       else
         config_paths << "/etc/choria/client.conf"
+        config_paths << "/usr/local/etc/choria/client.conf"
       end
 
       config_paths
     end
 
-    # Picks the default user config file, pririties are first Choria ones then old MCollective ones
+    # Picks the default user config file, priorities are first Choria ones then old MCollective ones
     #
     # In roughly this order, first to exist is used:
     #
     # - ~/.choriarc
     # - APPData/ChoriaIO/choria/etc/client.conf on windows
-    # - /etc/choria/client.conf on unix
+    # - /etc/choria/client.conf then
+    # - /usr/local/etc/choria/client.conf on unix
     # - ~/.mcollective
     # - APPData/PuppetLabs/mcollective/etc/client.cfg on windows
     # - /etc/puppetlabs/mcollective/client.cfg
     # - /etc/mcollective/client.cfg
+    # - /usr/local/etc/mcollective/client.cfg
     def self.config_file_for_user
       config_paths = choria_config_paths_for_user + mcollective_config_paths_for_user
       found = config_paths.find_index { |file| File.readable?(file) } || 0
