@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/07/07|      |Release 2.22.0                                                                                           |
+|2020/07/21|69    |Add FreeBSD support                                                                                      |
 |2020/07/07|      |Release 2.21.1                                                                                           |
 |2020/05/11|65    |Fix facts application when querying non-string facts                                                     |
 |2020/01/21|      |Release 2.21.0                                                                                           |
