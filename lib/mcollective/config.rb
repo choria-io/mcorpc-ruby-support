@@ -39,14 +39,6 @@ module MCollective
 
           begin
             case key
-            when "registration"
-              @registration = val.capitalize
-            when "registration_collective"
-              @registration_collective = val
-            when "registerinterval"
-              @registerinterval = Integer(val)
-            when "registration_splay"
-              @registration_splay = Util.str_to_bool(val)
             when "collectives"
               @collectives = val.split(",").map(&:strip)
             when "main_collective"
@@ -128,7 +120,7 @@ module MCollective
               @default_batch_size = Integer(val)
             when "default_batch_sleep_time"
               @default_batch_sleep_time = Float(val)
-            when "topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir"
+            when "topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir", "registration_splay", "registerinterval", "registration_collective", "registration"
               Log.warn("Use of deprecated '#{key}' option.  This option is ignored and should be removed from '#{configfile}'")
             else
               raise("Unknown config parameter '#{key}'")

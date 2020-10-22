@@ -122,8 +122,7 @@ module MCollective
         PluginManager.stubs(:loadclass)
         PluginManager.stubs("<<")
 
-        ["registerinterval", "max_log_size", "direct_addressing_threshold", "publish_timeout",
-         "fact_cache_time", "ttl"].each do |key|
+        ["max_log_size", "direct_addressing_threshold", "publish_timeout", "fact_cache_time", "ttl"].each do |key|
           File.expects(:readlines).with("/nonexisting").returns(["#{key} = nan"])
           File.expects(:exist?).with("/nonexisting").returns(true)
 
