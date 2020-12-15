@@ -132,20 +132,6 @@ module MCollective
          end
       end
 
-      it 'should log a warning when using a deprecated option' do
-        PluginManager.stubs(:loadclass)
-        PluginManager.stubs("<<")
-
-        ["topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir"].each do |key|
-          File.expects(:exist?).with("/nonexisting").returns(true)
-          File.expects(:readlines).with("/nonexisting").returns(["#{key} = nan", "libdir = /nonexistinglib"])
-
-          Log.stubs(:warn)
-          Log.expects(:warn).with("Use of deprecated '#{key}' option.  This option is ignored and should be removed from '/nonexisting'")
-          Config.instance.loadconfig("/nonexisting")
-        end
-      end
-
       it 'should enable agents by default' do
         File.expects(:readlines).with("/nonexisting").returns(["libdir=/nonexistinglib"])
         File.expects(:exist?).with("/nonexisting").returns(true)
