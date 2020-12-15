@@ -146,7 +146,7 @@ module MCollective
     # Returns the PuppetLabs mcollective path for windows
     def self.windows_prefix
       require "win32/dir"
-      File.join(Dir::COMMON_APPDATA, "PuppetLabs", "mcollective")
+      File.join(Dir::COMMON_APPDATA, "PuppetLabs", "choria")
     end
 
     def self.choria_windows_prefix
