@@ -120,8 +120,6 @@ module MCollective
               @default_batch_size = Integer(val)
             when "default_batch_sleep_time"
               @default_batch_sleep_time = Float(val)
-            when "topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir", "registration_splay", "registerinterval", "registration_collective", "registration"
-              Log.warn("Use of deprecated '#{key}' option.  This option is ignored and should be removed from '#{configfile}'")
             else
               # server config might now be choria config which will divirge from mcollective
               # in time, so we only raise this error when it looks like we aren't loading
