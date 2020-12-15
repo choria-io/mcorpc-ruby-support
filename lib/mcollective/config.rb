@@ -123,7 +123,10 @@ module MCollective
             when "topicprefix", "topicsep", "queueprefix", "rpchelptemplate", "helptemplatedir", "registration_splay", "registerinterval", "registration_collective", "registration"
               Log.warn("Use of deprecated '#{key}' option.  This option is ignored and should be removed from '#{configfile}'")
             else
-              raise("Unknown config parameter '#{key}'")
+              # server config might now be choria config which will divirge from mcollective
+              # in time, so we only raise this error when it looks like we aren't loading
+              # a server config else we try our best to load as much as we can
+              raise("Unknown config parameter '#{key}'") unless configfile =~ /server/
             end
           rescue ArgumentError
             raise("Could not parse value for configuration option '%s' with value '%s'" % [key, val])
@@ -148,10 +151,12 @@ module MCollective
           raise "The sylog logger is not usable on the Windows platform" if Util.windows?
         end
 
-        PluginManager.loadclass("Mcollective::Facts::#{@factsource}_facts")
-        PluginManager.loadclass("Mcollective::Connector::#{@connector}")
-        PluginManager.loadclass("Mcollective::Security::#{@securityprovider}")
-        PluginManager << {:type => "global_stats", :class => RunnerStats.new}
+        unless configfile =~ /server/
+          PluginManager.loadclass("Mcollective::Facts::#{@factsource}_facts")
+          PluginManager.loadclass("Mcollective::Connector::#{@connector}")
+          PluginManager.loadclass("Mcollective::Security::#{@securityprovider}")
+          PluginManager << {:type => "global_stats", :class => RunnerStats.new}
+        end
 
         Log.info("The Marionette Collective version #{MCollective::VERSION} started by #{$0} using config file #{configfile}")
       else
