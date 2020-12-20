@@ -1,10 +1,10 @@
 module MCollective
-  class Application::Help<Application
+  class Application::Help < Application # rubocop:disable Style/ClassAndModuleChildren
     description "Application list and help"
     usage "rpc help [application name]"
 
     def post_option_parser(configuration)
-      configuration[:application] = ARGV.shift if ARGV.size > 0
+      configuration[:application] = ARGV.shift unless ARGV.empty?
     end
 
     def main
@@ -17,7 +17,7 @@ module MCollective
         Applications.list.sort.each do |app|
           begin
             puts "  %-15s %s" % [app, Applications[app].application_description]
-          rescue
+          rescue # rubocop:disable Lint/SuppressedException
           end
         end
 

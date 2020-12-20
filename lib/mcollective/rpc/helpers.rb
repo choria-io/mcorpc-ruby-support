@@ -26,9 +26,7 @@ module MCollective
         hosts.map do |host|
           raise "JSON host list is not an array of Hashes" unless host.is_a?(Hash)
 
-          unless host.include?("sender") || host.include?("certname")
-            raise "JSON host list does not have senders in it"
-          end
+          raise "JSON host list does not have senders in it" unless host.include?("sender") || host.include?("certname")
 
           host["sender"] || host["certname"]
         end.uniq
@@ -39,6 +37,7 @@ module MCollective
       def self.extract_hosts_from_array(hosts)
         [hosts].flatten.map do |host|
           raise "#{host} should be a string" unless host.is_a?(String)
+
           host.chomp
         end
       end
@@ -61,7 +60,7 @@ module MCollective
       # If you've asked it to flatten the result it will not print sender
       # hostnames, it will just print the result as if it's one huge result,
       # handy for things like showing a combined mailq.
-      def self.rpcresults(result, flags = {})
+      def self.rpcresults(result, flags={})
         flags = {:verbose => false, :flatten => false, :format => :console, :force_display_mode => false}.merge(flags)
 
         result_text = ""
@@ -70,55 +69,49 @@ module MCollective
         # if running in verbose mode, just use the old style print
         # no need for all the DDL helpers obfuscating the result
         if flags[:format] == :json
-          if STDOUT.tty?
+          if $stdout.tty?
             result_text = JSON.pretty_generate(result)
           else
             result_text = result.to_json
           end
+        elsif flags[:verbose]
+          result_text = old_rpcresults(result, flags)
         else
-          if flags[:verbose]
-            result_text = old_rpcresults(result, flags)
-          else
-            [result].flatten.each do |r|
-              begin
-                ddl ||= DDL.new(r.agent).action_interface(r.action.to_s)
+          [result].flatten.each do |r|
+            begin
+              ddl ||= DDL.new(r.agent).action_interface(r.action.to_s)
 
-                sender = r[:sender]
-                status = r[:statuscode]
-                message = r[:statusmsg]
-                result = r[:data]
+              sender = r[:sender]
+              status = r[:statuscode]
+              message = r[:statusmsg]
+              result = r[:data]
 
-                if flags[:force_display_mode]
-                  display = flags[:force_display_mode]
-                else
-                  display = ddl[:display]
-                end
-
-                # appand the results only according to what the DDL says
-                case display
-                  when :ok
-                    if status == 0
-                      result_text << text_for_result(sender, status, message, result, ddl)
-                    end
-
-                  when :failed
-                    if status > 0
-                      result_text << text_for_result(sender, status, message, result, ddl)
-                    end
-
-                  when :always
-                    result_text << text_for_result(sender, status, message, result, ddl)
-
-                  when :flatten
-                    Log.warn("The display option :flatten is being deprecated and will be removed in the next minor release")
-                    result_text << text_for_flattened_result(status, result)
-
-                end
-              rescue Exception => e
-                # no DDL so just do the old style print unchanged for
-                # backward compat
-                result_text = old_rpcresults(result, flags)
+              if flags[:force_display_mode]
+                display = flags[:force_display_mode]
+              else
+                display = ddl[:display]
               end
+
+              # appand the results only according to what the DDL says
+              case display
+              when :ok
+                result_text << text_for_result(sender, status, message, result, ddl) if status == 0
+
+              when :failed
+                result_text << text_for_result(sender, status, message, result, ddl) if status > 0
+
+              when :always
+                result_text << text_for_result(sender, status, message, result, ddl)
+
+              when :flatten
+                Log.warn("The display option :flatten is being deprecated and will be removed in the next minor release")
+                result_text << text_for_flattened_result(status, result)
+
+              end
+            rescue Exception # rubocop:disable Lint/RescueException
+              # no DDL so just do the old style print unchanged for
+              # backward compat
+              result_text = old_rpcresults(result, flags)
             end
           end
         end
@@ -151,7 +144,7 @@ module MCollective
               end
             end
 
-            result.keys.sort_by{|k| k}.each do |k|
+            result.keys.sort.each do |k|
               # get all the output fields nicely lined up with a
               # 3 space front padding
               begin
@@ -169,6 +162,7 @@ module MCollective
               if [String, Numeric].include?(result[k].class)
                 lines = result[k].to_s.split("\n")
 
+                # rubocop:disable Metrics/BlockNesting
                 if lines.empty?
                   result_text << "\n"
                 else
@@ -178,6 +172,7 @@ module MCollective
                     result_text << "#{padtxt}#{line}\n"
                   end
                 end
+                # rubocop:enable Metrics/BlockNesting
               else
                 padding = " " * (lengths.max + 5)
                 result_text << " " << result[k].pretty_inspect.split("\n").join("\n" << padding) << "\n"
@@ -188,7 +183,7 @@ module MCollective
             # data by default since the DDL will supply all the defaults
             # it just doesnt look right
           else
-            result_text << "\n\t" + result.pretty_inspect.split("\n").join("\n\t")
+            result_text << "\n\t#{result.pretty_inspect.split("\n").join("\n\t")}"
           end
         end
 
@@ -201,16 +196,16 @@ module MCollective
         result_text = ""
 
         if status <= 1
-          unless result.is_a?(String)
-            result_text << result.pretty_inspect
-          else
+          if result.is_a?(String)
             result_text << result
+          else
+            result_text << result.pretty_inspect
           end
         end
       end
 
       # Backward compatible display block for results without a DDL
-      def self.old_rpcresults(result, flags = {})
+      def self.old_rpcresults(result, flags={})
         result_text = ""
 
         if flags[:flatten]
@@ -218,10 +213,10 @@ module MCollective
             if r[:statuscode] <= 1
               data = r[:data]
 
-              unless data.is_a?(String)
-                result_text << data.pretty_inspect
-              else
+              if data.is_a?(String)
                 result_text << data
+              else
+                result_text << data.pretty_inspect
               end
             else
               result_text << r.pretty_inspect
@@ -250,9 +245,7 @@ module MCollective
                 result_text << "    #{r[:statusmsg]}"
               end
             else
-              unless r[:statuscode] == 0
-                result_text << "%-40s %s\n" % [r[:sender], Util.colorize(:red, r[:statusmsg])]
-              end
+              result_text << "%-40s %s\n" % [r[:sender], Util.colorize(:red, r[:statusmsg])] unless r[:statuscode] == 0
             end
           end
         end
@@ -266,32 +259,32 @@ module MCollective
         parser.separator "RPC Options"
 
         # add SimpleRPC specific options to all clients that use our library
-        parser.on('--np', '--no-progress', 'Do not show the progress bar') do |v|
+        parser.on("--np", "--no-progress", "Do not show the progress bar") do |_v|
           options[:progress_bar] = false
         end
 
-        parser.on('--one', '-1', 'Send request to only one discovered nodes') do |v|
+        parser.on("--one", "-1", "Send request to only one discovered nodes") do |_v|
           options[:mcollective_limit_targets] = 1
         end
 
-        parser.on('--batch SIZE', 'Do requests in batches') do |v|
+        parser.on("--batch SIZE", "Do requests in batches") do |v|
           # validate batch string. Is it x% where x > 0 or is it an integer
-          if ((v =~ /^(\d+)%$/ && Integer($1) != 0) || v =~ /^(\d+)$/)
+          if (v =~ /^(\d+)%$/ && Integer($1) != 0) || v =~ /^(\d+)$/
             options[:batch_size] = v
           else
-            raise(::OptionParser::InvalidArgument.new(v))
+            raise ::OptionParser::InvalidArgument, v
           end
         end
 
-        parser.on('--batch-sleep SECONDS', Float, 'Sleep time between batches') do |v|
+        parser.on("--batch-sleep SECONDS", Float, "Sleep time between batches") do |v|
           options[:batch_sleep_time] = v
         end
 
-        parser.on('--limit-seed NUMBER', Integer, 'Seed value for deterministic random batching') do |v|
+        parser.on("--limit-seed NUMBER", Integer, "Seed value for deterministic random batching") do |v|
           options[:limit_seed] = v
         end
 
-        parser.on('--limit-nodes COUNT', '--ln', '--limit', 'Send request to only a subset of nodes, can be a percentage') do |v|
+        parser.on("--limit-nodes COUNT", "--ln", "--limit", "Send request to only a subset of nodes, can be a percentage") do |v|
           raise "Invalid limit specified: #{v} valid limits are /^\d+%*$/" unless v =~ /^\d+%*$/
 
           if v =~ /^\d+$/
@@ -301,12 +294,12 @@ module MCollective
           end
         end
 
-        parser.on('--json', '-j', 'Produce JSON output') do |v|
+        parser.on("--json", "-j", "Produce JSON output") do |_v|
           options[:progress_bar] = false
           options[:output_format] = :json
         end
 
-        parser.on('--display MODE', 'Influence how results are displayed. One of ok, all or failed') do |v|
+        parser.on("--display MODE", "Influence how results are displayed. One of ok, all or failed") do |v|
           if v == "all"
             options[:force_display_mode] = :always
           else

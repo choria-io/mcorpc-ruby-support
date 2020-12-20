@@ -193,10 +193,10 @@ module MCollective
           action_in_last_dir = File.join(File::SEPARATOR, "libdir2", "agent", "spectester", "action.sh")
           action_in_last_dir_new = File.join(File::SEPARATOR, "libdir2", "mcollective", "agent", "spectester", "action.sh")
 
-          File.expects("exists?").with(action_in_first_dir).returns(true)
-          File.expects("exists?").with(action_in_first_dir_new).returns(false)
-          File.expects("exists?").with(action_in_last_dir).never
-          File.expects("exists?").with(action_in_last_dir_new).never
+          File.expects(:exist?).with(action_in_first_dir).returns(true)
+          File.expects(:exist?).with(action_in_first_dir_new).returns(false)
+          File.expects(:exist?).with(action_in_last_dir).never
+          File.expects(:exist?).with(action_in_last_dir_new).never
           ActionRunner.new("action.sh", @req, :json).command.should == action_in_first_dir
         end
 
@@ -208,10 +208,10 @@ module MCollective
           action_in_last_dir = File.join(File::SEPARATOR, "libdir2", "agent", "spectester", "action.sh")
           action_in_last_dir_new = File.join(File::SEPARATOR, "libdir2", "mcollective", "agent", "spectester", "action.sh")
 
-          File.expects("exists?").with(action_in_first_dir).returns(false)
-          File.expects("exists?").with(action_in_first_dir_new).returns(false)
-          File.expects("exists?").with(action_in_last_dir).returns(true)
-          File.expects("exists?").with(action_in_last_dir_new).returns(false)
+          File.expects(:exist?).with(action_in_first_dir).returns(false)
+          File.expects(:exist?).with(action_in_first_dir_new).returns(false)
+          File.expects(:exist?).with(action_in_last_dir).returns(true)
+          File.expects(:exist?).with(action_in_last_dir_new).returns(false)
           ActionRunner.new("action.sh", @req, :json).command.should == action_in_last_dir
         end
 
@@ -221,8 +221,8 @@ module MCollective
           action_in_new_dir = File.join(File::SEPARATOR, "libdir1", "mcollective", "agent", "spectester", "action.sh")
           action_in_old_dir = File.join(File::SEPARATOR, "libdir1", "agent", "spectester", "action.sh")
 
-          File.expects("exists?").with(action_in_new_dir).returns(true)
-          File.expects("exists?").with(action_in_old_dir).returns(false)
+          File.expects(:exist?).with(action_in_new_dir).returns(true)
+          File.expects(:exist?).with(action_in_old_dir).returns(false)
           ActionRunner.new("action.sh", @req, :json).command.should == action_in_new_dir
         end
 
@@ -232,8 +232,8 @@ module MCollective
           action_in_new_dir = File.join(File::SEPARATOR, "libdir1", "mcollective", "agent", "spectester", "action.sh")
           action_in_old_dir = File.join(File::SEPARATOR, "libdir1", "agent", "spectester", "action.sh")
 
-          File.expects("exists?").with(action_in_new_dir).returns(true)
-          File.expects("exists?").with(action_in_old_dir).returns(true)
+          File.expects(:exist?).with(action_in_new_dir).returns(true)
+          File.expects(:exist?).with(action_in_old_dir).returns(true)
 
           ActionRunner.new("action.sh", @req, :json).command.should == action_in_new_dir
         end

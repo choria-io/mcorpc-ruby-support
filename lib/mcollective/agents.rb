@@ -42,6 +42,7 @@ module MCollective
     def loadagent(agentname)
       agentfile = findagentfile(agentname)
       return false unless agentfile
+
       classname = class_for_agent(agentname)
 
       PluginManager.delete("#{agentname}_agent")
@@ -62,16 +63,16 @@ module MCollective
           Util.subscribe(Util.make_subscriptions(agentname, :broadcast)) unless @@agents.include?(agentname)
 
           @@agents[agentname] = {:file => agentfile}
-          return true
+          true
         else
           Log.debug("Not activating agent #{agentname} due to agent policy in activate? method")
-          return false
+          false
         end
       rescue Exception # rubocop:disable Lint/RescueException
         Log.error("Loading agent %s failed: %s" % [agentname, $!])
         PluginManager.delete("%s_agent" % agentname)
 
-        return false
+        false
       end
     end
 
@@ -87,14 +88,14 @@ module MCollective
       klass = Kernel.const_get("MCollective").const_get("Agent").const_get(agent.capitalize)
 
       if klass.respond_to?("activate?")
-        return klass.activate?
+        klass.activate?
       else
         Log.debug("#{klass} does not have an activate? method, activating as default")
-        return true
+        true
       end
     rescue Exception # rubocop:disable Lint/RescueException
       Log.warn("Agent activation check for %s #{agent} failed: %s: %s" % [agent, $!.class, $!])
-      return false
+      false
     end
 
     # searches the libdirs for agents

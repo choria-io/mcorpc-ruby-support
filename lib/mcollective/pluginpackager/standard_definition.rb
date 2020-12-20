@@ -1,8 +1,7 @@
 module MCollective
   module PluginPackager
     class StandardDefinition
-      attr_accessor :path, :packagedata, :metadata, :target_path, :vendor, :revision
-      attr_accessor :plugintype, :preinstall, :postinstall, :dependencies, :mcname, :mcversion
+      attr_accessor :path, :packagedata, :metadata, :target_path, :vendor, :revision, :plugintype, :preinstall, :postinstall, :dependencies, :mcname, :mcversion
 
       def initialize(configuration, mcdependency, plugintype)
         @plugintype = plugintype

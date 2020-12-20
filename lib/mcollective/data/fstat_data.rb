@@ -1,6 +1,6 @@
 module MCollective
   module Data
-    class Fstat_data<Base
+    class Fstat_data < Base
       query do |file|
         result[:name] = file
         result[:output] = "not present"
@@ -18,8 +18,7 @@ module MCollective
         result[:uid] = 0
         result[:gid] = 0
 
-
-        if File.exists?(file)
+        if File.exist?(file)
           result[:output] = "present"
           result[:present] = 1
 
@@ -53,4 +52,3 @@ module MCollective
     end
   end
 end
-

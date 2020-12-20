@@ -809,6 +809,7 @@ module MCollective
 
           discovered = mock
           discovered.stubs(:size).returns(1)
+          discovered.stubs(:empty?).returns(false)
           discovered.expects(:in_groups_of).with(10).raises("spec pass")
 
           client.instance_variable_set("@client", @coreclient)

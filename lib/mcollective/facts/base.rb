@@ -17,6 +17,7 @@ module MCollective
       # Registers new fact sources into the plugin manager
       def self.inherited(klass)
         PluginManager << {:type => "facts_plugin", :class => klass.to_s}
+        super
       end
 
       # Returns the value of a single fact
@@ -27,7 +28,7 @@ module MCollective
 
         @mutex.synchronize do
           begin
-            if (Time.now.to_i - @last_facts_load > cache_time.to_i ) || force_reload?
+            if (Time.now.to_i - @last_facts_load > cache_time.to_i) || force_reload?
               Log.debug("Resetting facter cache, now: #{Time.now.to_i} last-known-good: #{@last_facts_load}")
 
               tfacts = load_facts_from_source
@@ -42,7 +43,7 @@ module MCollective
             else
               Log.debug("Using cached facts now: #{Time.now.to_i} last-known-good: #{@last_facts_load}")
             end
-          rescue Exception => e
+          rescue Exception => e # rubocop:disable Lint/RescueException
             Log.error("Failed to load facts: #{e.class}: #{e}")
 
             # Avoid loops where failing fact loads cause huge CPU
@@ -55,17 +56,16 @@ module MCollective
           end
         end
 
-
         # If you do not supply a specific fact all facts will be returned
         if fact.nil?
-          return @facts
+          @facts
         else
           @facts.include?(fact) ? @facts[fact] : nil
         end
       end
 
       # Returns all facts
-      def get_facts
+      def get_facts # rubocop:disable Naming/AccessorMethodName
         get_fact(nil)
       end
 
@@ -84,15 +84,15 @@ module MCollective
       def normalize_facts(value)
         case value
         when Array
-          return value.map { |v| normalize_facts(v) }
+          value.map { |v| normalize_facts(v) }
         when Hash
           new_hash = {}
-          value.each do |k,v|
+          value.each do |k, v|
             new_hash[k.to_s] = normalize_facts(v)
           end
-          return new_hash
+          new_hash
         else
-          return value.to_s
+          value.to_s
         end
       end
     end

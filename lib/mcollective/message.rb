@@ -2,8 +2,7 @@ module MCollective
   # container for a message, its headers, agent, collective and other meta data
   class Message
     attr_reader :message, :request, :validated, :msgtime, :payload, :type, :expected_msgid, :reply_to
-    attr_accessor :headers, :agent, :collective, :filter
-    attr_accessor :requestid, :discovered_hosts, :options, :ttl
+    attr_accessor :headers, :agent, :collective, :filter, :requestid, :discovered_hosts, :options, :ttl
 
     VALIDTYPES = [:message, :request, :direct_request, :reply].freeze
 
@@ -79,9 +78,7 @@ module MCollective
       if type == :direct_request
         raise "Direct requests is not enabled using the direct_addressing config option" unless Config.instance.direct_addressing
 
-        unless @discovered_hosts && !@discovered_hosts.empty?
-          raise "Can only set type to :direct_request if discovered_hosts have been set"
-        end
+        raise "Can only set type to :direct_request if discovered_hosts have been set" unless @discovered_hosts && !@discovered_hosts.empty?
 
         # clear out the filter, custom discovery sources might interpret the filters
         # different than the remote mcollectived and in directed mode really the only
@@ -109,6 +106,7 @@ module MCollective
     # at us.
     def expected_msgid=(msgid)
       raise "Can only store the expected msgid for reply messages" unless @type == :reply
+
       @expected_msgid = msgid
     end
 
@@ -132,7 +130,7 @@ module MCollective
 
     def description
       cid = ""
-      cid += payload[:callerid] + "@" if payload.include?(:callerid)
+      cid += "#{payload[:callerid]}@" if payload.include?(:callerid)
       cid += payload[:senderid]
 
       "#{requestid} for agent '#{agent}' in collective '#{collective}' from #{cid}"
@@ -163,6 +161,7 @@ module MCollective
       compound_filter.each do |filter|
         filter.each do |statement|
           next unless statement["fstatement"]
+
           functionname = statement["fstatement"]["name"]
           pluginname = Data.pluginname(functionname)
           value = statement["fstatement"]["value"]
@@ -175,9 +174,7 @@ module MCollective
 
           Data.ddl_validate(ddl, statement["fstatement"]["params"])
 
-          unless value && Data.ddl_has_output?(ddl, value)
-            raise(DDLValidationError, "Data plugin '%s()' does not return a '%s' value" % [functionname, value])
-          end
+          raise(DDLValidationError, "Data plugin '%s()' does not return a '%s' value" % [functionname, value]) unless value && Data.ddl_has_output?(ddl, value)
         end
       end
     end
@@ -194,15 +191,15 @@ module MCollective
         else
           # We're in the client, log and carry on as best we can
 
-          # Note: mc_sender is unverified.  The verified identity is in the
+          # NOTE: mc_sender is unverified.  The verified identity is in the
           # payload we just failed to decode
           Log.warn("Failed to decode a message from '#{headers['mc_sender']}': #{e}")
           return
         end
       end
 
-      if type == :request
-        raise "callerid in request is not valid, surpressing reply to potentially forged request" unless PluginManager["security_plugin"].valid_callerid?(payload[:callerid])
+      if type == :request && !PluginManager["security_plugin"].valid_callerid?(payload[:callerid])
+        raise "callerid in request is not valid, surpressing reply to potentially forged request"
       end
 
       [:collective, :agent, :filter, :requestid, :ttl, :msgtime].each do |prop|

@@ -1,52 +1,54 @@
 # discovers against stdin instead of the traditional network discovery
 # the input must be a flat file with a node name per line which should match identities as configured,
 # or it should be a json string as output by the -j option of mco rpc
-require 'mcollective/rpc/helpers'
+require "mcollective/rpc/helpers"
 
 module MCollective
   class Discovery
     class Stdin
       def self.discover(filter, timeout, limit=0, client=nil)
-        unless client.options[:discovery_options].empty?
-          type = client.options[:discovery_options].first.downcase
+        if client.options[:discovery_options].empty?
+          type = "auto"
         else
-          type = 'auto'
+          type = client.options[:discovery_options].first.downcase
         end
 
         discovered = []
 
-        file = STDIN.read
+        file = $stdin.read
 
-        if file =~ /^\s*$/
-          raise("data piped on STDIN contained only whitespace - could not discover hosts from it.")
-        end
+        raise("data piped on STDIN contained only whitespace - could not discover hosts from it.") if file =~ /^\s*$/
 
-        if type == 'auto'
+        if type == "auto"
           if file =~ /^\s*\[/
-            type = 'json'
+            type = "json"
           else
-            type = 'text'
+            type = "text"
           end
         end
 
         Log.debug("Parsing STDIN input as type %s" % type)
 
-        if type == 'json'
+        case type
+        when "json"
           hosts = RPC::Helpers.extract_hosts_from_json(file)
-        elsif type == 'text'
+        when "text"
           hosts = file.split("\n")
         else
           raise("stdin discovery plugin only knows the types auto/text/json, not \"#{type}\"")
         end
 
         hosts.map do |host|
-          raise 'Identities can only match /\w\.\-/' unless host.match(/^[\w\.\-]+$/)
+          raise 'Identities can only match /\w\.\-/' unless host.match(/^[\w.\-]+$/)
+
           host
         end
 
         # this plugin only supports identity filters, do regex matches etc against
         # the list found in the flatfile
-        unless filter["identity"].empty?
+        if filter["identity"].empty?
+          discovered = hosts
+        else
           filter["identity"].each do |identity|
             identity = Regexp.new(identity.gsub("\/", "")) if identity.match("^/")
 
@@ -56,8 +58,6 @@ module MCollective
               discovered << identity
             end
           end
-        else
-          discovered = hosts
         end
 
         discovered
@@ -65,4 +65,3 @@ module MCollective
     end
   end
 end
-

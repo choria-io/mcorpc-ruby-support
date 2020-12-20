@@ -28,5 +28,6 @@ end
 
 desc "Run spec tests"
 task :test do
-  sh "cd spec && rake"
+  sh "bundle exec rubocop --config .rubocop.yml lib"
+  sh "bundle exec rspec --colour --backtrace"
 end

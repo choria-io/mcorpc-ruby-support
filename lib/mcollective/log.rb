@@ -60,7 +60,7 @@ module MCollective
         else
           t = Time.new.strftime("%H:%M:%S")
 
-          STDERR.puts "#{t}: #{level}: #{from}: #{msg}"
+          warn "#{t}: #{level}: #{from}: #{msg}"
         end
       end
 
@@ -98,7 +98,7 @@ module MCollective
         @logger.start
       rescue Exception => e # rubocop:disable Lint/RescueException
         @configured = false
-        STDERR.puts "Could not start logger: #{e.class} #{e}"
+        warn "Could not start logger: #{e.class} #{e}"
       end
 
       # figures out the filename that called us

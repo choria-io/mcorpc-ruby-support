@@ -28,6 +28,7 @@ module MCollective
     class Audit
       def self.inherited(klass)
         PluginManager << {:type => "rpcaudit_plugin", :class => klass.to_s}
+        super
       end
 
       def audit_request(request, connection)

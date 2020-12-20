@@ -155,6 +155,7 @@ module MCollective
 
       @parser.on("--dm", "--disc-method METHOD", "Which discovery method to use") do |v|
         raise "Discovery method is already set by a competing option" if @options[:discovery_method] && @options[:discovery_method] != v
+
         @options[:discovery_method] = v
       end
 

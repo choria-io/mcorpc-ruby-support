@@ -35,11 +35,11 @@ module MCollective
 
       def run
         unless canrun?(command)
-          Log.warn("Cannot run #{to_s}")
-          raise RPCAborted, "Cannot execute #{to_s}"
+          Log.warn("Cannot run #{self}")
+          raise RPCAborted, "Cannot execute #{self}"
         end
 
-        Log.debug("Running #{to_s}")
+        Log.debug("Running #{self}")
 
         request_file = saverequest(request)
         reply_file = tempfile("reply")
@@ -51,13 +51,13 @@ module MCollective
 
         Log.debug("#{command} exited with #{runner.status.exitstatus}")
 
-        stderr.each_line {|l| Log.error("#{to_s}: #{l.chomp}")} unless stderr.empty?
-        stdout.each_line {|l| Log.info("#{to_s}: #{l.chomp}")} unless stdout.empty?
+        stderr.each_line {|l| Log.error("#{self}: #{l.chomp}")} unless stderr.empty?
+        stdout.each_line {|l| Log.info("#{self}: #{l.chomp}")} unless stdout.empty?
 
         {:exitstatus => runner.status.exitstatus,
-         :stdout     => runner.stdout,
-         :stderr     => runner.stderr,
-         :data       => load_results(reply_file.path)}
+         :stdout => runner.stdout,
+         :stderr => runner.stderr,
+         :data => load_results(reply_file.path)}
       ensure
         request_file.close! if request_file.respond_to?("close!")
         reply_file.close! if reply_file.respond_to?("close")
@@ -65,7 +65,7 @@ module MCollective
 
       def shell(command, infile, outfile)
         env = {"MCOLLECTIVE_REQUEST_FILE" => infile,
-               "MCOLLECTIVE_REPLY_FILE"   => outfile}
+               "MCOLLECTIVE_REPLY_FILE" => outfile}
 
         Shell.new("#{command} #{infile} #{outfile}", :cwd => Dir.tmpdir, :stdout => stdout, :stderr => stderr, :environment => env)
       end
@@ -78,20 +78,20 @@ module MCollective
         if respond_to?("load_#{format}_results")
           tempdata = send("load_#{format}_results", file)
 
-          tempdata.each_pair do |k,v|
+          tempdata.each_pair do |k, v|
             data[k.to_sym] = v
           end
         end
 
         data
-      rescue Exception => e
+      rescue Exception # rubocop:disable Lint/RescueException
         {}
       end
 
       def load_json_results(file)
         return {} unless File.readable?(file)
 
-        JSON.load(File.read(file)) || {}
+        JSON.parse(File.read(file)) || {}
       rescue JSON::ParserError
         {}
       end
@@ -119,7 +119,7 @@ module MCollective
       end
 
       def to_s
-        "%s#%s command: %s" % [ agent, action, command ]
+        "%s#%s command: %s" % [agent, action, command]
       end
 
       def tempfile(prefix)
@@ -127,15 +127,13 @@ module MCollective
       end
 
       def path_to_command(command)
-        if Util.absolute_path?(command)
-          return command
-        end
+        return command if Util.absolute_path?(command)
 
         Config.instance.libdir.each do |libdir|
           command_file_old = File.join(libdir, "agent", agent, command)
           command_file_new = File.join(libdir, "mcollective", "agent", agent, command)
-          command_file_old_exists = File.exists?(command_file_old)
-          command_file_new_exists = File.exists?(command_file_new)
+          command_file_old_exists = File.exist?(command_file_old)
+          command_file_new_exists = File.exist?(command_file_new)
 
           if command_file_new_exists && command_file_old_exists
             Log.debug("Found 'implemented_by' scripts found in two locations #{command_file_old} and #{command_file_new}")

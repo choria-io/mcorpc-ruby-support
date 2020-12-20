@@ -1,8 +1,8 @@
-class MCollective::Application::Facts<MCollective::Application
+class MCollective::Application::Facts < MCollective::Application # rubocop:disable Style/ClassAndModuleChildren
   description "Reports on usage for a specific fact"
 
   def post_option_parser(configuration)
-    configuration[:fact] = ARGV.shift if ARGV.size > 0
+    configuration[:fact] = ARGV.shift unless ARGV.empty?
   end
 
   def validate_configuration(configuration)
@@ -18,15 +18,15 @@ class MCollective::Application::Facts<MCollective::Application
     facts.keys.sort.each do |k|
       printf("        %-#{field_size}s found %d times\n", k, facts[k].size)
 
-      if verbose
-        puts
+      next unless verbose
 
-        facts[k].sort.each do |f|
-          puts("            #{f}")
-        end
+      puts
 
-        puts
+      facts[k].sort.each do |f|
+        puts("            #{f}")
       end
+
+      puts
     end
   end
 
@@ -50,11 +50,11 @@ class MCollective::Application::Facts<MCollective::Application
           if facts.include?(value)
             facts[value] << resp[:senderid]
           else
-            facts[value] = [ resp[:senderid] ]
+            facts[value] = [resp[:senderid]]
           end
         end
-      rescue Exception => e
-        STDERR.puts "Could not parse facts for #{resp[:senderid]}: #{e.class}: #{e}"
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        warn "Could not parse facts for #{resp[:senderid]}: #{e.class}: #{e}"
       end
     end
 

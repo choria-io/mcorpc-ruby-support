@@ -4,10 +4,10 @@ module MCollective
     # and just brings in a lot of convention and standard approached.
     class Client
       attr_accessor :timeout, :verbose, :filter, :config, :progress, :ttl, :reply_to
-      attr_reader :client, :stats, :ddl, :agent, :limit_targets, :limit_method, :output_format, :batch_size, :batch_sleep_time, :batch_mode
-      attr_reader :discovery_options, :discovery_method, :default_discovery_method, :limit_seed
+      attr_reader :client, :stats, :ddl, :agent, :limit_targets, :limit_method, :output_format, :batch_size, :batch_sleep_time, :batch_mode, :discovery_options,
+                  :discovery_method, :default_discovery_method, :limit_seed
 
-      @@initial_options = nil
+      @@initial_options = nil # rubocop:disable Style/ClassVars
 
       # Creates a stub for a remote agent, you can pass in an options array in the flags
       # which will then be used else it will just create a default options array with
@@ -17,7 +17,7 @@ module MCollective
       #
       # You typically would not call this directly you'd use MCollective::RPC#rpcclient instead
       # which is a wrapper around this that can be used as a Mixin
-      def initialize(agent, flags = {})
+      def initialize(agent, flags={}) # rubocop:disable Metrics/MethodLength
         if flags.include?(:options)
           initial_options = flags[:options]
 
@@ -25,22 +25,20 @@ module MCollective
           initial_options = Marshal.load(@@initial_options)
 
         else
-          oparser = MCollective::Optionparser.new({ :verbose => false,
-                                                    :progress_bar => true,
-                                                    :mcollective_limit_targets => false,
-                                                    :batch_size => nil,
-                                                    :batch_sleep_time => 1 },
+          oparser = MCollective::Optionparser.new({:verbose => false,
+                                                   :progress_bar => true,
+                                                   :mcollective_limit_targets => false,
+                                                   :batch_size => nil,
+                                                   :batch_sleep_time => 1},
                                                   "filter")
 
           initial_options = oparser.parse do |parser, opts|
-            if block_given?
-              yield(parser, opts)
-            end
+            yield(parser, opts) if block_given?
 
             Helpers.add_simplerpc_options(parser, opts)
           end
 
-          @@initial_options = Marshal.dump(initial_options)
+          @@initial_options = Marshal.dump(initial_options) # rubocop:disable Style/ClassVars
         end
 
         @initial_options = initial_options
@@ -109,21 +107,21 @@ module MCollective
         if initial_options[:stderr]
           @stderr = initial_options[:stderr]
         else
-          @stderr = STDERR
+          @stderr = $stderr
           @stderr.sync = true
         end
 
         if initial_options[:stdout]
           @stdout = initial_options[:stdout]
         else
-          @stdout = STDOUT
+          @stdout = $stdout
           @stdout.sync = true
         end
 
         if initial_options[:stdin]
           @stdin = initial_options[:stdin]
         else
-          @stdin = STDIN
+          @stdin = $stdin
         end
       end
 
@@ -159,12 +157,12 @@ module MCollective
       def new_request(action, data)
         callerid = PluginManager["security_plugin"].callerid
 
-        raise 'callerid received from security plugin is not valid' unless PluginManager["security_plugin"].valid_callerid?(callerid)
+        raise "callerid received from security plugin is not valid" unless PluginManager["security_plugin"].valid_callerid?(callerid)
 
-        {:agent  => @agent,
+        {:agent => @agent,
          :action => action,
          :caller => callerid,
-         :data   => data}
+         :data => data}
       end
 
       # For the provided arguments and action the input arguments get
@@ -238,7 +236,7 @@ module MCollective
       #
       # This will do everything exactly as normal but communicate to only 5
       # agents at a time
-      def method_missing(method_name, *args, &block)
+      def method_missing(method_name, *args, &block) # rubocop:disable Style/MissingRespondToMissing
         # set args to an empty hash if nothings given
         args = args[0]
         args = {} if args.nil?
@@ -256,7 +254,6 @@ module MCollective
 
         # if a global batch size is set just use that else set it
         # in the case that it was passed as an argument
-        batch_mode = args.include?(:batch_size) || @batch_mode
         batch_size = args.delete(:batch_size) || @batch_size
         batch_sleep_time = args.delete(:batch_sleep_time) || @batch_sleep_time
 
@@ -308,7 +305,7 @@ module MCollective
       # hash as a filter, this will force that request to be a directly addressed
       # request which technically does not need filters.  If you try to use this
       # mode with direct addressing disabled an exception will be raise
-      def custom_request(action, args, expected_agents, filter = {}, &block)
+      def custom_request(action, args, expected_agents, filter={}, &block)
         validate_request(action, args)
 
         if filter == {} && !Config.instance.direct_addressing
@@ -324,9 +321,7 @@ module MCollective
         # we could just use the merge method but I want to be sure
         # we dont merge in stuff that isnt actually valid
         ["identity", "fact", "agent", "cf_class", "compound"].each do |ftype|
-          if filter.include?(ftype)
-            custom_filter[ftype] = [filter[ftype], custom_filter[ftype]].flatten
-          end
+          custom_filter[ftype] = [filter[ftype], custom_filter[ftype]].flatten if filter.include?(ftype)
         end
 
         # ensure that all filters at least restrict the call to the agent we're a proxy for
@@ -341,9 +336,7 @@ module MCollective
         # If a specific reply-to was set then from the client perspective this should
         # be a fire and forget request too since no response will ever reach us - it
         # will go to the reply-to destination
-        if args[:process_results] == false || @reply_to
-          return fire_and_forget_request(action, args, custom_filter)
-        end
+        return fire_and_forget_request(action, args, custom_filter) if args[:process_results] == false || @reply_to
 
         # Now do a call pretty much exactly like in method_missing except with our own
         # options and discovery magic
@@ -358,7 +351,8 @@ module MCollective
 
       def discovery_timeout
         return @discovery_timeout if @discovery_timeout
-        return @client.discoverer.ddl.meta[:timeout]
+
+        @client.discoverer.ddl.meta[:timeout]
       end
 
       def discovery_timeout=(timeout)
@@ -423,12 +417,11 @@ module MCollective
 
         if value.nil?
           parsed = Util.parse_fact_string(fact)
-          @filter["fact"] = @filter["fact"] | [parsed] unless parsed == false
         else
           parsed = Util.parse_fact_string("#{fact}#{operator}#{value}")
-          @filter["fact"] = @filter["fact"] | [parsed] unless parsed == false
         end
 
+        @filter["fact"] = @filter["fact"] | [parsed] unless parsed == false
         @filter["fact"].compact!
         reset
       end
@@ -449,7 +442,7 @@ module MCollective
 
       # Set a compound filter
       def compound_filter(filter)
-        @filter["compound"] = @filter["compound"] |  [Matcher.create_compound_callstack(filter)]
+        @filter["compound"] = @filter["compound"] | [Matcher.create_compound_callstack(filter)]
         reset
       end
 
@@ -477,9 +470,9 @@ module MCollective
       #
       # Then we override discovery to try to grok the data on STDIN
       def detect_and_set_stdin_discovery
-        if self.default_discovery_method && !@stdin.tty? && !@stdin.eof?
-          self.discovery_method = 'stdin'
-          self.discovery_options = 'auto'
+        if default_discovery_method && !@stdin.tty? && !@stdin.eof?
+          self.discovery_method = "stdin"
+          self.discovery_options = "auto"
         end
       end
 
@@ -499,7 +492,7 @@ module MCollective
       #
       # Use reset to force a new discovery
       def discover(flags={})
-        flags.keys.each do |key|
+        flags.each_key do |key|
           raise "Unknown option #{key} passed to discover" unless [:verbose, :hosts, :nodes, :json].include?(key)
         end
 
@@ -565,8 +558,8 @@ module MCollective
           # and if we're configured to use the first found hosts as the
           # limit method then pass in the limit thus minimizing the amount
           # of work we do in the discover phase and speeding it up significantly
-          filter = @filter.merge({'collective' => @collective})
-          if @limit_method == :first and @limit_targets.is_a?(Integer)
+          filter = @filter.merge({"collective" => @collective})
+          if (@limit_method == :first) && @limit_targets.is_a?(Integer)
             @discovered_agents = @client.discover(filter, discovery_timeout, @limit_targets)
           else
             @discovered_agents = @client.discover(filter, discovery_timeout)
@@ -604,10 +597,10 @@ module MCollective
       end
 
       # Sets the collective we are communicating with
-      def collective=(c)
-        raise "Unknown collective #{c}" unless Config.instance.collectives.include?(c)
+      def collective=(collective)
+        raise "Unknown collective #{collective}" unless Config.instance.collectives.include?(collective)
 
-        @collective = c
+        @collective = collective
         @client.options = options
         reset
       end
@@ -616,7 +609,7 @@ module MCollective
       # used to restrict how many nodes we'll target
       # Limit targets can be reset by passing nil or false
       def limit_targets=(limit)
-        if !limit
+        unless limit
           @limit_targets = nil
           return
         end
@@ -646,9 +639,7 @@ module MCollective
 
       # Sets the batch size, if the size is set to 0 that will disable batch mode
       def batch_size=(limit)
-        unless Config.instance.direct_addressing
-          raise "Can only set batch size if direct addressing is supported"
-        end
+        raise "Can only set batch size if direct addressing is supported" unless Config.instance.direct_addressing
 
         validate_batch_size(limit)
 
@@ -721,21 +712,20 @@ module MCollective
         return nil unless ddl
         return nil unless ddl.action_interface(action).keys.include?(:aggregate)
 
-        return Aggregate.new(ddl.action_interface(action))
-
+        Aggregate.new(ddl.action_interface(action))
       rescue => e
         Log.error("Failed to load aggregate functions, calculating summaries disabled: %s: %s (%s)" % [e.backtrace.first, e.to_s, e.class])
-        return nil
+        nil
       end
 
       def aggregate_reply(reply, aggregate)
         return nil unless aggregate
 
         aggregate.call_functions(reply)
-        return aggregate
-      rescue Exception => e
+        aggregate
+      rescue Exception => e # rubocop:disable Lint/RescueException
         Log.error("Failed to calculate aggregate summaries for reply from %s, calculating summaries disabled: %s: %s (%s)" % [reply[:senderid], e.backtrace.first, e.to_s, e.class])
-        return nil
+        nil
       end
 
       def rpc_result_from_reply(agent, action, reply)
@@ -763,7 +753,7 @@ module MCollective
 
         req = new_request(action.to_s, args)
 
-        filter = options[:filter] unless filter
+        filter ||= options[:filter]
 
         message = Message.new(req, nil, {:agent => @agent, :type => :request, :collective => @collective, :filter => filter, :options => options})
         message.reply_to = @reply_to if @reply_to
@@ -788,8 +778,8 @@ module MCollective
       # the concept of identity to mean something else so we should pass the full
       # identity filter to them
       def identity_filter_discovery_optimization
-        if options[:filter]["identity"].size > 0 && @discovery_method == "mc"
-          regex_filters = options[:filter]["identity"].select{|i| i.match("^\/")}.size
+        if !options[:filter]["identity"].empty? && @discovery_method == "mc"
+          regex_filters = options[:filter]["identity"].select {|i| i.match("^\/")}.size
 
           if regex_filters == 0
             @discovered_agents = options[:filter]["identity"].clone
@@ -805,9 +795,10 @@ module MCollective
       # from normal call_agent.
       #
       # This is used by method_missing and works only with direct addressing mode
-      def call_agent_batched(action, args, opts, batch_size, sleep_time, &block)
+      def call_agent_batched(action, args, opts, batch_size, sleep_time, &block) # rubocop:disable Metrics/MethodLength
         raise "Batched requests requires direct addressing" unless Config.instance.direct_addressing
         raise "Cannot bypass result processing for batched requests" if args[:process_results] == false
+
         validate_batch_size(batch_size)
 
         sleep_time = Float(sleep_time)
@@ -820,7 +811,7 @@ module MCollective
         results = []
         respcount = 0
 
-        if discovered.size > 0
+        if !discovered.empty?
           req = new_request(action.to_s, args)
 
           aggregate = load_aggregate_functions(action, @ddl)
@@ -831,7 +822,7 @@ module MCollective
             @stdout.print twirl.twirl(respcount, discovered.size)
           end
 
-          if (batch_size =~ /^(\d+)%$/)
+          if batch_size =~ /^(\d+)%$/
             # determine batch_size as a percentage of the discovered array's size
             batch_size = (discovered.size / 100.0 * Integer($1)).ceil
           else
@@ -869,9 +860,7 @@ module MCollective
               end
             end
 
-            if @initial_options[:sort]
-              results.sort!
-            end
+            results.sort! if @initial_options[:sort]
 
             @stats.noresponsefrom.concat @client.stats[:noresponsefrom]
             @stats.unexpectedresponsefrom.concat @client.stats[:unexpectedresponsefrom]
@@ -881,9 +870,7 @@ module MCollective
             @stats.discoverytime += @client.stats[:discoverytime]
 
             processed_nodes += hosts.length
-            if (discovered.length > processed_nodes)
-              sleep sleep_time
-            end
+            sleep sleep_time if discovered.length > processed_nodes
           end
 
           @stats.aggregate_summary = aggregate.summarize if aggregate
@@ -899,9 +886,9 @@ module MCollective
         @stdout.print("\n") if @progress
 
         if block_given?
-          return stats
+          stats
         else
-          return [results].flatten
+          [results].flatten
         end
       end
 
@@ -942,7 +929,7 @@ module MCollective
         results = []
         respcount = 0
 
-        if discovered.size > 0
+        if !discovered.empty?
           message.type = :direct_request if @force_direct_request
 
           if @progress && !block_given?
@@ -967,9 +954,7 @@ module MCollective
             end
           end
 
-          if @initial_options[:sort]
-            results.sort!
-          end
+          results.sort! if @initial_options[:sort]
 
           @stats.aggregate_summary = aggregate.summarize if aggregate
           @stats.aggregate_failures = aggregate.failed if aggregate
@@ -985,9 +970,9 @@ module MCollective
         @stdout.print("\n\n") if @progress
 
         if block_given?
-          return stats
+          stats
         else
-          return [results].flatten
+          [results].flatten
         end
       end
 
@@ -1025,25 +1010,23 @@ module MCollective
         @stats.time_block_execution :start
 
         case block.arity
-          when 1
-            block.call(resp)
-          when 2
-            block.call(resp, result)
+        when 1
+          block.call(resp)
+        when 2
+          block.call(resp, result)
         end
 
         @stats.time_block_execution :end
 
-        return aggregate
+        aggregate
       end
 
       private
 
       def determine_batch_mode(batch_size)
-        if (batch_size != 0 && batch_size != "0")
-          return true
-        end
+        return true if batch_size != 0 && batch_size != "0"
 
-        return false
+        false
       end
 
       # Validate the bach_size based on the following criteria
@@ -1051,12 +1034,11 @@ module MCollective
       # batch_size is a string of digits
       # batch_size is of type Integer
       def validate_batch_size(batch_size)
-        if (batch_size.is_a?(Integer))
+        case batch_size
+        when Integer
           return
-        elsif (batch_size.is_a?(String))
-          if ((batch_size =~ /^(\d+)%$/ && Integer($1) != 0) || batch_size =~ /^(\d+)$/)
-            return
-          end
+        when String
+          return if (batch_size =~ /^(\d+)%$/ && Integer($1) != 0) || batch_size =~ /^(\d+)$/
         end
 
         raise("batch_size must be an integer or match a percentage string (e.g. '24%'")

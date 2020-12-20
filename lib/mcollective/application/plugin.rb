@@ -1,6 +1,5 @@
 module MCollective
-  class Application::Plugin<Application
-
+  class Application::Plugin < Application # rubocop:disable Style/ClassAndModuleChildren
     exclude_argument_sections "common", "filter", "rpc"
 
     description "MCollective Plugin Application"
@@ -18,119 +17,119 @@ mco plugin package [options] <directory>
     END_OF_USAGE
 
     option :pluginname,
-           :description => 'Plugin name',
-           :arguments   => ['-n', '--name NAME'],
-           :type        => String
+           :description => "Plugin name",
+           :arguments => ["-n", "--name NAME"],
+           :type => String
 
     option :postinstall,
-           :description => 'Post install script',
-           :arguments   => ['--postinstall POSTINSTALL'],
-           :type        => String
+           :description => "Post install script",
+           :arguments => ["--postinstall POSTINSTALL"],
+           :type => String
 
     option :preinstall,
-           :description => 'Pre install script',
-           :arguments   => ['--preinstall PREINSTALL'],
-           :type        => String
+           :description => "Pre install script",
+           :arguments => ["--preinstall PREINSTALL"],
+           :type => String
 
     option :revision,
-           :description => 'Revision number',
-           :arguments   => ['--revision REVISION'],
-           :type        => String
+           :description => "Revision number",
+           :arguments => ["--revision REVISION"],
+           :type => String
 
     option :iteration,
-           :description => 'DEPRECATED - Use --revision instead',
-           :arguments   => ['--iteration ITERATION'],
-           :type        => String
+           :description => "DEPRECATED - Use --revision instead",
+           :arguments => ["--iteration ITERATION"],
+           :type => String
 
     option :vendor,
-           :description => 'Vendor name',
-           :arguments   => ['--vendor VENDOR'],
-           :type        => String
+           :description => "Vendor name",
+           :arguments => ["--vendor VENDOR"],
+           :type => String
 
     option :pluginpath,
-           :description => 'MCollective plugin path',
-           :arguments   => ['--pluginpath PATH'],
-           :type        => String
+           :description => "MCollective plugin path",
+           :arguments => ["--pluginpath PATH"],
+           :type => String
 
     option :mcname,
-           :description => 'MCollective type (mcollective, pe-mcollective) that the packages depend on',
-           :arguments   => ['--mcname NAME'],
-           :type        => String
+           :description => "MCollective type (mcollective, pe-mcollective) that the packages depend on",
+           :arguments => ["--mcname NAME"],
+           :type => String
 
     option :mcversion,
-           :description => 'Version of MCollective that the packages depend on',
-           :arguments   => ['--mcversion MCVERSION'],
-           :type        => String
+           :description => "Version of MCollective that the packages depend on",
+           :arguments => ["--mcversion MCVERSION"],
+           :type => String
 
     option :dependency,
-           :description => 'Adds a dependency to the plugin',
-           :arguments   => ['--dependency DEPENDENCIES'],
-           :type        => :array
+           :description => "Adds a dependency to the plugin",
+           :arguments => ["--dependency DEPENDENCIES"],
+           :type => :array
 
     option :format,
-           :description => 'Package output format. Defaults to rpmpackage or debpackage',
-           :arguments   => ['--format OUTPUTFORMAT'],
-           :type        => String
+           :description => "Package output format. Defaults to rpmpackage or debpackage",
+           :arguments => ["--format OUTPUTFORMAT"],
+           :type => String
 
     option :sign,
-           :description => 'Embed a signature in the package',
-           :arguments   => ['--sign'],
-           :type        => :boolean
+           :description => "Embed a signature in the package",
+           :arguments => ["--sign"],
+           :type => :boolean
 
     option :rpctemplate,
-           :description => 'Template to use.',
-           :arguments   => ['--template HELPTEMPLATE'],
-           :type        => String
+           :description => "Template to use.",
+           :arguments => ["--template HELPTEMPLATE"],
+           :type => String
 
     option :description,
-           :description => 'Plugin description',
-           :arguments   => ['--description DESCRIPTION'],
-           :type        => String
+           :description => "Plugin description",
+           :arguments => ["--description DESCRIPTION"],
+           :type => String
 
     option :author,
-           :description => 'The author of the plugin',
-           :arguments   => ['--author AUTHOR'],
-           :type        => String
+           :description => "The author of the plugin",
+           :arguments => ["--author AUTHOR"],
+           :type => String
 
     option :license,
-           :description => 'The license under which the plugin is distributed',
-           :arguments   => ['--license LICENSE'],
-           :type        => String
+           :description => "The license under which the plugin is distributed",
+           :arguments => ["--license LICENSE"],
+           :type => String
 
     option :version,
-           :description => 'The version of the plugin',
-           :arguments   => ['--pluginversion VERSION'],
-           :type        => String
+           :description => "The version of the plugin",
+           :arguments => ["--pluginversion VERSION"],
+           :type => String
 
     option :url,
-           :description => 'Url at which information about the plugin can be found',
-           :arguments   => ['--url URL'],
-           :type        => String
+           :description => "Url at which information about the plugin can be found",
+           :arguments => ["--url URL"],
+           :type => String
 
     option :timeout,
            :description => "The plugin's timeout",
-           :arguments   => ['--timeout TIMEOUT'],
-           :type        => Integer
+           :arguments => ["--timeout TIMEOUT"],
+           :type => Integer
 
     option :actions,
-           :description => 'Actions to be generated for an Agent Plugin',
-           :arguments   => ['--actions [ACTIONS]'],
-           :type        => Array
+           :description => "Actions to be generated for an Agent Plugin",
+           :arguments => ["--actions [ACTIONS]"],
+           :type => Array
 
     option :outputs,
-           :description => 'Outputs to be generated for an Data Plugin',
-           :arguments   => ['--outputs [OUTPUTS]'],
-           :type        => Array
+           :description => "Outputs to be generated for an Data Plugin",
+           :arguments => ["--outputs [OUTPUTS]"],
+           :type => Array
 
     option :keep_artifacts,
            :description => "Don't remove artifacts after building packages",
-           :arguments   => ['--keep-artifacts'],
-           :type        => :boolean
+           :arguments => ["--keep-artifacts"],
+           :type => :boolean
 
     option :module_template,
            :description => "Path to the template used by the modulepackager",
-           :arguments   => ['--module-template PATH'],
-           :type        => String
+           :arguments => ["--module-template PATH"],
+           :type => String
 
     # Handle alternative format that optparser can't parse.
     def post_option_parser(configuration)
@@ -141,16 +140,16 @@ mco plugin package [options] <directory>
 
         if configuration[:action] == "generate"
           unless ARGV[0] && ARGV[0].match(/(actions|outputs)=(.+)/i)
-            unless configuration[:pluginname]
-              configuration[:pluginname] = ARGV.delete_at(0)
-            else
+            if configuration[:pluginname] # rubocop:disable Metrics/BlockNesting
               ARGV.delete_at(0)
+            else
+              configuration[:pluginname] = ARGV.delete_at(0)
             end
           end
 
           ARGV.each do |argument|
             if argument.match(/(actions|outputs)=(.+)/i)
-              configuration[$1.downcase.to_sym]= $2.split(",")
+              configuration[$1.downcase.to_sym] = $2.split(",")
             else
               raise "Could not parse --arg '#{argument}'"
             end
@@ -168,7 +167,7 @@ mco plugin package [options] <directory>
 
     # Generate a plugin skeleton
     def generate_command
-      raise "undefined plugin type. cannot generate plugin. valid types are 'agent' and 'data'" if configuration["target"] == '.'
+      raise "undefined plugin type. cannot generate plugin. valid types are 'agent' and 'data'" if configuration["target"] == "."
 
       unless configuration[:pluginname]
         puts "No plugin name specified. Using 'new_plugin'"
@@ -178,15 +177,16 @@ mco plugin package [options] <directory>
       load_plugin_config_values
 
       case configuration[:target].downcase
-      when 'agent'
+      when "agent"
         Generators::AgentGenerator.new(configuration[:pluginname], configuration[:actions], configuration[:pluginname],
                                        configuration[:description], configuration[:author], configuration[:license],
                                        configuration[:version], configuration[:url], configuration[:timeout])
-      when 'data'
+      when "data"
         raise "data plugin must have at least one output" unless configuration[:outputs]
+
         Generators::DataGenerator.new(configuration[:pluginname], configuration[:outputs], configuration[:pluginname],
-                                       configuration[:description], configuration[:author], configuration[:license],
-                                       configuration[:version], configuration[:url], configuration[:timeout])
+                                      configuration[:description], configuration[:author], configuration[:license],
+                                      configuration[:version], configuration[:url], configuration[:timeout])
       else
         raise "invalid plugin type. cannot generate plugin '#{configuration[:target]}'"
       end
@@ -196,11 +196,11 @@ mco plugin package [options] <directory>
     def package_command
       if configuration[:sign] && Config.instance.pluginconf.include?("debian_packager.keyname")
         configuration[:sign] = Config.instance.pluginconf["debian_packager.keyname"]
-        configuration[:sign] = "\"#{configuration[:sign]}\"" unless configuration[:sign].match(/\".*\"/)
+        configuration[:sign] = "\"#{configuration[:sign]}\"" unless configuration[:sign].match(/".*"/)
       end
 
       plugin = prepare_plugin
-      (configuration[:pluginpath] = configuration[:pluginpath] + "/") if (configuration[:pluginpath] && !configuration[:pluginpath].match(/^.*\/$/))
+      (configuration[:pluginpath] = "#{configuration[:pluginpath]}/") if configuration[:pluginpath] && !configuration[:pluginpath].match(/^.*\/$/)
       packager = PluginPackager["#{configuration[:format].capitalize}Packager"]
       packager.new(plugin, configuration[:pluginpath], configuration[:sign],
                    options[:verbose], configuration[:keep_artifacts],
@@ -219,11 +219,11 @@ mco plugin package [options] <directory>
         end
       end
 
-      return nil
+      nil
     end
 
     # Show application list and plugin help
-    def doc_command
+    def doc_command # rubocop:disable Metrics/MethodLength
       known_plugin_types = [
         ["Agents", :agent],
         ["Aggregate", :aggregate],
@@ -240,12 +240,12 @@ mco plugin package [options] <directory>
           found_plugin_type = nil
 
           known_plugin_types.each do |plugin_type|
-            PluginManager.find(plugin_type[1], "ddl").each do |ddl|
-              pluginname = ddl.gsub(/_#{plugin_type[1]}$/, "")
-              if pluginname == configuration[:target]
-                abort "Duplicate plugin name found, please specify a full path like agent/rpcutil" if found_plugin_type
-                found_plugin_type = plugin_type[1]
-              end
+            PluginManager.find(plugin_type[1], "ddl").each do |ddlf|
+              pluginname = ddlf.gsub(/_#{plugin_type[1]}$/, "")
+
+              abort "Duplicate plugin name found, please specify a full path like agent/rpcutil" if pluginname == configuration[:target] && found_plugin_type
+
+              found_plugin_type = plugin_type[1] if pluginname == configuration[:target]
             end
           end
 
@@ -256,7 +256,7 @@ mco plugin package [options] <directory>
         if ddl
           puts ddl.help(configuration[:rpctemplate])
         else
-          abort "Could not find a '%s' plugin named '%s'" % configuration[:target].split('/')
+          abort "Could not find a '%s' plugin named '%s'" % configuration[:target].split("/")
         end
 
       else
@@ -268,17 +268,17 @@ mco plugin package [options] <directory>
         known_plugin_types.each do |plugin_type|
           puts "%s:" % plugin_type[0]
 
-          PluginManager.find(plugin_type[1], "ddl").each do |ddl|
+          PluginManager.find(plugin_type[1], "ddl").each do |ddlf|
             begin
-              help = DDL.new(ddl, plugin_type[1], false)
+              help = DDL.new(ddlf, plugin_type[1], false)
 
               next unless help.client_activated?
 
               help.loadddlfile
-              pluginname = ddl.gsub(/_#{plugin_type[1]}$/, "")
+              pluginname = ddlf.gsub(/_#{plugin_type[1]}$/, "")
               puts "  %-25s %s" % [pluginname, help.meta[:description]]
             rescue => e
-              load_errors << [plugin_type[1], ddl, e]
+              load_errors << [plugin_type[1], ddlf, e]
             end
           end
 
@@ -305,7 +305,7 @@ mco plugin package [options] <directory>
       if configuration[:dependency] && configuration[:dependency].size == 1
         configuration[:dependency] = configuration[:dependency][0].split(" ")
       elsif configuration[:dependency]
-        configuration[:dependency].map!{|dep| {:name => dep, :version => nil}}
+        configuration[:dependency].map! {|dep| {:name => dep, :version => nil}}
       end
 
       mcdependency = {
@@ -315,7 +315,7 @@ mco plugin package [options] <directory>
 
       # Deprecation warning for --iteration
       if configuration[:iteration]
-        puts 'Warning. The --iteration flag has been deprecated. Please use --revision instead.'
+        puts "Warning. The --iteration flag has been deprecated. Please use --revision instead."
         configuration[:revision] = configuration[:iteration] unless configuration[:revision]
       end
 
@@ -330,12 +330,12 @@ mco plugin package [options] <directory>
     def set_plugin_type
       if plugin_directory_exists?("agent") || plugin_directory_exists?("application")
         configuration[:plugintype] = "AgentDefinition"
-        return "Agent"
+        "Agent"
       elsif plugin_directory_exists?(plugintype = identify_plugin)
         configuration[:plugintype] = "StandardDefinition"
-        return plugintype
+        plugintype
       else
-        raise RuntimeError, "target directory is not a valid mcollective plugin"
+        raise "target directory is not a valid mcollective plugin"
       end
     end
 
@@ -348,8 +348,8 @@ mco plugin package [options] <directory>
         File.directory?(file) && file.match(/(connector|facts|registration|security|audit|pluginpackager|data|discovery|validator)/)
       end
 
-      raise RuntimeError, "more than one plugin type detected in directory" if plugintype.size > 1
-      raise RuntimeError, "no plugins detected in directory" if plugintype.size < 1
+      raise "more than one plugin type detected in directory" if plugintype.size > 1
+      raise "no plugins detected in directory" if plugintype.empty?
 
       File.basename(plugintype[0])
     end
@@ -367,15 +367,15 @@ mco plugin package [options] <directory>
     end
 
     def main
-        abort "No action specified, please run 'mco help plugin' for help" unless configuration.include?(:action)
+      abort "No action specified, please run 'mco help plugin' for help" unless configuration.include?(:action)
 
-        cmd = "#{configuration[:action]}_command"
+      cmd = "#{configuration[:action]}_command"
 
-        if respond_to? cmd
-          send cmd
-        else
-          abort "Invalid action #{configuration[:action]}, please run 'mco help plugin' for help."
-        end
+      if respond_to? cmd
+        send cmd
+      else
+        abort "Invalid action #{configuration[:action]}, please run 'mco help plugin' for help."
+      end
     end
   end
 end

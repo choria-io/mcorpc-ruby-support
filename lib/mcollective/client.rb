@@ -7,10 +7,11 @@ module MCollective
       @config = Config.instance
       @options = nil
 
-      if options.is_a?(String)
+      case options
+      when String
         # String is the path to a config file
         @config.loadconfig(options) unless @config.configured
-      elsif options.is_a?(Hash)
+      when Hash
         @config.loadconfig(options[:config]) unless @config.configured
         @options = options
         @connection_timeout = options[:connection_timeout]
@@ -124,9 +125,7 @@ module MCollective
 
         reply.decode!
 
-        unless reply.requestid == requestid
-          raise(MsgDoesNotMatchRequestID, "Message reqid #{reply.requestid} does not match our reqid #{requestid}")
-        end
+        raise(MsgDoesNotMatchRequestID, "Message reqid #{reply.requestid} does not match our reqid #{requestid}") unless reply.requestid == requestid
 
         Log.debug("Received reply to #{reply.requestid} from #{reply.payload[:senderid]}")
       rescue SecurityValidationFailed => e
@@ -171,7 +170,7 @@ module MCollective
       request = createreq(body, agent, @options[:filter])
       publish_timeout = @options[:publish_timeout] || @config.publish_timeout
       stat = {:starttime => Time.now.to_f, :discoverytime => 0, :blocktime => 0, :totaltime => 0}
-      STDOUT.sync = true
+      $stdout.sync = true
       hosts_responded = 0
 
       begin
@@ -180,7 +179,7 @@ module MCollective
         else
           hosts_responded = unthreaded_req(request, publish_timeout, timeout, waitfor, &block)
         end
-      rescue Interrupt # rubocop:disable Lint/HandleExceptions
+      rescue Interrupt # rubocop:disable Lint/SuppressedException
       ensure
         unsubscribe(agent, :reply)
       end
@@ -277,9 +276,7 @@ module MCollective
         end
       rescue Timeout::Error
         if waitfor.is_a?(Array)
-          unless unfinished.empty?
-            Log.warn("Could not receive all responses. Did not receive responses from #{unfinished.keys.join(', ')}")
-          end
+          Log.warn("Could not receive all responses. Did not receive responses from #{unfinished.keys.join(', ')}") unless unfinished.empty?
         elsif waitfor > hosts_responded
           Log.warn("Could not receive all responses. Expected : #{waitfor}. Received : #{hosts_responded}")
         end

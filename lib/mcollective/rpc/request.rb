@@ -57,12 +57,14 @@ module MCollective
       # If data is a hash, gives easy access to its members, else returns nil
       def [](key)
         return nil unless @data.is_a?(Hash)
-        return @data[compatible_key(key)]
+
+        @data[compatible_key(key)]
       end
 
       def fetch(key, default)
         return nil unless @data.is_a?(Hash)
-        return @data.fetch(compatible_key(key), default)
+
+        @data.fetch(compatible_key(key), default)
       end
 
       def to_hash
@@ -76,10 +78,10 @@ module MCollective
         @ddl.validate_rpc_request(@action, @data)
       end
 
-      def to_json
-        to_hash.merge!({:sender   => @sender,
+      def to_json(*_args)
+        to_hash.merge!({:sender => @sender,
                         :callerid => @callerid,
-                        :uniqid   => @uniqid}).to_json
+                        :uniqid => @uniqid}).to_json
       end
     end
   end

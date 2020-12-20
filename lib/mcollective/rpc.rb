@@ -21,13 +21,11 @@ module MCollective
     def rpcoptions
       oparser = MCollective::Optionparser.new({:verbose => false, :progress_bar => true}, "filter")
 
-      options = oparser.parse do |parser, opts|
+      oparser.parse do |parser, opts|
         yield(parser, opts) if block_given?
 
         Helpers.add_simplerpc_options(parser, opts)
       end
-
-      options
     end
 
     # Wrapper to create clients, supposed to be used as
@@ -86,7 +84,7 @@ module MCollective
       if block_given?
         yield(rpc)
       else
-        return rpc
+        rpc
       end
     end
 

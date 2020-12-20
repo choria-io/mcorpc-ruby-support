@@ -40,7 +40,7 @@ module MCollective
 
           puts("Completed building module for %s" % module_name)
         rescue
-          STDERR.puts("Failed to build plugin module: %s: %s" % [$!.class, $!.to_s])
+          warn("Failed to build plugin module: %s: %s" % [$!.class, $!.to_s])
         ensure
           if @keep_artifacts
             puts("Keeping build artifacts")
@@ -191,12 +191,12 @@ module MCollective
       end
 
       def render_template(infile, outfile)
-        erb = ERB.new(File.read(infile), nil, "-")
+        erb = ERB.new(File.read(infile), 0, "%")
         File.open(outfile, "w") do |f|
           f.puts erb.result(binding)
         end
       rescue
-        STDERR.puts("Could not render template %s to %s" % [infile, outfile])
+        warn("Could not render template %s to %s" % [infile, outfile])
         raise
       end
 
@@ -218,9 +218,7 @@ module MCollective
         actual_version = s.stdout.chomp
         required_version = "1.12.0"
 
-        if Util.versioncmp(actual_version, required_version) < 0
-          raise("Cannot build package. pdk #{required_version} or greater required.  We have #{actual_version}.")
-        end
+        raise("Cannot build package. pdk #{required_version} or greater required.  We have #{actual_version}.") if Util.versioncmp(actual_version, required_version) < 0
       end
 
       def run_build
@@ -230,7 +228,7 @@ module MCollective
           end
         end
       rescue
-        STDERR.puts("Build process has failed")
+        warn("Build process has failed")
         raise
       end
 
@@ -238,14 +236,14 @@ module MCollective
         package_file = File.join(@tmpdir, "pkg", module_file_name)
         FileUtils.cp(package_file, ".")
       rescue
-        STDERR.puts("Could not copy package to working directory")
+        warn("Could not copy package to working directory")
         raise
       end
 
       def cleanup_tmpdirs
         FileUtils.rm_r(@tmpdir) if File.directory?(@tmpdir)
       rescue
-        STDERR.puts("Could not remove temporary build directory %s" % [@tmpdir])
+        warn("Could not remove temporary build directory %s" % [@tmpdir])
         raise
       end
     end

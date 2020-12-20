@@ -102,9 +102,9 @@ module MCollective
           # If data field has not been set we set the comparison result to nil
           eval_result = nil
         end
-        return eval_result
+        eval_result
       else
-        return result
+        result
       end
     rescue NoMethodError
       Log.debug("cannot execute discovery function '#{function_hash['name']}'. data plugin not found")
@@ -113,9 +113,10 @@ module MCollective
 
     # Evaluates a compound statement
     def self.eval_compound_statement(expression)
-      if expression.values.first =~ /^\//
+      case expression.values.first
+      when /^\//
         Util.has_cf_class?(expression.values.first)
-      elsif expression.values.first =~ />=|<=|=|<|>/
+      when />=|<=|=|<|>/
         optype = expression.values.first.match(/>=|<=|=|<|>/)
         name, value = expression.values.first.split(optype[0])
         if value.split("")[0] == "/"
@@ -160,20 +161,21 @@ module MCollective
           result = l_compare.match(r_compare)
           # Flip return value for != operator
           if function_hash["operator"] == "!=~"
-            return !result
+            !result
           else
-            return !!result
+            !!result
           end
         else
           Log.debug("Cannot do a regex check on a non string value.")
-          return false
+          false
         end
         # Otherwise do a normal comparison while taking the type into account
       else
         if l_compare.is_a? String
           r_compare = r_compare.to_s
         elsif r_compare.is_a? String
-          if l_compare.is_a? Numeric
+          case l_compare
+          when Numeric
             r_compare = r_compare.strip
             begin
               r_compare = Integer(r_compare)
@@ -184,7 +186,7 @@ module MCollective
                 raise(ArgumentError, "invalid numeric value: #{r_compare}")
               end
             end
-          elsif l_compare.is_a?(TrueClass) || l_compare.is_a?(FalseClass)
+          when TrueClass, FalseClass
             r_compare = r_compare.strip
             if r_compare == true.to_s # rubocop:disable Metrics/BlockNesting
               r_compare = true
@@ -201,8 +203,8 @@ module MCollective
         else
           raise(ArgumentError, "invalid operator: #{operator}")
         end
-        result = l_compare.send(operator, r_compare)
-        return result
+        l_compare.send(operator, r_compare)
+
       end
     end
 
@@ -210,9 +212,7 @@ module MCollective
     def self.create_compound_callstack(call_string)
       callstack = Matcher::Parser.new(call_string).execution_stack
       callstack.each_with_index do |statement, i|
-        if statement.keys.first == "fstatement"
-          callstack[i]["fstatement"] = create_function_hash(statement.values.first)
-        end
+        callstack[i]["fstatement"] = create_function_hash(statement.values.first) if statement.keys.first == "fstatement"
       end
       callstack
     end

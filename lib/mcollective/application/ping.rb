@@ -1,13 +1,12 @@
-# encoding: utf-8
 module MCollective
-  class Application::Ping<Application
+  class Application::Ping < Application # rubocop:disable Style/ClassAndModuleChildren
     description "Ping all nodes"
 
     option :graph,
-           :description    => "Shows a graph of ping distribution",
-           :arguments      => ["--graph", "-g"],
-           :default        => false,
-           :type           => :bool
+           :description => "Shows a graph of ping distribution",
+           :arguments => ["--graph", "-g"],
+           :default => false,
+           :type => :bool
 
     # Convert the times structure into a array representing
     # buckets of responses in 50 ms intervals.  Return a small
@@ -15,7 +14,7 @@ module MCollective
     def spark(resp_times)
       return "" unless configuration[:graph] || Config.instance.pluginconf["rpc.graph"]
 
-      ticks=%w[▁ ▂ ▃ ▄ ▅ ▆ ▇]
+      ticks = %w[▁ ▂ ▃ ▄ ▅ ▆ ▇]
 
       histo = {}
 
@@ -34,9 +33,8 @@ module MCollective
       end
 
       # get a numerically sorted list of times
-      histo = histo.keys.sort.map{|k| histo[k]}
+      histo = histo.keys.sort.map {|k| histo[k]}
 
-      range = histo.max - histo.min
       scale = ticks.size - 1
       distance = histo.max.to_f / scale
 
@@ -67,8 +65,8 @@ module MCollective
 
       puts("\n\n---- ping statistics ----")
 
-      if times.size > 0
-        sum = times.inject(0){|acc,i|acc +i}
+      if !times.empty?
+        sum = times.inject(0) {|acc, i| acc + i}
         avg = sum / times.length.to_f
 
         puts "%d replies max: %.2f min: %.2f avg: %.2f %s" % [times.size, times.max, times.min, avg, spark(times)]

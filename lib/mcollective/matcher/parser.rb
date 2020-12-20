@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/BlockNesting
 module MCollective
   module Matcher
     class Parser
@@ -10,9 +11,9 @@ module MCollective
         @token_errors = []
         @paren_errors = []
         parse
-        exit_with_token_errors if @token_errors.size > 0
-        exit_with_parse_errors if @parse_errors.size > 0
-        exit_with_paren_errors if @paren_errors.size > 0
+        exit_with_token_errors unless @token_errors.empty?
+        exit_with_parse_errors unless @parse_errors.empty?
+        exit_with_paren_errors unless @paren_errors.empty?
       end
 
       # Exit and highlight any malformed tokens
@@ -31,7 +32,7 @@ module MCollective
             @scanner.arguments[i] = Util.colorize(:red, @scanner.arguments[i])
           end
         end
-        raise "Parse errors found while parsing -S input #{ @scanner.arguments.join}"
+        raise "Parse errors found while parsing -S input #{@scanner.arguments.join}"
       end
 
       def exit_with_paren_errors
@@ -42,13 +43,12 @@ module MCollective
       end
 
       # Parse the input string, one token at a time a contruct the call stack
-      def parse
+      def parse # rubocop:disable Metrics/MethodLength
         pre_index = @scanner.token_index
-        p_token,p_token_value = nil
-        c_token,c_token_value = @scanner.get_token
-        parenth = 0
+        p_token = nil
+        c_token, c_token_value = @scanner.get_token
 
-        while (c_token != nil)
+        until c_token.nil?
           @scanner.token_index += 1
           n_token, n_token_value = @scanner.get_token
 
@@ -58,67 +58,56 @@ module MCollective
               @token_errors << c_token_value
 
             when "and"
-              unless (n_token =~ /not|fstatement|statement|\(/) || (scanner.token_index == scanner.arguments.size) && !(n_token == nil)
+              unless (n_token =~ /not|fstatement|statement|\(/) || (scanner.token_index == scanner.arguments.size) && !n_token.nil?
                 @parse_errors << [pre_index, scanner.token_index]
               end
 
-              if p_token == nil
+              case p_token
+              when nil
                 @parse_errors << [pre_index - c_token.size, scanner.token_index]
-              elsif (p_token == "and" || p_token == "or")
+              when "and", "or"
                 @parse_errors << [pre_index - 1 - p_token.size, pre_index - 1]
               end
 
             when "or"
-              unless (n_token =~ /not|fstatement|statement|\(/) || (scanner.token_index == scanner.arguments.size) && !(n_token == nil)
+              unless (n_token =~ /not|fstatement|statement|\(/) || (scanner.token_index == scanner.arguments.size) && !n_token.nil?
                 @parse_errors << [pre_index, scanner.token_index]
               end
 
-              if p_token == nil
+              case p_token
+              when nil
                 @parse_errors << [pre_index - c_token.size, scanner.token_index]
-              elsif (p_token == "and" || p_token == "or")
+              when "and", "or"
                 @parse_errors << [pre_index - 1 - p_token.size, pre_index - 1]
               end
 
             when "not"
-              unless n_token =~ /fstatement|statement|\(|not/ && !(n_token == nil)
-                @parse_errors << [pre_index, scanner.token_index]
-              end
+              @parse_errors << [pre_index, scanner.token_index] unless n_token =~ /fstatement|statement|\(|not/ && !n_token.nil?
 
-            when "statement","fstatement"
-              unless n_token =~ /and|or|\)/
-                unless scanner.token_index == scanner.arguments.size
-                  @parse_errors << [pre_index, scanner.token_index]
-                end
-              end
+            when "statement", "fstatement"
+              @parse_errors << [pre_index, scanner.token_index] if n_token !~ /and|or|\)/ && scanner.token_index != scanner.arguments.size
 
             when ")"
-              unless (n_token =~ /|and|or|not|\(/)
-                unless(scanner.token_index == scanner.arguments.size)
-                  @parse_errors << [pre_index, scanner.token_index]
-                end
-              end
-              unless @paren_errors.empty?
-                @paren_errors.pop
+              @parse_errors << [pre_index, scanner.token_index] if n_token !~ /|and|or|not|\(/ && scanner.token_index != scanner.arguments.size
+              if @paren_errors.empty?
+                @paren_errors.push(n_token.nil? ? scanner.token_index - 1 : scanner.token_index - n_token_value.size)
               else
-                @paren_errors.push((n_token.nil?) ? scanner.token_index - 1: scanner.token_index - n_token_value.size)
+                @paren_errors.pop
               end
 
             when "("
-              unless n_token =~ /fstatement|statement|not|\(/
-                @parse_errors << [pre_index, scanner.token_index]
-              end
-              @paren_errors.push((n_token.nil?) ? scanner.token_index - 1: scanner.token_index - n_token_value.size)
+              @parse_errors << [pre_index, scanner.token_index] unless n_token =~ /fstatement|statement|not|\(/
+              @paren_errors.push(n_token.nil? ? scanner.token_index - 1 : scanner.token_index - n_token_value.size)
 
             else
               @parse_errors << [pre_index, scanner.token_index]
             end
 
-            unless n_token == " " ||c_token == "bad_token"
-              @execution_stack << {c_token => c_token_value}
-            end
+            @execution_stack << {c_token => c_token_value} unless n_token == " " || c_token == "bad_token"
 
-            p_token, p_token_value = c_token, c_token_value
-            c_token, c_token_value = n_token, n_token_value
+            p_token = c_token
+            c_token = n_token
+            c_token_value = n_token_value
           end
           pre_index = @scanner.token_index
         end
@@ -126,3 +115,4 @@ module MCollective
     end
   end
 end
+# rubocop:enable Metrics/BlockNesting

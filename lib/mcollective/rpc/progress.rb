@@ -13,7 +13,7 @@ module MCollective
     #  * [ ==================================================> ] 100 / 100
     class Progress
       def initialize(size=nil)
-        @twirl = ['|', '/', '-', "\\", '|', '/', '-', "\\"]
+        @twirl = ["|", "/", "-", "\\", "|", "/", "-", "\\"]
         @twirldex = 0
 
         if size
@@ -56,7 +56,7 @@ module MCollective
 
         @twirldex == 7 ? @twirldex = 0 : @twirldex += 1
 
-        return txt
+        txt
       end
     end
   end

@@ -16,8 +16,8 @@ module MCollective
               return hosts if limit > 0 && hosts.size == limit
             end
           end
-        rescue Timeout::Error => e
-        rescue Exception => e
+        rescue Timeout::Error # rubocop:disable Lint/SuppressedException
+        rescue Exception # rubocop:disable Lint/RescueException
           raise
         ensure
           client.unsubscribe("discovery", :reply)
