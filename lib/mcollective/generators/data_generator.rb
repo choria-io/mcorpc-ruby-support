@@ -1,11 +1,10 @@
 module MCollective
   module Generators
-    class DataGenerator<Base
-
+    class DataGenerator < Base
       attr_accessor :ddl, :content
 
-      def initialize(plugin_name, outputs = [],  name = nil, description = nil, author = nil ,
-                     license = nil, version = nil, url = nil, timeout = nil)
+      def initialize(plugin_name, outputs=[], name=nil, description=nil, author=nil,
+                     license=nil, version=nil, url=nil, timeout=nil)
 
         super(name, description, author, license, version, url, timeout)
         @mod_name = "Data"
@@ -22,7 +21,7 @@ module MCollective
         query_text = "dataquery :description => \"Query information\" do\n"
         query_text += ERB.new(File.read(File.join(File.dirname(__FILE__), "templates", "data_input_snippet.erb"))).result
 
-        @outputs.each_with_index do |output,i|
+        @outputs.each_with_index do |output, i|
           query_text += "%2s%s" % [" ", "output :#{output},\n"]
           query_text += "%9s%s" % [" ", ":description => \"%DESCRIPTION%\",\n"]
           query_text += "%9s%s" % [" ", ":display_as => \"%DESCRIPTION%\"\n"]
@@ -39,7 +38,7 @@ module MCollective
         content_text = "%6s%s" % [" ", "query do |what|\n"]
 
         @outputs.each do |output|
-           content_text += "%8s%s" % [" ", "result[:#{output}] = nil\n"]
+          content_text += "%8s%s" % [" ", "result[:#{output}] = nil\n"]
         end
         content_text += "%6s%s" % [" ", "end\n"]
 

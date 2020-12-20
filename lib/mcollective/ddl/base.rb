@@ -64,6 +64,7 @@ module MCollective
       def usage(usage_text)
         @usage = usage_text
       end
+      # rubocop:enable Lint/DuplicateMethods, Style/TrivialAccessors
 
       def template_for_plugintype
         case @plugintype
@@ -80,9 +81,7 @@ module MCollective
       end
 
       def loadddlfile
-        if @config.mode == :client && !client_activated?
-          raise("%s/%s is disabled, cannot load DDL file" % [@plugintype, @pluginname])
-        end
+        raise("%s/%s is disabled, cannot load DDL file" % [@plugintype, @pluginname]) if @config.mode == :client && !client_activated?
 
         if ddlfile = findddlfile
           instance_eval(File.read(ddlfile), ddlfile, 1)
@@ -111,10 +110,10 @@ module MCollective
       end
 
       def validate_requirements
-        if requirement = @requirements[:mcollective]
-          if Util.versioncmp(Util.mcollective_version, requirement) < 0
-            raise DDLValidationError, "%s plugin '%s' requires MCollective version %s or newer" % [@plugintype.to_s.capitalize, @pluginname, requirement]
-          end
+        requirement = @requirements[:mcollective]
+
+        if requirement && (Util.versioncmp(Util.mcollective_version, requirement) < 0)
+          raise DDLValidationError, "%s plugin '%s' requires MCollective version %s or newer" % [@plugintype.to_s.capitalize, @pluginname, requirement]
         end
 
         true
@@ -147,7 +146,7 @@ module MCollective
           Validator.validate(argument, input[key][:type])
         end
 
-        return true
+        true
       rescue => e
         raise DDLValidationError, "Cannot validate input %s: %s" % [key, e.to_s], e.backtrace
       end
@@ -196,8 +195,8 @@ module MCollective
         action = @current_entity
 
         @entities[action][:output][argument] = {:description => properties[:description],
-                                                :display_as  => properties[:display_as],
-                                                :default     => properties[:default]}
+                                                :display_as => properties[:display_as],
+                                                :default => properties[:default]}
 
         @entities[action][:output][argument][:type] = properties[:type] if properties[:type]
       end
@@ -208,9 +207,7 @@ module MCollective
         valid_requirements = [:mcollective]
 
         requirement.each_key do |key|
-          unless valid_requirements.include?(key)
-            raise "Requirement %s is not a valid requirement, only %s is supported" % [key, valid_requirements.join(", ")]
-          end
+          raise "Requirement %s is not a valid requirement, only %s is supported" % [key, valid_requirements.join(", ")] unless valid_requirements.include?(key)
 
           @requirements[key] = requirement[key]
         end

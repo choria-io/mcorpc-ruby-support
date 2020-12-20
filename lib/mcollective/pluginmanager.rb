@@ -91,7 +91,7 @@ module MCollective
 
     # use eval to create an instance of a class
     def self.create_instance(klass)
-      eval("#{klass}.new") # rubocop:disable Security/Eval
+      eval("#{klass}.new") # rubocop:disable Security/Eval, Style/EvalWithLocation
     rescue Exception => e # rubocop:disable Lint/RescueException
       raise("Could not create instance of plugin #{klass}: #{e}")
     end
@@ -146,9 +146,7 @@ module MCollective
       extension = ".#{extension}" unless extension =~ /^\./
 
       klasses = find(type, extension).map do |plugin|
-        if block_given?
-          next unless yield(plugin)
-        end
+        next if block_given? && !yield(plugin)
 
         "%s::%s::%s" % ["MCollective", type.capitalize, plugin.capitalize]
       end.compact
@@ -159,7 +157,7 @@ module MCollective
     # Loads a class from file by doing some simple search/replace
     # on class names and then doing a require.
     def self.loadclass(klass, squash_failures=false)
-      fname = klass.gsub("::", "/").downcase + ".rb"
+      fname = "#{klass.gsub('::', '/').downcase}.rb"
 
       Log.debug("Loading #{klass} from #{fname}")
 

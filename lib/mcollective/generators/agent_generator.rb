@@ -1,11 +1,10 @@
 module MCollective
   module Generators
-    class AgentGenerator<Base
-
+    class AgentGenerator < Base
       attr_accessor :ddl, :content
 
-      def initialize(plugin_name, actions = [],  name = nil, description = nil, author = nil ,
-                     license = nil, version = nil, url = nil, timeout = nil)
+      def initialize(plugin_name, actions=[], name=nil, description=nil, author=nil,
+                     license=nil, version=nil, url=nil, timeout=nil)
 
         super(name, description, author, license, version, url, timeout)
         @plugin_name = plugin_name

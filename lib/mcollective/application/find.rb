@@ -1,4 +1,4 @@
-class MCollective::Application::Find<MCollective::Application
+class MCollective::Application::Find < MCollective::Application # rubocop:disable Style/ClassAndModuleChildren
   description "Find hosts using the discovery system matching filter criteria"
 
   def main
@@ -12,12 +12,12 @@ class MCollective::Application::Find<MCollective::Application
 
     discoverytime = Time.now - starttime
 
-    STDERR.puts if options[:verbose]
+    $stderr.puts if options[:verbose]
 
     nodes.each {|c| puts c}
 
-    STDERR.puts "\nDiscovered %s nodes in %.2f seconds using the %s discovery plugin" % [nodes.size, discoverytime, mc.client.discoverer.discovery_method] if options[:verbose]
+    warn "\nDiscovered %s nodes in %.2f seconds using the %s discovery plugin" % [nodes.size, discoverytime, mc.client.discoverer.discovery_method] if options[:verbose]
 
-    nodes.size > 0 ? exit(0) : exit(1)
+    !nodes.empty? ? exit(0) : exit(1)
   end
 end

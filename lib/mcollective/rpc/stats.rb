@@ -2,9 +2,8 @@ module MCollective
   module RPC
     # Class to wrap all the stats and to keep track of some timings
     class Stats
-      attr_accessor :noresponsefrom, :unexpectedresponsefrom, :starttime, :discoverytime, :blocktime, :responses
-      attr_accessor :totaltime, :discovered, :discovered_nodes, :okcount, :failcount, :noresponsefrom
-      attr_accessor :responsesfrom, :requestid, :aggregate_summary, :ddl, :aggregate_failures
+      attr_accessor :noresponsefrom, :unexpectedresponsefrom, :starttime, :discoverytime, :blocktime, :responses, :totaltime, :discovered, :discovered_nodes, :okcount,
+                    :failcount, :responsesfrom, :requestid, :aggregate_summary, :ddl, :aggregate_failures
 
       def initialize
         reset
@@ -17,7 +16,7 @@ module MCollective
         @responsesfrom = []
         @responses = 0
         @starttime = Time.now.to_f
-        @discoverytime = 0 unless @discoverytime
+        @discoverytime ||= 0
         @blocktime = 0
         @totaltime = 0
         @discovered = 0
@@ -31,18 +30,18 @@ module MCollective
 
       # returns a hash of our stats
       def to_hash
-        {:noresponsefrom    => @noresponsefrom,
+        {:noresponsefrom => @noresponsefrom,
          :unexpectedresponsefrom => @unexpectedresponsefrom,
-         :starttime         => @starttime,
-         :discoverytime     => @discoverytime,
-         :blocktime         => @blocktime,
-         :responses         => @responses,
-         :totaltime         => @totaltime,
-         :discovered        => @discovered,
-         :discovered_nodes  => @discovered_nodes,
-         :okcount           => @okcount,
-         :requestid         => @requestid,
-         :failcount         => @failcount,
+         :starttime => @starttime,
+         :discoverytime => @discoverytime,
+         :blocktime => @blocktime,
+         :responses => @responses,
+         :totaltime => @totaltime,
+         :discovered => @discovered,
+         :discovered_nodes => @discovered_nodes,
+         :okcount => @okcount,
+         :requestid => @requestid,
+         :failcount => @failcount,
          :aggregate_summary => @aggregate_summary,
          :aggregate_failures => @aggregate_failures}
       end
@@ -82,9 +81,10 @@ module MCollective
 
       # Utility to time discovery from :start to :end
       def time_discovery(action)
-        if action == :start
+        case action
+        when :start
           @discovery_start = Time.now.to_f
-        elsif action == :end
+        when :end
           @discoverytime = Time.now.to_f - @discovery_start
         else
           raise("Uknown discovery action #{action}")
@@ -95,9 +95,10 @@ module MCollective
 
       # helper to time block execution time
       def time_block_execution(action)
-        if action == :start
+        case action
+        when :start
           @block_start = Time.now.to_f
-        elsif action == :end
+        when :end
           @blocktime += Time.now.to_f - @block_start
         else
           raise("Uknown block action #{action}")
@@ -156,16 +157,16 @@ module MCollective
 
           result.puts Util.colorize(:bold, "Summary of %s:" % display_as)
           result.puts
-          unless aggregate_report == ""
-            result.puts aggregate.to_s.split("\n").map{|x| "   " + x}.join("\n")
-          else
+          if aggregate_report == ""
             result.puts Util.colorize(:yellow, "     No aggregate summary could be computed")
+          else
+            result.puts aggregate.to_s.split("\n").map {|x| "   #{x}"}.join("\n")
           end
           result.puts
         end
 
         @aggregate_failures.each do |failed|
-          case(failed[:type])
+          case (failed[:type])
           when :startup
             message = "exception raised while processing startup hook"
           when :create
@@ -187,65 +188,55 @@ module MCollective
 
       # Returns a blob of text representing the request status based on the
       # stats contained in this class
-      def report(caption = "rpc stats", summarize = true, verbose = false)
+      def report(caption="rpc stats", summarize=true, verbose=false)
         result_text = []
 
         if verbose
-            if @aggregate_summary.size > 0 && summarize
-              result_text << text_for_aggregates
-            else
-              result_text << ""
-            end
+          if !@aggregate_summary.empty? && summarize
+            result_text << text_for_aggregates
+          else
+            result_text << ""
+          end
 
           result_text << Util.colorize(:yellow, "---- #{caption} ----")
 
           if @discovered
             @responses < @discovered ? color = :red : color = :reset
-            result_text << "           Nodes: %s / %s" % [ Util.colorize(color, @discovered), Util.colorize(color, @responses) ]
+            result_text << "           Nodes: %s / %s" % [Util.colorize(color, @discovered), Util.colorize(color, @responses)]
           else
             result_text << "           Nodes: #{@responses}"
           end
 
           @failcount < 0 ? color = :red : color = :reset
 
-          result_text << "     Pass / Fail: %s / %s" % [Util.colorize(color, @okcount), Util.colorize(color, @failcount) ]
+          result_text << "     Pass / Fail: %s / %s" % [Util.colorize(color, @okcount), Util.colorize(color, @failcount)]
           result_text << "      Start Time: %s"      % [Time.at(@starttime)]
           result_text << "  Discovery Time: %.2fms"  % [@discoverytime * 1000]
           result_text << "      Agent Time: %.2fms"  % [@blocktime * 1000]
           result_text << "      Total Time: %.2fms"  % [@totaltime * 1000]
-        else
-          if @discovered
-            @responses < @discovered ? color = :red : color = :green
+        elsif @discovered
+          @responses < @discovered ? color = :red : color = :green
 
-            if @aggregate_summary.size + @aggregate_failures.size > 0 && summarize
-              result_text << text_for_aggregates
-            else
-              result_text << ""
-            end
-
-            result_text << "Finished processing %s / %s hosts in %.2f ms" % [Util.colorize(color, @responses), Util.colorize(color, @discovered), @blocktime * 1000]
+          if @aggregate_summary.size + @aggregate_failures.size > 0 && summarize
+            result_text << text_for_aggregates
           else
-            result_text << "Finished processing %s hosts in %.2f ms" % [Util.colorize(:bold, @responses), @blocktime * 1000]
+            result_text << ""
           end
+
+          result_text << "Finished processing %s / %s hosts in %.2f ms" % [Util.colorize(color, @responses), Util.colorize(color, @discovered), @blocktime * 1000]
+        else
+          result_text << "Finished processing %s hosts in %.2f ms" % [Util.colorize(:bold, @responses), @blocktime * 1000]
         end
 
         no_response_r = no_response_report
         unexpected_response_r = unexpected_response_report
-        if no_response_r || unexpected_response_r
-          result_text << ""
-        end
+        result_text << "" if no_response_r || unexpected_response_r
 
-        if no_response_r != ""
-          result_text << "" << no_response_r
-        end
+        result_text << "" << no_response_r if no_response_r != ""
 
-        if unexpected_response_r != ""
-          result_text << "" << unexpected_response_r
-        end
+        result_text << "" << unexpected_response_r if unexpected_response_r != ""
 
-        if no_response_r || unexpected_response_r
-          result_text << ""
-        end
+        result_text << "" if no_response_r || unexpected_response_r
 
         result_text.join("\n")
       end
@@ -254,13 +245,13 @@ module MCollective
       def no_response_report
         result_text = StringIO.new
 
-        if @noresponsefrom.size > 0
+        unless @noresponsefrom.empty?
           result_text.puts Util.colorize(:red, "No response from:")
           result_text.puts
 
           field_size = Util.field_size(@noresponsefrom, 30)
           fields_num = Util.field_number(field_size)
-          format = "   " + ( " %-#{field_size}s" * fields_num )
+          format = "   #{" %-#{field_size}s" * fields_num}"
 
           @noresponsefrom.sort.in_groups_of(fields_num) do |c|
             result_text.puts format % c
@@ -274,13 +265,13 @@ module MCollective
       def unexpected_response_report
         result_text = StringIO.new
 
-        if @unexpectedresponsefrom.size > 0
+        unless @unexpectedresponsefrom.empty?
           result_text.puts Util.colorize(:red, "Unexpected response from:")
           result_text.puts
 
           field_size = Util.field_size(@unexpectedresponsefrom, 30)
           fields_num = Util.field_number(field_size)
-          format = "   " + ( " %-#{field_size}s" * fields_num )
+          format = "   #{" %-#{field_size}s" * fields_num}"
 
           @unexpectedresponsefrom.sort.in_groups_of(fields_num) do |c|
             result_text.puts format % c

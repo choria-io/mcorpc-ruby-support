@@ -10,6 +10,7 @@ module MCollective
       # Register plugins that inherits base
       def self.inherited(klass)
         PluginManager << {:type => "registration_plugin", :class => klass.to_s}
+        super
       end
 
       # Creates a background thread that periodically send a registration notice.
@@ -44,7 +45,7 @@ module MCollective
           collective = main_collective
         end
 
-        return collective
+        collective
       end
 
       def interval
@@ -52,15 +53,15 @@ module MCollective
       end
 
       def publish(message)
-        unless message
-          Log.debug("Skipping registration due to nil body")
-        else
+        if message
           req = Message.new(message, nil, {:type => :request, :agent => "registration", :collective => target_collective, :filter => msg_filter})
           req.encode!
 
           Log.debug("Sending registration #{req.requestid} to collective #{req.collective}")
 
           req.publish
+        else
+          Log.debug("Skipping registration due to nil body")
         end
       end
 
@@ -69,22 +70,23 @@ module MCollective
       end
 
       private
+
       def publish_thread(connnection)
         if config.registration_splay
-            splay_delay = rand(interval)
-            Log.debug("registration_splay enabled. Registration will start in #{splay_delay} seconds")
-            sleep splay_delay
-          end
+          splay_delay = rand(interval)
+          Log.debug("registration_splay enabled. Registration will start in #{splay_delay} seconds")
+          sleep splay_delay
+        end
 
-          loop do
-            begin
-              publish(body)
-              sleep interval
-            rescue Exception => e
-              Log.error("Sending registration message failed: #{e}")
-              sleep interval
-            end
+        loop do
+          begin
+            publish(body)
+            sleep interval
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            Log.error("Sending registration message failed: #{e}")
+            sleep interval
           end
+        end
       end
     end
   end

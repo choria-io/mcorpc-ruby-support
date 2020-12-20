@@ -10,12 +10,12 @@ module MCollective
 
       if agent.is_a?(Regexp)
         if !Agents.agentlist.grep(agent).empty?
-          return true
+          true
         else
-          return false
+          false
         end
       else
-        return Agents.agentlist.include?(agent)
+        Agents.agentlist.include?(agent)
       end
     end
 
@@ -41,9 +41,10 @@ module MCollective
 
       begin
         File.readlines(cfile).each do |k|
-          if klass.is_a?(Regexp)
+          case klass
+          when Regexp
             return true if k.chomp.match(klass)
-          elsif k.chomp == klass
+          when k.chomp
             return true
           end
         end
@@ -74,11 +75,11 @@ module MCollective
       fact = fact.clone
       case fact
       when Array
-        return fact.any? { |element| test_fact_value(element, value, operator)}
+        fact.any? { |element| test_fact_value(element, value, operator)}
       when Hash
-        return fact.keys.any? { |element| test_fact_value(element, value, operator)}
+        fact.keys.any? { |element| test_fact_value(element, value, operator)}
       else
-        return test_fact_value(fact, value, operator)
+        test_fact_value(fact, value, operator)
       end
     end
 
@@ -104,7 +105,7 @@ module MCollective
           value = Float(value) # rubocop:disable Lint/UselessAssignment
         end
 
-        return true if eval("fact #{operator} value") # rubocop:disable Security/Eval
+        return true if eval("fact #{operator} value") # rubocop:disable Security/Eval, Style/EvalWithLocation
       end
 
       false
@@ -118,9 +119,10 @@ module MCollective
     def self.has_identity?(identity)
       identity = Regexp.new(identity.gsub("\/", "")) if identity.start_with?("/")
 
-      if identity.is_a?(Regexp)
+      case identity
+      when Regexp
         return Config.instance.identity.match(identity)
-      elsif Config.instance.identity == identity
+      when Config.instance.identity
         return true
       end
 
@@ -135,9 +137,9 @@ module MCollective
     # Creates an empty filter
     def self.empty_filter
       {
-        "fact"     => [],
+        "fact" => [],
         "cf_class" => [],
-        "agent"    => [],
+        "agent" => [],
         "identity" => [],
         "compound" => []
       }
@@ -161,7 +163,7 @@ module MCollective
         # File.expand_path will raise if HOME isn't set, catch it
         user_path = File.expand_path("~/.mcollective")
         config_paths << user_path
-      rescue Exception # rubocop:disable Lint/RescueException, Lint/HandleExceptions
+      rescue Exception # rubocop:disable Lint/RescueException, Lint/SuppressedException
       end
 
       if windows?
@@ -182,7 +184,7 @@ module MCollective
         # File.expand_path will raise if HOME isn't set, catch it
         user_path = File.expand_path("~/.choriarc")
         config_paths << user_path
-      rescue Exception # rubocop:disable Lint/RescueException, Lint/HandleExceptions
+      rescue Exception # rubocop:disable Lint/RescueException, Lint/SuppressedException
       end
 
       if windows?
@@ -217,14 +219,14 @@ module MCollective
     # Creates a standard options hash
     def self.default_options
       {
-        :verbose           => false,
-        :disctimeout       => nil,
-        :timeout           => 5,
-        :config            => config_file_for_user,
-        :collective        => nil,
-        :discovery_method  => nil,
+        :verbose => false,
+        :disctimeout => nil,
+        :timeout => 5,
+        :config => config_file_for_user,
+        :collective => nil,
+        :discovery_method => nil,
         :discovery_options => Config.instance.default_discovery_options,
-        :filter            => empty_filter
+        :filter => empty_filter
       }
     end
 
@@ -273,15 +275,16 @@ module MCollective
 
     # Parse a fact filter string like foo=bar into the tuple hash thats needed
     def self.parse_fact_string(fact)
-      if fact =~ /^([^ ]+?)[ ]*=>[ ]*(.+)/
+      case fact
+      when /^([^ ]+?) *=> *(.+)/
         {:fact => $1, :value => $2, :operator => ">="}
-      elsif fact =~ /^([^ ]+?)[ ]*=<[ ]*(.+)/
+      when /^([^ ]+?) *=< *(.+)/
         {:fact => $1, :value => $2, :operator => "<="}
-      elsif fact =~ /^([^ ]+?)[ ]*(<=|>=|<|>|!=|==|=~)[ ]*(.+)/
+      when /^([^ ]+?) *(<=|>=|<|>|!=|==|=~) *(.+)/
         {:fact => $1, :value => $3, :operator => $2}
-      elsif fact =~ /^(.+?)[ ]*=[ ]*\/(.+)\/$/
+      when /^(.+?) *= *\/(.+)\/$/
         {:fact => $1, :value => "/#{$2}/", :operator => "=~"}
-      elsif fact =~ /^([^= ]+?)[ ]*=[ ]*(.+)/
+      when /^([^= ]+?) *= *(.+)/
         {:fact => $1, :value => $2, :operator => "=="}
       else
         raise "Could not parse fact #{fact} it does not appear to be in a valid format"
@@ -326,9 +329,9 @@ module MCollective
       }
 
       if colorize
-        return colors[code] || ""
+        colors[code] || ""
       else
-        return ""
+        ""
       end
     end
 
@@ -379,9 +382,7 @@ module MCollective
       text.each_with_index do |line, i|
         whitespace = 0
 
-        while whitespace < line.length && line[whitespace].chr == " "
-          whitespace += 1
-        end
+        whitespace += 1 while whitespace < line.length && line[whitespace].chr == " "
 
         # If the current line is empty, indent it so that a snippet
         # from the previous line is aligned correctly.
@@ -435,21 +436,21 @@ module MCollective
     #
     # Returns [0, 0] if it can't figure it out or if you're
     # not running on a tty
-    def self.terminal_dimensions(stdout=STDOUT, environment=ENV)
+    def self.terminal_dimensions(stdout=$stdout, environment=ENV)
       return [0, 0] unless stdout.tty?
 
       return [80, 40] if Util.windows?
 
       if environment["COLUMNS"] && environment["LINES"]
-        return [environment["COLUMNS"].to_i, environment["LINES"].to_i]
+        [environment["COLUMNS"].to_i, environment["LINES"].to_i]
 
       elsif environment["TERM"] && command_in_path?("tput")
-        return [`tput cols`.to_i, `tput lines`.to_i]
+        [`tput cols`.to_i, `tput lines`.to_i]
 
       elsif command_in_path?("stty")
-        return `stty size`.scan(/\d+/).map(&:to_i)
+        `stty size`.scan(/\d+/).map(&:to_i)
       else
-        return [0, 0]
+        [0, 0]
       end
     rescue
       [0, 0]
@@ -490,6 +491,7 @@ module MCollective
         elsif b == "."            then return 1
         elsif a =~ /^\d+$/ && b =~ /^\d+$/
           return a.to_s.upcase <=> b.to_s.upcase if a =~ /^0/ || b =~ /^0/
+
           return a.to_i <=> b.to_i
         else
           return a.upcase <=> b.upcase
@@ -516,10 +518,11 @@ module MCollective
     # Any other value will return FalseClass
     def self.str_to_bool(val)
       clean_val = val.to_s.strip
-      if clean_val =~ /^(1|yes|true|y|t)$/i
-        return true
-      elsif clean_val =~ /^(0|no|false|n|f)$/i
-        return false
+      case clean_val
+      when /^(1|yes|true|y|t)$/i
+        true
+      when /^(0|no|false|n|f)$/i
+        false
       else
         raise("Cannot convert string value '#{clean_val}' into a boolean.")
       end
@@ -531,8 +534,7 @@ module MCollective
       template_path = File.join(config_dir, template_file)
       return template_path if File.exist?(template_path)
 
-      template_path = File.join("/etc/mcollective", template_file)
-      template_path
+      File.join("/etc/mcollective", template_file)
     end
 
     # subscribe to the direct addressing queue
@@ -563,6 +565,7 @@ module MCollective
 
       while char = Win32API.new("crtdll", "_getch", [], "I").Call
         break if [10, 13].include?(char) # return or newline
+
         if [127, 8].include?(char) # backspace and delete
           input.slice!(-1, 1) unless input.empty?
         else
@@ -574,17 +577,13 @@ module MCollective
     end
 
     def self.get_hidden_input_on_unix # rubocop:disable Naming/AccessorMethodName
-      unless $stdin.tty?
-        raise "Could not hook to stdin to hide input. If using SSH, try using -t flag while connecting to server."
-      end
-      unless system "stty -echo -icanon"
-        raise "Could not hide input using stty command."
-      end
+      raise "Could not hook to stdin to hide input. If using SSH, try using -t flag while connecting to server." unless $stdin.tty?
+      raise "Could not hide input using stty command." unless system "stty -echo -icanon"
+
       input = $stdin.gets
     ensure
-      unless system "stty echo icanon"
-        raise "Could not enable echoing of input. Try executing `stty echo icanon` to debug."
-      end
+      raise "Could not enable echoing of input. Try executing `stty echo icanon` to debug." unless system "stty echo icanon"
+
       input
     end
 

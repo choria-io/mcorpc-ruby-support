@@ -1,8 +1,8 @@
 module MCollective
   module Logger
     # Implements a syslog based logger using the standard ruby syslog class
-    class Syslog_logger<Base
-      require 'syslog'
+    class Syslog_logger < Base
+      require "syslog"
 
       include Syslog::Constants
 
@@ -19,34 +19,30 @@ module MCollective
       end
 
       def syslog_facility(facility)
-        begin
-          Syslog.const_get("LOG_#{facility.upcase}")
-        rescue NameError => e
-          STDERR.puts "Invalid syslog facility #{facility} supplied, reverting to USER"
-          Syslog::LOG_USER
-        end
+        Syslog.const_get("LOG_#{facility.upcase}")
+      rescue NameError
+        warn "Invalid syslog facility #{facility} supplied, reverting to USER"
+        Syslog::LOG_USER
       end
 
-      def set_logging_level(level)
+      def set_logging_level(level) # rubocop:disable Naming/AccessorMethodName
         # noop
       end
 
       def valid_levels
-        {:info  => :info,
-         :warn  => :warning,
+        {:info => :info,
+         :warn => :warning,
          :debug => :debug,
          :fatal => :crit,
          :error => :err}
       end
 
       def log(level, from, msg)
-        if @known_levels.index(level) >= @known_levels.index(@active_level)
-          Syslog.send(map_level(level), "#{from} #{msg}")
-        end
+        Syslog.send(map_level(level), "#{from} #{msg}") if @known_levels.index(level) >= @known_levels.index(@active_level)
       rescue
         # if this fails we probably cant show the user output at all,
         # STDERR it as last resort
-        STDERR.puts("#{level}: #{msg}")
+        warn("#{level}: #{msg}")
       end
     end
   end

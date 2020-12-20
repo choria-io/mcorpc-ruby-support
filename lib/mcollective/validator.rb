@@ -30,12 +30,16 @@ module MCollective
     end
 
     # Allows validation plugins to be called like module methods : Validator.validate()
-    def self.method_missing(method, *args, &block) # rubocop:disable Style/MethodMissing
+    def self.method_missing(method, *args, &block)
       if has_validator?(method)
         Validator[method].validate(*args)
       else
         raise ValidatorError, "Unknown validator: '#{method}'."
       end
+    end
+
+    def self.respond_to_missing?(method, *)
+      has_validator?(method)
     end
 
     def self.has_validator?(validator)
@@ -48,6 +52,7 @@ module MCollective
 
     def self.load_validators?
       return true if @last_load.nil?
+
       (@last_load - Time.now.to_i) > 300
     end
 

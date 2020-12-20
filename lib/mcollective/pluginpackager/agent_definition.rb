@@ -2,8 +2,7 @@ module MCollective
   module PluginPackager
     # MCollective Agent Plugin package
     class AgentDefinition
-      attr_accessor :path, :packagedata, :metadata, :target_path, :vendor, :revision, :preinstall
-      attr_accessor :plugintype, :dependencies, :postinstall, :mcname, :mcversion
+      attr_accessor :path, :packagedata, :metadata, :target_path, :vendor, :revision, :preinstall, :plugintype, :dependencies, :postinstall, :mcname, :mcversion
 
       def initialize(configuration, mcdependency, plugintype)
         @plugintype = plugintype
@@ -53,9 +52,7 @@ module MCollective
         agent[:files] = (Dir.glob(File.join(agentdir, "**", "**")) - ddls)
         agent[:plugindependency] = {:name => "#{@mcname}-#{@metadata[:name]}-common", :version => @metadata[:version], :revision => @revision}
 
-        if @metadata[:provider] == "external"
-          agent[:executable_files] << File.join(agentdir, @agent_name)
-        end
+        agent[:executable_files] << File.join(agentdir, @agent_name) if @metadata[:provider] == "external"
 
         agent
       end
@@ -95,9 +92,7 @@ module MCollective
         end
 
         # We fail if there is no ddl file present
-        if common[:files].grep(/^.*\.ddl$/).empty?
-          raise "cannot create package - No ddl file found in #{File.join(@path, 'agent')}"
-        end
+        raise "cannot create package - No ddl file found in #{File.join(@path, 'agent')}" if common[:files].grep(/^.*\.ddl$/).empty?
 
         common[:files].uniq!
 

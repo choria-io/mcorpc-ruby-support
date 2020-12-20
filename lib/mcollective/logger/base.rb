@@ -29,7 +29,7 @@ module MCollective
       end
 
       # Sets a new level and record it in @active_level
-      def set_level(level)
+      def set_level(level) # rubocop:disable Naming/AccessorMethodName
         set_logging_level(level)
         @active_level = level.to_sym
       end
@@ -47,6 +47,7 @@ module MCollective
       end
 
       private
+
       def map_level(level)
         raise "Logger class do not know how to handle #{level} messages" unless valid_levels.include?(level.to_sym)
 
@@ -54,7 +55,7 @@ module MCollective
       end
 
       # Gets the next level in the list, cycles down to the firt once it reaches the end
-      def get_next_level
+      def get_next_level # rubocop:disable Naming/AccessorMethodName
         # if all else fails, always go to debug mode
         nextlvl = :debug
 

@@ -17,9 +17,9 @@ module MCollective
         startup_hook
       end
 
-      ['startup_hook', 'process_result'].each do |method|
+      ["startup_hook", "process_result"].each do |method|
         define_method method do
-          raise RuntimeError, "'#{method}' method of function class #{@name} has not yet been implemented"
+          raise "'#{method}' method of function class #{@name} has not yet been implemented"
         end
       end
 

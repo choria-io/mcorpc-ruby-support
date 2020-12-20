@@ -31,6 +31,7 @@ module MCollective
       # Register plugins that inherits base
       def self.inherited(klass)
         PluginManager << {:type => "security_plugin", :class => klass.to_s}
+        super
       end
 
       # Initializes configuration and logging as well as prepare a zero'd hash of stats
@@ -52,18 +53,18 @@ module MCollective
       # - identity - the configured identity of the system
       #
       # TODO: Support REGEX and/or multiple filter keys to be AND'd
-      def validate_filter?(filter)
+      def validate_filter?(filter) # rubocop:disable Metrics/MethodLength
         failed = 0
         passed = 0
 
         passed = 1 if Util.empty_filter?(filter)
 
-        filter.keys.each do |key|
+        filter.each_key do |key|
           case key
           when /puppet_class|cf_class/
             filter[key].each do |f|
               Log.debug("Checking for class #{f}")
-              if Util.has_cf_class?(f) then
+              if Util.has_cf_class?(f)
                 Log.debug("Passing based on configuration management class #{f}")
                 passed += 1
               else
@@ -80,34 +81,34 @@ module MCollective
               begin
                 compound.each do |expression|
                   case expression.keys.first
-                    when "statement"
-                      truth_values << Matcher.eval_compound_statement(expression).to_s
-                    when "fstatement"
-                      truth_values << Matcher.eval_compound_fstatement(expression.values.first)
-                    when "and"
-                      truth_values << "&&"
-                    when "or"
-                      truth_values << "||"
-                    when "("
-                      truth_values << "("
-                    when ")"
-                      truth_values << ")"
-                    when "not"
-                      truth_values << "!"
+                  when "statement"
+                    truth_values << Matcher.eval_compound_statement(expression).to_s
+                  when "fstatement"
+                    truth_values << Matcher.eval_compound_fstatement(expression.values.first)
+                  when "and"
+                    truth_values << "&&"
+                  when "or"
+                    truth_values << "||"
+                  when "("
+                    truth_values << "("
+                  when ")"
+                    truth_values << ")"
+                  when "not"
+                    truth_values << "!"
                   end
                 end
 
-                result = eval(truth_values.join(" "))
+                result = eval(truth_values.join(" ")) # rubocop:disable Security/Eval
               rescue DDLValidationError
                 result = false
               end
 
               if result
                 Log.debug("Passing based on class and fact composition")
-                passed +=1
+                passed += 1
               else
                 Log.debug("Failing based on class and fact composition")
-                failed +=1
+                failed += 1
               end
             end
 
@@ -136,7 +137,7 @@ module MCollective
           when "identity"
             unless filter[key].empty?
               # Identity filters should not be 'and' but 'or' as each node can only have one identity
-              matched = filter[key].select{|f| Util.has_identity?(f)}.size
+              matched = filter[key].select {|f| Util.has_identity?(f)}.size
 
               if matched == 1
                 Log.debug("Passing based on identity")
@@ -154,13 +155,13 @@ module MCollective
 
           @stats.passed
 
-          return true
+          true
         else
           Log.debug("Message failed the filter checks")
 
           @stats.filtered
 
-          return false
+          false
         end
       end
 
@@ -194,12 +195,10 @@ module MCollective
       # Mostly used by security plugins to figure out if they should do the hard work of decrypting
       # etc messages that would only later on be ignored
       def should_process_msg?(msg, msgid)
-        if msg.expected_msgid
-          unless msg.expected_msgid == msgid
-            msgtext = "Got a message with id %s but was expecting %s, ignoring message" % [msgid, msg.expected_msgid]
-            Log.debug msgtext
-            raise MsgDoesNotMatchRequestID, msgtext
-          end
+        if msg.expected_msgid && msg.expected_msgid != msgid
+          msgtext = "Got a message with id %s but was expecting %s, ignoring message" % [msgid, msg.expected_msgid]
+          Log.debug msgtext
+          raise MsgDoesNotMatchRequestID, msgtext
         end
 
         true
@@ -211,7 +210,7 @@ module MCollective
       # callerids are generally in the form uid=123 or cert=foo etc so we do that
       # here but security plugins could override this for some complex uses
       def valid_callerid?(id)
-        !!id.match(/^[\w]+=[\w\.\-]+$/)
+        !!id.match(/^\w+=[\w.\-]+$/)
       end
 
       # Returns a unique id for the caller, by default we just use the unix

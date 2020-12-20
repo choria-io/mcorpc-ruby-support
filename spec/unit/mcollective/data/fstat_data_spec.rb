@@ -34,13 +34,13 @@ module MCollective
         end
 
         it "should detect missing files" do
-          File.expects(:exists?).with("/nonexisting").returns(false)
+          File.expects(:exist?).with("/nonexisting").returns(false)
           @plugin.query_data("/nonexisting")
           @plugin.result.output.should == "not present"
         end
 
         it "should provide correct file stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(false)
           File.expects(:stat).with("rspec").returns(@stat)
           File.expects(:read).with("rspec").returns("rspec")
@@ -67,7 +67,7 @@ module MCollective
         end
 
         it "should provide correct link stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(true)
           File.expects(:lstat).with("rspec").returns(@stat)
 
@@ -80,7 +80,7 @@ module MCollective
         end
 
         it "should provide correct directory stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(false)
           File.expects(:stat).with("rspec").returns(@stat)
 
@@ -93,7 +93,7 @@ module MCollective
         end
 
         it "should provide correct socket stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(false)
           File.expects(:stat).with("rspec").returns(@stat)
 
@@ -106,7 +106,7 @@ module MCollective
         end
 
         it "should provide correct chardev stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(false)
           File.expects(:stat).with("rspec").returns(@stat)
 
@@ -119,7 +119,7 @@ module MCollective
         end
 
         it "should provide correct blockdev stats" do
-          File.expects(:exists?).with("rspec").returns(true)
+          File.expects(:exist?).with("rspec").returns(true)
           File.expects(:symlink?).with("rspec").returns(false)
           File.expects(:stat).with("rspec").returns(@stat)
 

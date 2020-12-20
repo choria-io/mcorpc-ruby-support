@@ -166,7 +166,7 @@ module MCollective
 
     # Signs a string using the private key
     def sign(string, base64=false)
-      sig = @private_key.sign(OpenSSL::Digest::SHA1.new, string)
+      sig = @private_key.sign(OpenSSL::Digest.new("SHA1"), string)
 
       base64 ? base64_encode(sig) : sig
     end
@@ -175,7 +175,7 @@ module MCollective
     def verify_signature(signature, string, base64=false)
       signature = base64_decode(signature) if base64
 
-      @public_key.verify(OpenSSL::Digest::SHA1.new, signature, string)
+      @public_key.verify(OpenSSL::Digest.new("SHA1"), signature, string)
     end
 
     # base 64 encode a string
@@ -196,6 +196,7 @@ module MCollective
       # The Base 64 character set is A-Z a-z 0-9 + / =
       # Also allow for whitespace, but raise if we get anything else
       raise(ArgumentError, "invalid base64") if string !~ /^[A-Za-z0-9+\/=\s]+$/
+
       Base64.decode64(string)
     end
 
@@ -248,7 +249,8 @@ module MCollective
       raise "Could not find key #{key}" unless File.exist?(key)
       raise "#{type} key file '#{key}' is empty" if File.zero?(key)
 
-      if type == :public
+      case type
+      when :public
         begin
           key = OpenSSL::PKey::RSA.new(File.read(key))
         rescue OpenSSL::PKey::RSAError
@@ -271,9 +273,9 @@ module MCollective
         # See  http://bugs.ruby-lang.org/issues/4550
         OpenSSL.errors if Util.ruby_version =~ /^1.8/
 
-        return key
-      elsif type == :private
-        return OpenSSL::PKey::RSA.new(File.read(key), passphrase)
+        key
+      when :private
+        OpenSSL::PKey::RSA.new(File.read(key), passphrase)
       else
         raise "Can only load :public or :private keys"
       end

@@ -13,19 +13,17 @@ module MCollective
 
         begin
           initialize_data
-        rescue Exception => e
-          Log.warn("Could not pre-populate reply data from the DDL: %s: %s" % [e.class, e.to_s ])
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          Log.warn("Could not pre-populate reply data from the DDL: %s: %s" % [e.class, e.to_s])
         end
       end
 
       def initialize_data
-        unless @ddl.actions.include?(@action)
-          raise "No action '%s' defined for agent '%s' in the DDL" % [@action, @ddl.pluginname]
-        end
+        raise "No action '%s' defined for agent '%s' in the DDL" % [@action, @ddl.pluginname] unless @ddl.actions.include?(@action)
 
         interface = @ddl.action_interface(@action)
 
-        interface[:output].keys.each do |output|
+        interface[:output].each_key do |output|
           # must deep clone this data to avoid accidental updates of the DDL in cases where the
           # default is for example a string and someone does << on it
           @data[output] = Marshal.load(Marshal.dump(interface[:output][output].fetch(:default, nil)))
@@ -44,20 +42,20 @@ module MCollective
         @statuscode = code
 
         case code
-          when 1
-            raise RPCAborted, msg
+        when 1
+          raise RPCAborted, msg
 
-          when 2
-            raise UnknownRPCAction, msg
+        when 2
+          raise UnknownRPCAction, msg
 
-          when 3
-            raise MissingRPCData, msg
+        when 3
+          raise MissingRPCData, msg
 
-          when 4
-            raise InvalidRPCData, msg
+        when 4
+          raise InvalidRPCData, msg
 
-          else
-            raise UnknownRPCError, msg
+        else
+          raise UnknownRPCError, msg
         end
       end
 
@@ -78,9 +76,9 @@ module MCollective
       # Returns a compliant Hash of the reply that should be sent
       # over the middleware
       def to_hash
-        return {:statuscode => @statuscode,
-                :statusmsg => @statusmsg,
-                :data => @data}
+        {:statuscode => @statuscode,
+         :statusmsg => @statusmsg,
+         :data => @data}
       end
     end
   end

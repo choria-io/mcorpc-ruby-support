@@ -1,13 +1,13 @@
 module MCollective
   class Aggregate
-    class Summary<Base
+    class Summary < Base
       # Before function is run processing
       def startup_hook
         @result[:value] = {}
         @result[:type] = :collection
 
         # set default aggregate_format if it is undefined
-        @aggregate_format = :calculate unless @aggregate_format
+        @aggregate_format ||= :calculate # rubocop:disable Naming/MemoizedInstanceVariableName
       end
 
       # Increments the value field if value has been seen before
@@ -15,7 +15,7 @@ module MCollective
       def process_result(value, reply)
         unless value.nil?
           if value.is_a? Array
-            value.map{|val| add_value(val)}
+            value.map {|val| add_value(val)}
           else
             add_value(value)
           end
@@ -33,7 +33,6 @@ module MCollective
       def summarize
         if @aggregate_format == :calculate
           max_key_length = @result[:value].keys.map do |k|
-
             # Response values retain their types. Here we check
             # if the response is a string and turn it into a string
             # if it isn't one.

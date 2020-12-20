@@ -84,9 +84,7 @@ module MCollective
 
     # Return the path to a plugin's core directories
     def self.get_plugin_path(target)
-      if File.exist?(File.join(target, "lib", "mcollective"))
-        return File.join(target, "lib", "mcollective")
-      end
+      return File.join(target, "lib", "mcollective") if File.exist?(File.join(target, "lib", "mcollective"))
 
       target
     end

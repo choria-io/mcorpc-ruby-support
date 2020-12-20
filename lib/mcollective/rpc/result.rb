@@ -40,12 +40,10 @@ module MCollective
 
         return if interface.fetch(:output, {}).empty?
 
-        interface[:output].each do |output, properties|
+        interface[:output].each do |output, _properties|
           next if data.include?(output)
 
-          if output.is_a?(Symbol) && data.include?(output.to_s)
-            data[output] = data.delete(output.to_s)
-          end
+          data[output] = data.delete(output.to_s) if output.is_a?(Symbol) && data.include?(output.to_s)
         end
       end
 
@@ -69,17 +67,17 @@ module MCollective
         @results.fetch(compatible_key(key), default)
       end
 
-      def each
-        @results.each_pair {|k,v| yield(k,v) }
+      def each(&block)
+        @results.each_pair(&block)
       end
 
-      def to_json(*a)
+      def to_json(*result)
         {:agent => @agent,
          :action => @action,
          :sender => self[:sender],
          :statuscode => self[:statuscode],
          :statusmsg => self[:statusmsg],
-         :data => data}.to_json(*a)
+         :data => data}.to_json(*result)
       end
 
       def <=>(other)

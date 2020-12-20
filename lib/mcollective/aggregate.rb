@@ -25,7 +25,7 @@ module MCollective
           format = (arguments.delete(:format) if arguments) || nil
           begin
             @functions << load_function(agg[:function]).new(output, arguments, format, @action)
-          rescue Exception => e
+          rescue Exception => e # rubocop:disable Lint/RescueException
             Log.error("Cannot create aggregate function '%s': %s" % [output, e])
             @failed << {:name => output, :type => :startup}
           end
@@ -47,7 +47,7 @@ module MCollective
         Log.debug("Calling aggregate function %s for result" % function)
         begin
           function.process_result(reply[:data][function.output_name], reply)
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           Log.error("Could not process aggregate function for '%s': %s" % [function.output_name, e])
           @failed << {:name => function.output_name, :type => :process_result}
           @functions.delete(function)
@@ -60,7 +60,7 @@ module MCollective
       summary = @functions.map do |function|
         begin
           function.summarize
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           Log.error("Could not summarize aggregate result for '%s': %s" % [function.output_name, e])
           @failed << {:name => function.output_name, :type => :summarize}
           nil
@@ -78,7 +78,7 @@ module MCollective
 
       PluginManager.loadclass("MCollective::Aggregate::%s" % function_name) unless Aggregate.const_defined?(function_name)
       Aggregate.const_get(function_name)
-    rescue Exception
+    rescue Exception # rubocop:disable Lint/RescueException
       raise("Aggregate function file '%s.rb' cannot be loaded" % function_name.downcase)
     end
   end

@@ -1,13 +1,13 @@
 module MCollective
   module Facts
-    require 'yaml'
+    require "yaml"
 
     # A factsource that reads a hash of facts from a YAML file
     #
     # Multiple files can be specified seperated with a : in the
     # config file, they will be merged with later files overriding
     # earlier ones in the list.
-    class Yaml_facts<Base
+    class Yaml_facts < Base
       def initialize
         @yaml_file_mtimes = {}
 
@@ -23,15 +23,15 @@ module MCollective
         fact_files.each do |file|
           begin
             if File.exist?(file)
-	      if YAML.respond_to? :safe_load
-                facts.merge!(YAML.safe_load(File.read(file))) 
-	      else
-                facts.merge!(YAML.load(File.read(file)))  # rubocop:disable Security/YAMLLoad
+              if YAML.respond_to? :safe_load
+                facts.merge!(YAML.safe_load(File.read(file)))
+              else
+                facts.merge!(YAML.load(File.read(file)))
               end
             else
               raise("Can't find YAML file to load: #{file}")
             end
-          rescue Exception => e
+          rescue Exception => e # rubocop:disable Lint/RescueException
             Log.error("Failed to load yaml facts from #{file}: #{e.class}: #{e}")
           end
         end
@@ -49,13 +49,13 @@ module MCollective
           @yaml_file_mtimes[file] ||= File.stat(file).mtime
           mtime = File.stat(file).mtime
 
-          if mtime > @yaml_file_mtimes[file]
-            @yaml_file_mtimes[file] = mtime
+          next unless mtime > @yaml_file_mtimes[file]
 
-            Log.debug("Forcing fact reload due to age of #{file}")
+          @yaml_file_mtimes[file] = mtime
 
-            return true
-          end
+          Log.debug("Forcing fact reload due to age of #{file}")
+
+          return true
         end
 
         false

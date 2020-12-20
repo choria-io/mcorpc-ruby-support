@@ -122,14 +122,12 @@ module MCollective
       end
     end
 
-    def self.synchronize(cache_name)
+    def self.synchronize(cache_name, &block)
       raise("No cache called '%s'" % cache_name) unless @cache.include?(cache_name)
 
       raise("No block supplied to synchronize") unless block_given?
 
-      @cache_locks[cache_name].synchronize do
-        yield
-      end
+      @cache_locks[cache_name].synchronize(&block)
     end
 
     def self.invalidate!(cache_name, key)

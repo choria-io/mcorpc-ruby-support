@@ -5,19 +5,13 @@ module MCollective
 
     attr_accessor :mode
 
-    attr_reader :daemonize, :pluginconf, :configured
-    attr_reader :logfile, :keeplogs, :max_log_size, :loglevel, :logfacility
-    attr_reader :identity, :connector, :securityprovider, :factsource
-    attr_reader :registration, :registerinterval, :classesfile
-    attr_reader :rpcauditprovider, :rpcaudit, :configdir, :rpcauthprovider
-    attr_reader :rpcauthorization, :color, :configfile
-    attr_reader :rpclimitmethod, :logger_type, :fact_cache_time, :collectives
-    attr_reader :main_collective, :ssl_cipher, :registration_collective
-    attr_reader :direct_addressing, :direct_addressing_threshold, :ttl
-    attr_reader :default_discovery_method, :default_discovery_options
-    attr_reader :publish_timeout, :threaded, :soft_shutdown, :activate_agents
-    attr_reader :registration_splay, :discovery_timeout, :soft_shutdown_timeout
-    attr_reader :connection_timeout, :default_batch_size, :default_batch_sleep_time
+    attr_reader :daemonize, :pluginconf, :configured, :logfile, :keeplogs, :max_log_size, :loglevel, :logfacility,
+                :identity, :connector, :securityprovider, :factsource, :registration, :registerinterval, :classesfile,
+                :rpcauditprovider, :rpcaudit, :configdir, :rpcauthprovider, :rpcauthorization, :color, :configfile,
+                :rpclimitmethod, :logger_type, :fact_cache_time, :collectives, :main_collective, :ssl_cipher, :registration_collective,
+                :direct_addressing, :direct_addressing_threshold, :ttl, :default_discovery_method, :default_discovery_options,
+                :publish_timeout, :threaded, :soft_shutdown, :activate_agents, :registration_splay, :discovery_timeout, :soft_shutdown_timeout,
+                :connection_timeout, :default_batch_size, :default_batch_sleep_time
 
     def initialize
       @configured = false
@@ -34,6 +28,7 @@ module MCollective
 
           next if line =~ /^#|^$/
           next unless line =~ /(.+?)\s*=\s*(.+)/
+
           key = $1.strip
           val = $2
 
@@ -133,7 +128,7 @@ module MCollective
 
         read_plugin_config_dir("#{@configdir}/plugin.d")
 
-        raise 'Identities can only match /\w\.\-/' unless @identity =~ /^[\w\.\-]+$/
+        raise 'Identities can only match /\w\.\-/' unless @identity =~ /^[\w.\-]+$/
 
         @configured = true
 
@@ -145,9 +140,7 @@ module MCollective
           $LOAD_PATH.unshift dir
         end
 
-        if @logger_type == "syslog"
-          raise "The sylog logger is not usable on the Windows platform" if Util.windows?
-        end
+        raise "The sylog logger is not usable on the Windows platform" if @logger_type == "syslog" && Util.windows?
 
         unless configfile =~ /server/
           PluginManager.loadclass("Mcollective::Facts::#{@factsource}_facts")
@@ -216,7 +209,7 @@ module MCollective
       return unless File.directory?(dir)
 
       Dir.new(dir).each do |pluginconfigfile|
-        next unless pluginconfigfile =~ /^([\w]+).cfg$/
+        next unless pluginconfigfile =~ /^(\w+).cfg$/
 
         plugin = $1
         File.open("#{dir}/#{pluginconfigfile}", "r").each do |line|
@@ -224,6 +217,7 @@ module MCollective
           line.gsub!(/\s*$/, "")
           next if line =~ /^#|^$/
           next unless line =~ /(.+?)\s*=\s*(.+)/
+
           key = $1.strip
           val = $2
           @pluginconf["#{plugin}.#{key}"] = val

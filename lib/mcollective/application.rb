@@ -79,9 +79,9 @@ module MCollective
 
       # Creates an empty set of options
       def intialize_application_options
-        @application_options = {:description          => nil,
-                                :usage                => [],
-                                :cli_arguments        => [],
+        @application_options = {:description => nil,
+                                :usage => [],
+                                :cli_arguments => [],
                                 :exclude_arg_sections => []}
       end
     end
@@ -101,7 +101,7 @@ module MCollective
       validation_result = blk.call(value)
 
       unless validation_result == true
-        STDERR.puts "Validation of #{name} failed: #{validation_result}"
+        warn "Validation of #{name} failed: #{validation_result}"
         exit 1
       end
     end
@@ -123,7 +123,7 @@ module MCollective
 
       post_option_parser(configuration) if respond_to?(:post_option_parser)
 
-      return options
+      options
     rescue Exception # rubocop:disable Lint/RescueException
       application_failure($!)
     end
@@ -205,14 +205,15 @@ module MCollective
       application_cli_arguments.each do |carg|
         # Check for required arguments
         next unless carg[:required]
+
         unless configuration[carg[:name]]
           validation_passed = false
-          STDERR.puts "The #{carg[:name]} option is mandatory"
+          warn "The #{carg[:name]} option is mandatory"
         end
       end
 
       unless validation_passed
-        STDERR.puts "\nPlease run with --help for detailed help"
+        warn "\nPlease run with --help for detailed help"
         exit 1
       end
     end
@@ -242,23 +243,23 @@ module MCollective
 
     # Handles failure, if we're far enough in the initialization
     # phase it will log backtraces if its in verbose mode only
-    def application_failure(e, err_dest=STDERR)
+    def application_failure(err, err_dest=$stderr)
       # peole can use exit() anywhere and not get nasty backtraces as a result
-      if e.is_a?(SystemExit)
+      if err.is_a?(SystemExit)
         disconnect
-        raise(e)
+        raise(err)
       end
 
       if options[:verbose]
-        err_dest.puts "\nThe %s application failed to run: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
+        err_dest.puts "\nThe %s application failed to run: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, err.to_s)]
       else
-        err_dest.puts "\nThe %s application failed to run, use -v for full error backtrace details: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, e.to_s)]
+        err_dest.puts "\nThe %s application failed to run, use -v for full error backtrace details: %s\n" % [Util.colorize(:bold, $0), Util.colorize(:red, err.to_s)]
       end
 
       if options.nil? || options[:verbose]
-        e.backtrace.first << Util.colorize(:red, "  <----")
-        err_dest.puts "\n%s %s" % [Util.colorize(:red, e.to_s), Util.colorize(:bold, "(#{e.class})")]
-        e.backtrace.each {|l| err_dest.puts "\tfrom #{l}"}
+        err.backtrace.first << Util.colorize(:red, "  <----")
+        err_dest.puts "\n%s %s" % [Util.colorize(:red, err.to_s), Util.colorize(:bold, "(#{err.class})")]
+        err.backtrace.each {|l| err_dest.puts "\tfrom #{l}"}
       end
 
       disconnect
@@ -289,13 +290,13 @@ module MCollective
 
     def disconnect
       MCollective::PluginManager["connector_plugin"].disconnect
-    rescue # rubocop:disable Lint/HandleExceptions
+    rescue # rubocop:disable Lint/SuppressedException
     end
 
     # Fake abstract class that logs if the user tries to use an application without
     # supplying a main override method.
     def main
-      STDERR.puts "Applications need to supply a 'main' method"
+      warn "Applications need to supply a 'main' method"
       exit 1
     end
 
@@ -305,9 +306,7 @@ module MCollective
                        :okcount => 0,
                        :failcount => 0}.merge(stats.to_hash)
 
-      if request_stats[:discoverytime] == 0 && request_stats[:responses] == 0
-        return 4
-      end
+      return 4 if request_stats[:discoverytime] == 0 && request_stats[:responses] == 0
 
       if request_stats[:discovered] > 0
         if request_stats[:responses] == 0

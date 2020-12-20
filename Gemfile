@@ -1,6 +1,5 @@
 source ENV["GEM_SOURCE"] || "https://rubygems.org"
 
-gem "json", "~> 2.1.0"
 gem "systemu", "~> 2.6.4"
 gem "rdoc"
 gem "yarjuf", "~> 1.0"
@@ -8,4 +7,4 @@ gem "rspec", "~> 2.11.0"
 gem "mocha", "~> 0.10.0"
 gem "mcollective-test"
 gem "rake", "< 11.0"
-gem "rubocop", "0.51.0"
+gem "rubocop", "1.6.1"

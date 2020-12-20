@@ -167,7 +167,7 @@ module MCollective
       end
     end
 
-    describe "#descovery_method" do
+    describe "#discovery_method" do
       it "should default to 'mc'" do
         @client.expects(:options).returns({})
         @discovery.discovery_method.should == "mc"

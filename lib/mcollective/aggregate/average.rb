@@ -1,6 +1,6 @@
 module MCollective
   class Aggregate
-    class Average<Base
+    class Average < Base
       # Before function is run processing
       def startup_hook
         @result[:value] = 0
@@ -9,7 +9,7 @@ module MCollective
         @count = 0
 
         # Set default aggregate_function if it is undefined
-        @aggregate_format = "Average of #{@result[:output]}: %f" unless @aggregate_format
+        @aggregate_format ||= "Average of #{@result[:output]}: %f" # rubocop:disable Naming/MemoizedInstanceVariableName
       end
 
       # Determines the average of a set of numerical values

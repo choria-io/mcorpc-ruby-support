@@ -67,8 +67,8 @@ class String
   unless method_defined?(:bytes)
     def bytes(&block)
       # This should not be necessary, really ...
-      require "enumerator"
       return to_enum(:each_byte) unless block_given?
+
       each_byte(&block)
     end
   end
@@ -141,9 +141,7 @@ class OpenSSL::SSL::SSLContext # rubocop:disable Style/ClassAndModuleChildren
   end
 
   # ruby 1.8.5 doesn't define this constant, but has it on by default
-  if defined?(OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS)
-    DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS
-  end
+  DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS if defined?(OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS)
 
   DEFAULT_PARAMS[:ciphers] << ":!SSLv2" if DEFAULT_PARAMS[:ciphers]
 

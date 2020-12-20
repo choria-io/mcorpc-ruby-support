@@ -1,33 +1,33 @@
-class MCollective::Application::Rpc<MCollective::Application
+class MCollective::Application::Rpc < MCollective::Application # rubocop:disable Style/ClassAndModuleChildren
   description "Generic RPC agent client application"
 
   usage "mco rpc [options] [filters] --agent <agent> --action <action> [--argument <key=val> --argument ...]"
   usage "mco rpc [options] [filters] <agent> <action> [<key=val> <key=val> ...]"
 
   option :show_results,
-         :description    => "Do not process results, just send request",
-         :arguments      => ["--no-results", "--nr"],
-         :default        => true,
-         :type           => :bool
+         :description => "Do not process results, just send request",
+         :arguments => ["--no-results", "--nr"],
+         :default => true,
+         :type => :bool
 
   option :agent,
-         :description    => "Agent to call",
-         :arguments      => ["-a", "--agent AGENT"]
+         :description => "Agent to call",
+         :arguments => ["-a", "--agent AGENT"]
 
   option :action,
-         :description    => "Action to call",
-         :arguments      => ["--action ACTION"]
+         :description => "Action to call",
+         :arguments => ["--action ACTION"]
 
   option :arguments,
-         :description    => "Arguments to pass to agent",
-         :arguments      => ["--arg", "--argument ARGUMENT"],
-         :type           => :array,
-         :default        => [],
-         :validate       => Proc.new {|val| val.match(/^(.+?)=(.+)$/) ? true : "Could not parse --arg #{val} should be of the form key=val" }
+         :description => "Arguments to pass to agent",
+         :arguments => ["--arg", "--argument ARGUMENT"],
+         :type => :array,
+         :default => [],
+         :validate => proc {|val| val.match(/^(.+?)=(.+)$/) ? true : "Could not parse --arg #{val} should be of the form key=val" }
 
   def post_option_parser(configuration)
     # handle the alternative format that optparse cant parse
-    unless (configuration.include?(:agent) && configuration.include?(:action))
+    unless configuration.include?(:agent) && configuration.include?(:action)
       if ARGV.length >= 2
         configuration[:agent] = ARGV[0]
         ARGV.delete_at(0)
@@ -37,15 +37,15 @@ class MCollective::Application::Rpc<MCollective::Application
 
         ARGV.each do |v|
           if v =~ /^(.+?)=(.+)$/
-            configuration[:arguments] = [] unless configuration.include?(:arguments)
+            configuration[:arguments] ||= []
             configuration[:arguments] << v
           else
-            STDERR.puts("Could not parse --arg #{v}")
+            warn("Could not parse --arg #{v}")
             exit(1)
           end
         end
       else
-        STDERR.puts("No agent, action and arguments specified")
+        warn("No agent, action and arguments specified")
         exit(1)
       end
     end
@@ -55,24 +55,22 @@ class MCollective::Application::Rpc<MCollective::Application
     configuration[:arguments] = {}
 
     args.each do |v|
-      if v =~ /^(.+?)=(.+)$/
-        configuration[:arguments][$1.to_sym] = $2
-      end
+      configuration[:arguments][$1.to_sym] = $2 if v =~ /^(.+?)=(.+)$/
     end
   end
 
   def string_to_ddl_type(arguments, ddl)
     return if ddl.empty?
 
-    arguments.keys.each do |key|
-      if ddl[:input].keys.include?(key)
-        case ddl[:input][key][:type]
-          when :boolean
-            arguments[key] = MCollective::DDL.string_to_boolean(arguments[key])
+    arguments.each_key do |key|
+      next unless ddl[:input].keys.include?(key)
 
-          when :number, :integer, :float
-            arguments[key] = MCollective::DDL.string_to_number(arguments[key])
-        end
+      case ddl[:input][key][:type]
+      when :boolean
+        arguments[key] = MCollective::DDL.string_to_boolean(arguments[key])
+
+      when :number, :integer, :float
+        arguments[key] = MCollective::DDL.string_to_number(arguments[key])
       end
     end
   end
@@ -89,11 +87,11 @@ class MCollective::Application::Rpc<MCollective::Application
     if mc.reply_to
       configuration[:arguments][:process_results] = true
 
-      puts "Request sent with id: " + mc.send(configuration[:action], configuration[:arguments]) + " replies to #{mc.reply_to}"
+      puts "Request sent with id: %s replies to %s" % [mc.send(configuration[:action], configuration[:arguments]), mc.reply_to]
     elsif !configuration[:show_results]
       configuration[:arguments][:process_results] = false
 
-      puts "Request sent with id: " + mc.send(configuration[:action], configuration[:arguments])
+      puts "Request sent with id: #{mc.send(configuration[:action], configuration[:arguments])}"
     else
       discover_args = {:verbose => true}
 
@@ -103,7 +101,7 @@ class MCollective::Application::Rpc<MCollective::Application
 
       printrpc mc.send(configuration[:action], configuration[:arguments])
 
-      printrpcstats :summarize => true, :caption => "#{configuration[:agent]}##{configuration[:action]} call stats" if mc.discover.size > 0
+      printrpcstats :summarize => true, :caption => "#{configuration[:agent]}##{configuration[:action]} call stats" unless mc.discover.empty?
 
       halt mc.stats
     end

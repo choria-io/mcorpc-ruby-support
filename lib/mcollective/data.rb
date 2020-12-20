@@ -28,10 +28,14 @@ module MCollective
     end
 
     # Data.package("httpd").architecture
-    def self.method_missing(method, *args) # rubocop:disable Style/MethodMissing:
+    def self.method_missing(method, *args)
       super unless PluginManager.include?(pluginname(method))
 
       PluginManager[pluginname(method)].lookup(args.first)
+    end
+
+    def self.respond_to_missing?(method, *)
+      PluginManager.include?(pluginname(method)) || super
     end
 
     def self.ddl(plugin)
@@ -55,7 +59,8 @@ module MCollective
         ddl.validate_input_argument(input, :query, argument)
       else
         raise("No data plugin argument was declared in the %s DDL but an input was supplied" % name) if argument
-        return true
+
+        true
       end
     end
 
@@ -82,7 +87,7 @@ module MCollective
         when :number, :integer, :float
           return DDL.string_to_number(input)
         end
-      rescue # rubocop:disable Lint/HandleExceptions
+      rescue # rubocop:disable Lint/SuppressedException
       end
 
       input

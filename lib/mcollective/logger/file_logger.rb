@@ -1,4 +1,4 @@
-require 'logger'
+require "logger"
 
 module MCollective
   module Logger
@@ -9,7 +9,7 @@ module MCollective
     #   - config.logfile
     #   - config.keeplogs defaults to 2097152
     #   - config.max_log_size defaults to 5
-    class File_logger<Base
+    class File_logger < Base
       def start
         config = Config.instance
 
@@ -19,16 +19,16 @@ module MCollective
         set_level(config.loglevel.to_sym)
       end
 
-      def set_logging_level(level)
+      def set_logging_level(level) # rubocop:disable Naming/AccessorMethodName
         @logger.level = map_level(level)
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         @logger.level = ::Logger::DEBUG
         log(:error, "", "Could not set logging to #{level} using debug instead: #{e.class} #{e}")
       end
 
       def valid_levels
-        {:info  => ::Logger::INFO,
-         :warn  => ::Logger::WARN,
+        {:info => ::Logger::INFO,
+         :warn => ::Logger::WARN,
          :debug => ::Logger::DEBUG,
          :fatal => ::Logger::FATAL,
          :error => ::Logger::ERROR}
@@ -39,7 +39,7 @@ module MCollective
       rescue
         # if this fails we probably cant show the user output at all,
         # STDERR it as last resort
-        STDERR.puts("#{level}: #{msg}")
+        warn("#{level}: #{msg}")
       end
 
       def reopen

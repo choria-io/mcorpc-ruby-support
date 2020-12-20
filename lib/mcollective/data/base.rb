@@ -8,6 +8,7 @@ module MCollective
         type = klass.to_s.split("::").last.downcase
 
         PluginManager << {:type => type, :class => klass.to_s, :single_instance => false}
+        super
       end
 
       def initialize
@@ -22,9 +23,9 @@ module MCollective
       def lookup(what)
         ddl_validate(what)
 
-        Log.debug("Doing data query %s for '%s'" % [ @name, what ])
+        Log.debug("Doing data query %s for '%s'" % [@name, what])
 
-        Timeout::timeout(@timeout) do
+        Timeout.timeout(@timeout) do
           query_data(what)
         end
 
@@ -40,7 +41,7 @@ module MCollective
       end
 
       def self.query(&block)
-        self.module_eval { define_method("query_data", &block) }
+        module_eval { define_method("query_data", &block) }
       end
 
       def ddl_validate(what)
@@ -58,10 +59,10 @@ module MCollective
 
       # Always be active unless a specific block is given with activate_when
       def self.activate?
-        return true
+        true
       end
 
-      def startup_hook;end
+      def startup_hook; end
     end
   end
 end

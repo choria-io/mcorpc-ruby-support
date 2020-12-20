@@ -1,8 +1,8 @@
 module MCollective
   module Data
-    class Fact_data<Base
+    class Fact_data < Base
       query do |path|
-        parts = path.split /\./
+        parts = path.split(/\./)
         walk_path(parts)
       end
 
@@ -14,7 +14,7 @@ module MCollective
         result[:value] = false
         result[:value_encoding] = false
 
-        facts = PluginManager['facts_plugin'].get_facts
+        facts = PluginManager["facts_plugin"].get_facts
 
         path.each do |level|
           case facts
@@ -25,7 +25,7 @@ module MCollective
               return
             end
           when Hash
-            if !facts.include?(level)
+            unless facts.include?(level)
               # we don't have the key for the next level, so give up
               return
             end
@@ -44,10 +44,10 @@ module MCollective
           # this is fixed flatten the data with json and flag that we have
           # munged the data
           result[:value] = facts.to_json
-          result[:value_encoding] = 'application/json'
+          result[:value_encoding] = "application/json"
         else
           result[:value] = facts
-          result[:value_encoding] = 'text/plain'
+          result[:value_encoding] = "text/plain"
         end
       end
     end

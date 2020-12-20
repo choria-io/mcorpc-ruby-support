@@ -1,6 +1,6 @@
 module MCollective
   module Data
-    class Agent_data<Base
+    class Agent_data < Base
       query do |plugin|
         raise "No agent called #{plugin} found" unless PluginManager.include?("#{plugin}_agent")
 

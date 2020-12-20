@@ -38,18 +38,22 @@ module MCollective
         case opt.to_s
         when "stdout"
           raise "stdout should support <<" unless val.respond_to?("<<")
+
           @stdout = val
 
         when "stderr"
           raise "stderr should support <<" unless val.respond_to?("<<")
+
           @stderr = val
 
         when "stdin"
           raise "stdin should be a String" unless val.is_a?(String)
+
           @stdin = val
 
         when "cwd"
           raise "Directory #{val} does not exist" unless File.directory?(val)
+
           @cwd = val
 
         when "environment"
@@ -62,6 +66,7 @@ module MCollective
 
         when "timeout"
           raise "timeout should be a positive integer or the symbol :on_thread_exit symbol" unless val.eql?(:on_thread_exit) || (val.is_a?(Integer) && val > 0)
+
           @timeout = val
         end
       end
@@ -69,10 +74,10 @@ module MCollective
 
     # Actually does the systemu call passing in the correct environment, stdout and stderr
     def runcommand
-      opts = {"env"    => @environment,
+      opts = {"env" => @environment,
               "stdout" => @stdout,
               "stderr" => @stderr,
-              "cwd"    => @cwd}
+              "cwd" => @cwd}
 
       opts["stdin"] = @stdin if @stdin
 
@@ -108,8 +113,8 @@ module MCollective
             # only wait if the parent thread is dead
             Process.waitpid(cid) unless thread.alive?
           end
-        rescue SystemExit # rubocop:disable Lint/HandleExceptions
-        rescue Errno::ESRCH # rubocop:disable Lint/HandleExceptions
+        rescue SystemExit # rubocop:disable Lint/SuppressedException
+        rescue Errno::ESRCH # rubocop:disable Lint/SuppressedException
         rescue Errno::ECHILD
           Log.warn("Could not reap process '#{cid}'.")
         rescue Exception => e # rubocop:disable Lint/RescueException

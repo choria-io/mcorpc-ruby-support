@@ -1,5 +1,5 @@
 module MCollective
-  class Application::Completion<MCollective::Application
+  class Application::Completion < MCollective::Application # rubocop:disable Style/ClassAndModuleChildren
     description "Helper for shell completion systems"
 
     exclude_argument_sections "common", "filter", "rpc"
@@ -43,8 +43,8 @@ module MCollective
         PluginManager.find(:agent, "ddl").each do |agent|
           begin
             ddl = DDL.new(agent)
-            puts "%s:%s" % [ agent, ddl.meta[:description] ]
-          rescue
+            puts "%s:%s" % [agent, ddl.meta[:description]]
+          rescue # rubocop:disable Lint/SuppressedException
           end
         end
       else
@@ -64,7 +64,7 @@ module MCollective
       else
         DDL.new(configuration[:agent], :agent).actions.sort.each {|a| puts a}
       end
-    rescue
+    rescue # rubocop:disable Lint/SuppressedException
     end
 
     def list_inputs
@@ -79,7 +79,7 @@ module MCollective
       else
         DDL.new(configuration[:agent], :agent).action_interface(configuration[:action])[:input].keys.sort.each {|i| puts i}
       end
-    rescue
+    rescue # rubocop:disable Lint/SuppressedException
     end
 
     def list_applications
@@ -93,7 +93,7 @@ module MCollective
     end
 
     def main
-      actions = configuration.keys.map{|k| k.to_s}.grep(/^list_/)
+      actions = configuration.keys.map(&:to_s).grep(/^list_/)
 
       abort "Please choose either --list-[agents|actions|inputs|applications]" if actions.empty?
       abort "Please choose only one of --list-[agents|actions|inputs|applications]" if actions.size > 1

@@ -87,14 +87,10 @@ module MCollective
       # Sets the display preference to either :ok, :failed, :flatten or :always
       # operates on action level
       def display(pref)
-        if pref == :flatten
-          Log.warn("The display option :flatten is being deprecated and will be removed in the next minor release.")
-        end
+        Log.warn("The display option :flatten is being deprecated and will be removed in the next minor release.") if pref == :flatten
 
         # defaults to old behavior, complain if its supplied and invalid
-        unless [:ok, :failed, :flatten, :always].include?(pref)
-          raise "Display preference #{pref} is not valid, should be :ok, :failed, :flatten or :always"
-        end
+        raise "Display preference #{pref} is not valid, should be :ok, :failed, :flatten or :always" unless [:ok, :failed, :flatten, :always].include?(pref)
 
         action = @current_entity
         @entities[action][:display] = pref
@@ -223,23 +219,15 @@ module MCollective
       # agent should be allowed based on action name and inputs.
       def validate_rpc_request(action, arguments)
         # is the action known?
-        unless actions.include?(action)
-          raise DDLValidationError, "Attempted to call action #{action} for #{@pluginname} but it's not declared in the DDL"
-        end
+        raise DDLValidationError, "Attempted to call action #{action} for #{@pluginname} but it's not declared in the DDL" unless actions.include?(action)
 
         input = action_interface(action)[:input] || {}
         compatible_args = symbolize_basic_input_arguments(input, arguments)
 
         input.each_key do |key|
-          unless input[key][:optional]
-            unless compatible_args.include?(key)
-              raise DDLValidationError, "Action #{action} needs a #{key} argument"
-            end
-          end
+          raise DDLValidationError, "Action #{action} needs a #{key} argument" if !input[key][:optional] && !compatible_args.include?(key)
 
-          if compatible_args.include?(key)
-            validate_input_argument(input, key, compatible_args[key])
-          end
+          validate_input_argument(input, key, compatible_args[key]) if compatible_args.include?(key)
         end
 
         true

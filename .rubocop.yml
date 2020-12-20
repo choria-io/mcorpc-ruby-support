@@ -1,6 +1,8 @@
 AllCops:
   DisplayCopNames: true
   DisplayStyleGuide: true
+  SuggestExtensions: false
+  TargetRubyVersion: 2.4
   Exclude:
     - "module/**/*"
     - "vendor/**/*"
@@ -25,9 +27,6 @@ Style/TrailingUnderscoreVariable:
 Lint/NonLocalExitFromIterator:
   Enabled: false
 
-Style/TrailingUnderscoreVariable:
-  Enabled: false
-
 Naming/ClassAndModuleCamelCase:
   Enabled: false
 
@@ -45,6 +44,9 @@ Style/StringLiterals:
 
 Style/FormatString:
   EnforcedStyle: percent
+
+Style/FormatStringToken:
+  EnforcedStyle: unannotated
 
 Style/SpecialGlobalVars:
   Enabled: false
@@ -70,9 +72,6 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
-Style/Documentation:
-  Severity: warning
-
 Style/EachWithObject:
   Enabled: false
 
@@ -87,6 +86,7 @@ Style/DoubleNegation:
 
 Style/Documentation:
   Enabled: false
+  Severity: warning
 
 Style/PerlBackrefs:
   Enabled: false
@@ -106,7 +106,7 @@ Lint/UnusedMethodArgument:
 Lint/AssignmentInCondition:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 180
 
 Metrics/PerceivedComplexity:
@@ -133,9 +133,6 @@ Metrics/ModuleLength:
 Metrics/BlockLength:
   Enabled: false
 
-Performance/Casecmp:
-  Enabled: false
-
 Style/FrozenStringLiteralComment:
   Enabled: false
 
@@ -145,21 +142,18 @@ Style/SymbolArray:
 Security/MarshalLoad:
   Enabled: false
 
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   Enabled: false
 
 # @todo use safe_load but its a big change
 Security/YAMLLoad:
   Enabled: false
 
-Performance/RegexpMatch:
-  Enabled: false
-
 Style/SafeNavigation:
   Enabled: false
 
-Lint/RescueWithoutErrorClass:
+Style/RescueStandardError:
   Enabled: false
 
-Performance/StringReplacement:
+Style/OptionalBooleanParameter:
   Enabled: false

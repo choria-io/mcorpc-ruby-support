@@ -12,11 +12,11 @@ module MCollective
         load_application(appname)
       rescue Exception => e # rubocop:disable Lint/RescueException
         e.backtrace.first << Util.colorize(:red, "  <----")
-        STDERR.puts "Application '%s' failed to load:" % appname
-        STDERR.puts
-        STDERR.puts Util.colorize(:red, "   %s (%s)" % [$!, $!.class])
-        STDERR.puts
-        STDERR.puts "       %s" % [$!.backtrace.join("\n       ")]
+        warn "Application '%s' failed to load:" % appname
+        $stderr.puts
+        warn Util.colorize(:red, "   %s (%s)" % [$!, $!.class])
+        $stderr.puts
+        warn "       %s" % [$!.backtrace.join("\n       ")]
         exit 1
       end
 
@@ -40,7 +40,7 @@ module MCollective
     rescue SystemExit
       exit 1
     rescue Exception # rubocop:disable Lint/RescueException
-      STDERR.puts("Failed to generate application list: %s: %s" % [$!.class, $!])
+      warn("Failed to generate application list: %s: %s" % [$!.class, $!])
       exit 1
     end
 
@@ -49,13 +49,14 @@ module MCollective
     def self.filter_extra_options(opts)
       words = Shellwords.shellwords(opts)
       words.each_with_index do |word, idx|
-        if word == "-c"
+        case word
+        when "-c"
           return "--config=#{words[idx + 1]}"
-        elsif word == "--config"
+        when "--config"
           return "--config=#{words[idx + 1]}"
-        elsif word =~ /\-c=/
+        when /-c=/
           return word
-        elsif word =~ /\-\-config=/
+        when /--config=/
           return word
         end
       end

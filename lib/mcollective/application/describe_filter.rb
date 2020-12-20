@@ -1,5 +1,5 @@
 module MCollective
-  class Application::Describe_filter<Application
+  class Application::Describe_filter < Application # rubocop:disable Style/ClassAndModuleChildren
     exclude_argument_sections "common", "rpc"
 
     description "Display human readable interpretation of filters"
@@ -12,30 +12,29 @@ module MCollective
       puts "-S Query expands to the following instructions:"
       puts
       stack.each do |token|
-        if token.keys[0] == "statement"
+        case token.keys[0]
+        when "statement"
           if token.values[0] =~ /(<=|>=|=|=~|=)/
             op = $1
-            k,v = token.values[0].split(op)
+            k, v = token.values[0].split(op)
             puts indent + get_fact_string(k, v, op)
           else
             puts indent + get_class_string(token.values[0])
           end
-        elsif token.keys[0] == "fstatement"
+        when "fstatement"
           v = token.values[0]
-          result_string = indent + "Execute the Data Query '#{v["name"]}'"
-          if v["params"]
-            result_string += " with parameters (#{v["params"]})"
-          end
+          result_string = indent + "Execute the Data Query '#{v['name']}'"
+          result_string += " with parameters (#{v['params']})" if v["params"]
           result_string += ". "
-          result_string += "Check if the query's '#{v["value"]}' value #{v["operator"]} '#{v["r_compare"]}'  "
+          result_string += "Check if the query's '#{v['value']}' value #{v['operator']} '#{v['r_compare']}'  "
           puts result_string
-        elsif token.keys[0] == "("
-          puts indent + "("
+        when "("
+          puts "#{indent}("
           old_indent = indent
           indent *= 2
-        elsif token.keys[0] == ")"
+        when ")"
           indent = old_indent
-          puts indent + ")"
+          puts "#{indent})"
         else
           puts indent + token.keys[0].upcase
         end
@@ -46,7 +45,7 @@ module MCollective
       puts "-F filter expands to the following fact comparisons:"
       puts
       facts.each do |f|
-        puts "  " + get_fact_string(f[:fact], f[:value], f[:operator])
+        puts "  #{get_fact_string(f[:fact], f[:value], f[:operator])}"
       end
     end
 
@@ -54,30 +53,31 @@ module MCollective
       puts "-C filter expands to the following class checks:"
       puts
       classes.each do |c|
-        puts "  " + get_class_string(c)
+        puts "  #{get_class_string(c)}"
       end
     end
 
     def main
-      if !(@options[:filter]["fact"].empty?)
+      unless @options[:filter]["fact"].empty?
         describe_f_filter(@options[:filter]["fact"])
         puts
       end
 
-      if !(@options[:filter]["cf_class"].empty?)
+      unless @options[:filter]["cf_class"].empty?
         describe_c_filter(@options[:filter]["cf_class"])
         puts
       end
 
-      if !(@options[:filter]["compound"].empty?)
+      unless @options[:filter]["compound"].empty?
         describe_s_filter(@options[:filter]["compound"][0])
         puts
       end
     end
 
     private
-    def get_fact_string(fact, value, op)
-      "Check if fact '#{fact}' #{op} '#{value}'"
+
+    def get_fact_string(fact, value, oper)
+      "Check if fact '#{fact}' #{oper} '#{value}'"
     end
 
     def get_class_string(classname)
