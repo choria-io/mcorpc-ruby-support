@@ -36,7 +36,7 @@ module MCollective
 
         Applications.expects(:load_config).once
         PluginManager.expects("[]").with("test_application").once.returns(app)
-        Applications["test"].should == app
+        expect(Applications["test"]).to eq(app)
       end
     end
 
@@ -71,7 +71,7 @@ module MCollective
         Applications.expects(:load_application)
         PluginManager.expects("[]").once.returns(app)
 
-        Applications.run("test").should == "hello world"
+        expect(Applications.run("test")).to eq("hello world")
       end
     end
 
@@ -119,7 +119,7 @@ module MCollective
         Applications.expects("load_config").returns(true).once
         Config.instance.expects("libdir").returns([@tmpdir])
 
-        Applications.list.should == ["test"]
+        expect(Applications.list).to eq(["test"])
       end
 
       it "should print a friendly error and exit on failure" do
@@ -127,7 +127,7 @@ module MCollective
         Applications.expects(:warn).with(regexp_matches(/Failed to generate application list/)).once
 
         expect {
-          Applications.list.should
+          expect(Applications.list).to
         }.to raise_error(SystemExit)
       end
     end
@@ -135,19 +135,19 @@ module MCollective
     describe "#filter_extra_options" do
       it "should parse --config=x" do
         ["--config=x --foo=bar -f -f bar", "--foo=bar --config=x -f -f bar"].each do |t|
-          Applications.filter_extra_options(t).should == "--config=x"
+          expect(Applications.filter_extra_options(t)).to eq("--config=x")
         end
       end
 
       it "should parse --config x" do
         ["--config x --foo=bar -f -f bar", "--foo=bar --config x -f -f bar"].each do |t|
-          Applications.filter_extra_options(t).should == "--config=x"
+          expect(Applications.filter_extra_options(t)).to eq("--config=x")
         end
       end
 
       it "should parse -c x" do
         ["-c x --foo=bar -f -f bar", "--foo=bar -c x -f -f bar"].each do |t|
-          Applications.filter_extra_options(t).should == "--config=x"
+          expect(Applications.filter_extra_options(t)).to eq("--config=x")
         end
       end
     end

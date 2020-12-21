@@ -30,10 +30,10 @@ module MCollective
           m = mock
           m.stubs(:expected_msgid).returns("rspec")
 
-          @plugin.should_process_msg?(m, "rspec").should == true
+          expect(@plugin.should_process_msg?(m, "rspec")).to eq(true)
 
           expect {
-            @plugin.should_process_msg?(m, "fail").should == true
+            expect(@plugin.should_process_msg?(m, "fail")).to eq(true)
           }.to raise_error(MsgDoesNotMatchRequestID)
         end
 
@@ -41,7 +41,7 @@ module MCollective
           m = mock
           m.stubs(:expected_msgid).returns(nil)
 
-          @plugin.should_process_msg?(m, "rspec").should == true
+          expect(@plugin.should_process_msg?(m, "rspec")).to eq(true)
         end
       end
 
@@ -55,7 +55,7 @@ module MCollective
 
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
 
-          @plugin.validate_filter?({}).should == true
+          expect(@plugin.validate_filter?({})).to eq(true)
         end
 
         it "should pass for known classes" do
@@ -67,7 +67,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on configuration management class foo").once
 
-          @plugin.validate_filter?({"cf_class" => ["foo"]}).should == true
+          expect(@plugin.validate_filter?({"cf_class" => ["foo"]})).to eq(true)
         end
 
         it "should fail for unknown classes" do
@@ -79,7 +79,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on configuration management class foo").once
 
-          @plugin.validate_filter?({"cf_class" => ["foo"]}).should == false
+          expect(@plugin.validate_filter?({"cf_class" => ["foo"]})).to eq(false)
         end
 
         it "should pass for known agents" do
@@ -91,7 +91,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on agent foo").once
 
-          @plugin.validate_filter?({"agent" => ["foo"]}).should == true
+          expect(@plugin.validate_filter?({"agent" => ["foo"]})).to eq(true)
         end
 
         it "should fail for unknown agents" do
@@ -103,7 +103,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on agent foo").once
 
-          @plugin.validate_filter?({"agent" => ["foo"]}).should == false
+          expect(@plugin.validate_filter?({"agent" => ["foo"]})).to eq(false)
         end
 
         it "should pass for known facts" do
@@ -115,7 +115,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on fact fact operator value").once
 
-          @plugin.validate_filter?({"fact" => [{:fact => "fact", :operator => "operator", :value => "value"}]}).should == true
+          expect(@plugin.validate_filter?({"fact" => [{:fact => "fact", :operator => "operator", :value => "value"}]})).to eq(true)
         end
 
         it "should fail for unknown facts" do
@@ -127,7 +127,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on fact fact operator value").once
 
-          @plugin.validate_filter?({"fact" => [{:fact => "fact", :operator => "operator", :value => "value"}]}).should == false
+          expect(@plugin.validate_filter?({"fact" => [{:fact => "fact", :operator => "operator", :value => "value"}]})).to eq(false)
         end
 
         it "should pass for known identity" do
@@ -139,7 +139,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on identity").once
 
-          @plugin.validate_filter?({"identity" => ["test"]}).should == true
+          expect(@plugin.validate_filter?({"identity" => ["test"]})).to eq(true)
         end
 
         it "should fail for known identity" do
@@ -151,7 +151,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failed based on identity").once
 
-          @plugin.validate_filter?({"identity" => ["test"]}).should == false
+          expect(@plugin.validate_filter?({"identity" => ["test"]})).to eq(false)
         end
 
         it "should treat multiple identity filters correctly" do
@@ -164,7 +164,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on identity").once
 
-          @plugin.validate_filter?({"identity" => ["foo", "bar"]}).should == true
+          expect(@plugin.validate_filter?({"identity" => ["foo", "bar"]})).to eq(true)
         end
 
         it "should fail if no identity matches are found" do
@@ -177,7 +177,7 @@ module MCollective
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failed based on identity").once
 
-          @plugin.validate_filter?({"identity" => ["foo", "bar"]}).should == false
+          expect(@plugin.validate_filter?({"identity" => ["foo", "bar"]})).to eq(false)
         end
       end
 
@@ -189,7 +189,7 @@ module MCollective
             :msgtime => @time.to_i,
             :body => "body"}
 
-          @plugin.create_reply("reqid", "agent", "body").should == expected
+          expect(@plugin.create_reply("reqid", "agent", "body")).to eq(expected)
         end
       end
 
@@ -205,7 +205,7 @@ module MCollective
             :ttl => 20,
             :msgtime => @time.to_i}
 
-          @plugin.create_request("reqid", "filter", "body", :server, "discovery", "mcollective", 20).should == expected
+          expect(@plugin.create_request("reqid", "filter", "body", :server, "discovery", "mcollective", 20)).to eq(expected)
         end
 
         it "should set the callerid when appropriate" do
@@ -220,29 +220,29 @@ module MCollective
             :msgtime => @time.to_i}
 
           @plugin.stubs(:callerid).returns("callerid")
-          @plugin.create_request("reqid", "filter", "body", :client, "discovery", "mcollective").should == expected
+          expect(@plugin.create_request("reqid", "filter", "body", :client, "discovery", "mcollective")).to eq(expected)
         end
       end
 
       describe "#valid_callerid?" do
         it "should not pass invalid callerids" do
-          @plugin.valid_callerid?("foo-bar").should == false
-          @plugin.valid_callerid?("foo=bar=baz").should == false
-          @plugin.valid_callerid?('foo=bar\baz').should == false
-          @plugin.valid_callerid?("foo=bar/baz").should == false
-          @plugin.valid_callerid?("foo=bar|baz").should == false
+          expect(@plugin.valid_callerid?("foo-bar")).to eq(false)
+          expect(@plugin.valid_callerid?("foo=bar=baz")).to eq(false)
+          expect(@plugin.valid_callerid?('foo=bar\baz')).to eq(false)
+          expect(@plugin.valid_callerid?("foo=bar/baz")).to eq(false)
+          expect(@plugin.valid_callerid?("foo=bar|baz")).to eq(false)
         end
 
         it "should pass valid callerids" do
-          @plugin.valid_callerid?("cert=foo-bar").should == true
-          @plugin.valid_callerid?("uid=foo.bar").should == true
-          @plugin.valid_callerid?("uid=foo.bar.123").should == true
+          expect(@plugin.valid_callerid?("cert=foo-bar")).to eq(true)
+          expect(@plugin.valid_callerid?("uid=foo.bar")).to eq(true)
+          expect(@plugin.valid_callerid?("uid=foo.bar.123")).to eq(true)
         end
       end
 
       describe "#callerid" do
         it "should return a unix UID based callerid" do
-          @plugin.callerid.should == "uid=#{Process.uid}"
+          expect(@plugin.callerid).to eq("uid=#{Process.uid}")
         end
       end
 

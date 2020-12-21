@@ -7,18 +7,18 @@ module MCollective
     describe "#initialize" do
       it "should store the included list as an array" do
         parser = Optionparser.new({}, "included")
-        parser.instance_variable_get("@include").should == ["included"]
+        expect(parser.instance_variable_get("@include")).to eq(["included"])
 
         parser = Optionparser.new({}, ["included"])
-        parser.instance_variable_get("@include").should == ["included"]
+        expect(parser.instance_variable_get("@include")).to eq(["included"])
       end
 
       it "should store the excluded list as an array" do
         parser = Optionparser.new({}, "", "excluded")
-        parser.instance_variable_get("@exclude").should == ["excluded"]
+        expect(parser.instance_variable_get("@exclude")).to eq(["excluded"])
 
         parser = Optionparser.new({}, "", ["excluded"])
-        parser.instance_variable_get("@exclude").should == ["excluded"]
+        expect(parser.instance_variable_get("@exclude")).to eq(["excluded"])
       end
 
       it "should gather default options" do
@@ -44,12 +44,12 @@ module MCollective
         block_ran = false
 
         parser.parse do |p, o|
-          p.class.should == OptionParser
-          o.should == Util.default_options.merge(defaults)
+          expect(p.class).to eq(OptionParser)
+          expect(o).to eq(Util.default_options.merge(defaults))
           block_ran = true
         end
 
-        block_ran.should == true
+        expect(block_ran).to eq(true)
       end
 
       it "should add required options" do
@@ -89,7 +89,7 @@ module MCollective
       it "should parse MCOLLECTIVE_EXTRA_OPTS" do
         ENV["MCOLLECTIVE_EXTRA_OPTS"] = "--dt 999"
         @parser = Optionparser.new
-        @parser.parse[:disctimeout].should == 999
+        expect(@parser.parse[:disctimeout]).to eq(999)
         ENV.delete("MCOLLECTIVE_EXTRA_OPTS")
       end
 
@@ -106,7 +106,7 @@ module MCollective
         parser.stubs(:add_required_options)
         parser.stubs(:add_common_options)
         Config.instance.expects(:main_collective).returns(:rspec).once
-        parser.parse[:collective].should == :rspec
+        expect(parser.parse[:collective]).to eq(:rspec)
       end
     end
 
@@ -122,43 +122,43 @@ module MCollective
       it 'should parse the --target option' do
         ARGV << '--target=rspec_collective'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:collective].should == 'rspec_collective'
+        expect(@parser.instance_variable_get(:@options)[:collective]).to eq('rspec_collective')
       end
 
       it 'should parse the --discovery-timeout option' do
         ARGV << '--discovery-timeout=1'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:disctimeout].should == 1
+        expect(@parser.instance_variable_get(:@options)[:disctimeout]).to eq(1)
       end
 
       it 'should parse the --timeout option' do
         ARGV << '--timeout=5'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:timeout].should == 5
+        expect(@parser.instance_variable_get(:@options)[:timeout]).to eq(5)
       end
 
       it 'should parse the --quiet option' do
         ARGV << '--quiet'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:verbose].should == false
+        expect(@parser.instance_variable_get(:@options)[:verbose]).to eq(false)
       end
 
       it 'should parse the --ttl option' do
         ARGV << '--ttl=9'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:ttl].should == 9
+        expect(@parser.instance_variable_get(:@options)[:ttl]).to eq(9)
       end
 
       it 'should parse the --reply-to option' do
         ARGV << '--reply-to=/rspec/test'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:reply_to].should == '/rspec/test'
+        expect(@parser.instance_variable_get(:@options)[:reply_to]).to eq('/rspec/test')
       end
 
       it 'should parse the --disc-method option' do
         ARGV << '--disc-method=flatfile'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:discovery_method].should == 'flatfile'
+        expect(@parser.instance_variable_get(:@options)[:discovery_method]).to eq('flatfile')
       end
 
       it 'should fail on the --disc-method option if the discovery method has already been set' do
@@ -172,20 +172,20 @@ module MCollective
       it 'should parse the --publish_timeout option' do
         ARGV << '--publish_timeout=5'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:publish_timeout].should == 5
+        expect(@parser.instance_variable_get(:@options)[:publish_timeout]).to eq(5)
       end
 
       it 'should parse the --threaded option' do
         ARGV << '--threaded'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:threaded].should == true
+        expect(@parser.instance_variable_get(:@options)[:threaded]).to eq(true)
       end
 
       it 'should parse the --disc-option option' do
         ARGV << '--disc-option=option1'
         ARGV << '--disc-option=option2'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:discovery_options].should == ['option1', 'option2']
+        expect(@parser.instance_variable_get(:@options)[:discovery_options]).to eq(['option1', 'option2'])
         ARGV.pop
       end
 
@@ -193,14 +193,14 @@ module MCollective
         File.expects(:readable?).with('nodes.txt').returns(true)
         ARGV << '--nodes=nodes.txt'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:discovery_method].should == 'flatfile'
-        @parser.instance_variable_get(:@options)[:discovery_options].should == ['nodes.txt']
+        expect(@parser.instance_variable_get(:@options)[:discovery_method]).to eq('flatfile')
+        expect(@parser.instance_variable_get(:@options)[:discovery_options]).to eq(['nodes.txt'])
       end
 
       it 'should parse the --nodes option' do
         ARGV << '--connection-timeout=1'
         @parser.parse
-        @parser.instance_variable_get(:@options)[:connection_timeout].should == 1
+        expect(@parser.instance_variable_get(:@options)[:connection_timeout]).to eq(1)
       end
 
       it 'should fail on the --nodes option if discovery_method or discovery_options have already been set' do

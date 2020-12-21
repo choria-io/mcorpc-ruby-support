@@ -21,15 +21,15 @@ module MCollective
 
       it "should return the correct class if klass is given as klass" do
         result = Validator["array"]
-        result.should == ArrayValidator
+        expect(result).to eq(ArrayValidator)
       end
       it "should return the correct class if klass is given as KlassValidator" do
         result = Validator["ArrayValidator"]
-        result.should == ArrayValidator
+        expect(result).to eq(ArrayValidator)
       end
       it "should return the correct class if klass is given as :klass" do
         result = Validator[:array]
-        result.should == ArrayValidator
+        expect(result).to eq(ArrayValidator)
       end
     end
 
@@ -49,18 +49,18 @@ module MCollective
     describe "#validator_class" do
       it "should return the correct string for a given validator plugin name" do
         result = Validator.validator_class("test")
-        result.should == "TestValidator"
+        expect(result).to eq("TestValidator")
       end
     end
 
     describe "#has_validator?" do
       it "should return true if the validator has been loaded" do
         Validator.const_set(:TestValidator, Class)
-        Validator.has_validator?("test").should == true
+        expect(Validator.has_validator?("test")).to eq(true)
       end
 
       it "should return false if the validator has not been loaded" do
-        Validator.has_validator?("test2").should == false
+        expect(Validator.has_validator?("test2")).to eq(false)
       end
     end
   end

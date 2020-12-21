@@ -20,12 +20,12 @@ module MCollective
 
         it 'should return true if you are a member of the named collective' do
           @plugin.query_data("collective_a")
-          @plugin.result[:member].should == true
+          expect(@plugin.result[:member]).to eq(true)
         end
 
         it 'should return false if you are a member of the named collective' do
           @plugin.query_data("no_such_collective")
-          @plugin.result[:member].should == false
+          expect(@plugin.result[:member]).to eq(false)
         end
       end
     end

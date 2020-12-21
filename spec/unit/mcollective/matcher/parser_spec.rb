@@ -12,42 +12,42 @@ module MCollective
       describe '#parse' do
         it "should parse statements seperated by '='" do
           parser = Parser.new("foo=bar")
-          parser.execution_stack.should == [{"statement" => "foo=bar"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo=bar"}])
         end
 
         it "should parse statements seperated by '<'" do
           parser = Parser.new("foo<bar")
-          parser.execution_stack.should == [{"statement" => "foo<bar"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo<bar"}])
         end
 
         it "should parse statements seperated by '>'" do
           parser = Parser.new("foo>bar")
-          parser.execution_stack.should == [{"statement" => "foo>bar"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo>bar"}])
         end
 
         it "should parse statements seperated by '<='" do
           parser = Parser.new("foo<=bar")
-          parser.execution_stack.should == [{"statement" => "foo<=bar"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo<=bar"}])
         end
 
         it "should parse statements seperated by '>='" do
           parser = Parser.new("foo>=bar")
-          parser.execution_stack.should == [{"statement" => "foo>=bar"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo>=bar"}])
         end
 
         it "should parse class regex statements" do
           parser = Parser.new("/foo/")
-          parser.execution_stack.should == [{"statement" => "/foo/"}]
+          expect(parser.execution_stack).to eq([{"statement" => "/foo/"}])
         end
 
         it "should parse fact regex statements" do
           parser = Parser.new("foo=/bar/")
-          parser.execution_stack.should == [{"statement" => "foo=/bar/"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo=/bar/"}])
         end
 
         it "should parse a correct 'and' token" do
           parser = Parser.new("foo=bar and bar=foo")
-          parser.execution_stack.should == [{"statement" => "foo=bar"}, {"and" => "and"}, {"statement" => "bar=foo"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo=bar"}, {"and" => "and"}, {"statement" => "bar=foo"}])
         end
 
         it "should not parse an incorrect and token" do
@@ -58,7 +58,7 @@ module MCollective
 
         it "should parse a correct 'or' token" do
           parser = Parser.new("foo=bar or bar=foo")
-          parser.execution_stack.should == [{"statement" => "foo=bar"}, {"or" => "or"}, {"statement" => "bar=foo"}]
+          expect(parser.execution_stack).to eq([{"statement" => "foo=bar"}, {"or" => "or"}, {"statement" => "bar=foo"}])
         end
 
         it "should not parse an incorrect or token" do
@@ -69,9 +69,9 @@ module MCollective
 
         it "should parse a correct 'not' token" do
           parser = Parser.new("! bar=foo")
-          parser.execution_stack.should == [{"not" => "not"}, {"statement" => "bar=foo"}]
+          expect(parser.execution_stack).to eq([{"not" => "not"}, {"statement" => "bar=foo"}])
           parser = Parser.new("not bar=foo")
-          parser.execution_stack.should == [{"not" => "not"}, {"statement" => "bar=foo"}]
+          expect(parser.execution_stack).to eq([{"not" => "not"}, {"statement" => "bar=foo"}])
         end
 
         it "should not parse an incorrect 'not' token" do
@@ -82,7 +82,7 @@ module MCollective
 
         it "should parse correct parentheses" do
           parser = Parser.new("(foo=bar)")
-          parser.execution_stack.should == [{"(" => "("}, {"statement" => "foo=bar"}, {")" => ")"}]
+          expect(parser.execution_stack).to eq([{"(" => "("}, {"statement" => "foo=bar"}, {")" => ")"}])
         end
 
         it "should fail on incorrect parentheses" do
@@ -99,23 +99,23 @@ module MCollective
 
         it "should parse correctly formatted compound statements" do
           parser = Parser.new("(foo=bar or foo=rab) and (bar=foo)")
-          parser.execution_stack.should == [{"(" => "("}, {"statement"=>"foo=bar"}, {"or"=>"or"}, {"statement"=>"foo=rab"},
+          expect(parser.execution_stack).to eq([{"(" => "("}, {"statement"=>"foo=bar"}, {"or"=>"or"}, {"statement"=>"foo=rab"},
                                             {")"=>")"}, {"and"=>"and"}, {"("=>"("}, {"statement"=>"bar=foo"},
-                                            {")"=>")"}]
+                                            {")"=>")"}])
         end
 
         it "should parse complex fstatements and statements with operators seperated by whitespaces" do
           parser = Parser.new(%q(foo('bar').value = 1 and foo=bar or foo  = bar and baz("abc") = "xyz"))
-          parser.execution_stack.should == [{"fstatement"=>"foo('bar').value=1"}, {"and"=>"and"}, {"statement"=>"foo=bar"}, {"or"=>"or"}, {"statement"=>"foo=bar"}, {"and"=>"and"}, {"fstatement"=>'baz("abc")=xyz'}]
+          expect(parser.execution_stack).to eq([{"fstatement"=>"foo('bar').value=1"}, {"and"=>"and"}, {"statement"=>"foo=bar"}, {"or"=>"or"}, {"statement"=>"foo=bar"}, {"and"=>"and"}, {"fstatement"=>'baz("abc")=xyz'}])
         end
 
         it "should parse statements where classes are mixed with fact comparisons and fstatements" do
           parser = Parser.new("klass and function('param').value = 1 and fact=value")
-          parser.execution_stack.should == [{"statement" => "klass"},
+          expect(parser.execution_stack).to eq([{"statement" => "klass"},
                                             {"and" => "and"},
                                             {"fstatement" => "function('param').value=1"},
                                             {"and" => "and"},
-                                            {"statement" => "fact=value"}]
+                                            {"statement" => "fact=value"}])
         end
       end
     end

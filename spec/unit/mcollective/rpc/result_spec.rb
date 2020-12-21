@@ -10,20 +10,20 @@ module MCollective
       end
 
       it "should include Enumerable" do
-        Result.ancestors.include?(Enumerable).should == true
+        expect(Result.ancestors.include?(Enumerable)).to eq(true)
       end
 
       describe "#initialize" do
         it "should set the agent" do
-          @result.agent.should == "tester"
+          expect(@result.agent).to eq("tester")
         end
 
         it "should set the action" do
-          @result.action.should == "test"
+          expect(@result.action).to eq("test")
         end
 
         it "should set the results" do
-          @result.results.should == {:foo => "bar", :bar => "baz"}
+          expect(@result.results).to eq({:foo => "bar", :bar => "baz"})
         end
       end
 
@@ -57,8 +57,8 @@ module MCollective
 
       describe "#[]" do
         it "should access the results hash and return correct data" do
-          @result[:foo].should == "bar"
-          @result[:bar].should == "baz"
+          expect(@result[:foo]).to eq("bar")
+          expect(@result[:bar]).to eq("baz")
         end
       end
 
@@ -66,16 +66,16 @@ module MCollective
         it "should set the correct result data" do
           @result[:meh] = "blah"
 
-          @result[:foo].should == "bar"
-          @result[:bar].should == "baz"
-          @result[:meh].should == "blah"
+          expect(@result[:foo]).to eq("bar")
+          expect(@result[:bar]).to eq("baz")
+          expect(@result[:meh]).to eq("blah")
         end
       end
 
       describe "#fetch" do
         it "should fetch data with the correct default behavior" do
-          @result.fetch(:foo, "default").should == "bar"
-          @result.fetch(:rspec, "default").should == "default"
+          expect(@result.fetch(:foo, "default")).to eq("bar")
+          expect(@result.fetch(:rspec, "default")).to eq("default")
         end
       end
 
@@ -85,15 +85,15 @@ module MCollective
 
           @result.each {|k,v| data[k] = v}
 
-          data[:foo].should == "bar"
-          data[:bar].should == "baz"
+          expect(data[:foo]).to eq("bar")
+          expect(data[:bar]).to eq("baz")
         end
       end
 
       describe "#to_json" do
         it "should correctly json encode teh data" do
           result = Result.new("tester", "test", {:statuscode => 0, :statusmsg => "OK", :sender => "rspec",  :data => {:foo => "bar", :bar => "baz"}})
-          JSON.load(result.to_json).should == {"agent" => "tester", "action" => "test", "statuscode" => 0, "statusmsg" => "OK", "sender" => "rspec", "data" => {"foo" => "bar", "bar" => "baz"}}
+          expect(JSON.load(result.to_json)).to eq({"agent" => "tester", "action" => "test", "statuscode" => 0, "statusmsg" => "OK", "sender" => "rspec", "data" => {"foo" => "bar", "bar" => "baz"}})
         end
       end
 
@@ -112,9 +112,9 @@ module MCollective
                                   :sender => "b_rspec",
                                   :data => {}})
 
-          (result_a <=> result_b).should == -1
-          (result_b <=> result_a).should == 1
-          (result_a <=> result_a).should == 0
+          expect(result_a <=> result_b).to eq(-1)
+          expect(result_b <=> result_a).to eq(1)
+          expect(result_a <=> result_a).to eq(0)
         end
       end
     end

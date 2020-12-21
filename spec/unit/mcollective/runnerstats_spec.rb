@@ -18,12 +18,12 @@ module MCollective
 
     describe "#to_hash" do
       it "should return the correct data" do
-        @stats.to_hash.keys.sort.should == [:stats, :threads, :pid, :times, :agents].sort
+        expect(@stats.to_hash.keys.sort).to eq([:stats, :threads, :pid, :times, :agents].sort)
 
-        @stats.to_hash[:stats].should == {:validated => 0, :unvalidated => 0, :passed => 0, :filtered => 0,
-          :starttime => 0, :total => 0, :ttlexpired => 0, :replies => 0}
+        expect(@stats.to_hash[:stats]).to eq({:validated => 0, :unvalidated => 0, :passed => 0, :filtered => 0,
+          :starttime => 0, :total => 0, :ttlexpired => 0, :replies => 0})
 
-        @stats.to_hash[:agents].should == "agents"
+        expect(@stats.to_hash[:agents]).to eq("agents")
       end
     end
 
@@ -32,7 +32,7 @@ module MCollective
       describe "##{tst.first}" do
         it "should increment #{tst.first}" do
           @stats.send(tst.first)
-          @stats.to_hash[:stats][tst.last].should == 1
+          expect(@stats.to_hash[:stats][tst.last]).to eq(1)
         end
       end
     end

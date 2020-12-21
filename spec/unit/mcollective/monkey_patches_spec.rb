@@ -9,13 +9,13 @@ describe OpenSSL::SSL::SSLContext do
   end
 
   it 'disables SSLv2 via the SSLContext#options bitmask' do
-    (subject.options & OpenSSL::SSL::OP_NO_SSLv2).should == OpenSSL::SSL::OP_NO_SSLv2
+    expect(subject.options & OpenSSL::SSL::OP_NO_SSLv2).to eq(OpenSSL::SSL::OP_NO_SSLv2)
   end
 
   it 'explicitly disable SSLv2 ciphers using the ! prefix so they cannot be re-added' do
     if OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
       cipher_str = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
-      cipher_str.split(':').should include('!SSLv2')
+      expect(cipher_str.split(':')).to include('!SSLv2')
     end
   end
 
@@ -23,11 +23,11 @@ describe OpenSSL::SSL::SSLContext do
     ciphers = subject.ciphers.select do |name, version, bits, alg_bits|
       /SSLv2/.match(version)
     end
-    ciphers.should be_empty
+    expect(ciphers).to be_empty
   end
 
   it 'disables SSLv3 via the SSLContext#options bitmask' do
-    (subject.options & OpenSSL::SSL::OP_NO_SSLv3).should == OpenSSL::SSL::OP_NO_SSLv3
+    expect(subject.options & OpenSSL::SSL::OP_NO_SSLv3).to eq(OpenSSL::SSL::OP_NO_SSLv3)
   end
 
 end

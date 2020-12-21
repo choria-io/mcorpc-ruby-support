@@ -39,8 +39,8 @@ module MCollective
 
         Log.expects(:error)
         aggregate = Aggregate.new(invalid_ddl)
-        aggregate.functions.should == ["function"]
-        aggregate.failed.should == [{:type=>:create, :name=>:fail}]
+        expect(aggregate.functions).to eq(["function"])
+        expect(aggregate.failed).to eq([{:type=>:create, :name=>:fail}])
       end
 
       it "should pass additional arguments if specified in the ddl" do
@@ -56,7 +56,7 @@ module MCollective
 
         Log.expects(:error)
         aggregate = Aggregate.new(ddl)
-        aggregate.failed.should == [{:type=>:startup, :name =>:foo }]
+        expect(aggregate.failed).to eq([{:type=>:startup, :name =>:foo }])
       end
     end
 
@@ -68,12 +68,12 @@ module MCollective
 
       it "should return false if the ddl output does not include the function's input" do
         result = @aggregate.contains_output?(:baz)
-        result.should == false
+        expect(result).to eq(false)
       end
 
       it "should return true if the ddl output includes the function's input" do
         result = @aggregate.contains_output?(:foo)
-        result.should == true
+        expect(result).to eq(true)
       end
     end
 
@@ -101,7 +101,7 @@ module MCollective
 
         Log.expects(:error)
         aggregate.call_functions(result)
-        aggregate.failed.should == [:name => :test, :type => :process_result]
+        expect(aggregate.failed).to eq([:name => :test, :type => :process_result])
       end
 
       it "should not fail if 'summarize' method raises en exception" do
@@ -130,7 +130,7 @@ module MCollective
         aggregate.functions = [func1, func2]
 
         result = aggregate.summarize
-        result.should == [func2, func1]
+        expect(result).to eq([func2, func1])
       end
 
       it "should not summarise data that raises an exception" do
@@ -143,7 +143,7 @@ module MCollective
         Log.expects(:error)
 
         aggregate.summarize
-        aggregate.failed.should == [{:name => "rspec", :type => :summarize}]
+        expect(aggregate.failed).to eq([{:name => "rspec", :type => :summarize}])
       end
     end
 

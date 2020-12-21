@@ -13,32 +13,32 @@ module MCollective
     describe "#setup" do
       it "should use a mutex to manage access to the cache" do
         @locks_mutex.expects(:synchronize).yields
-        Cache.setup("x").should == true
-        @cache.should == {"x" => {:max_age => 300.0}}
+        expect(Cache.setup("x")).to eq(true)
+        expect(@cache).to eq({"x" => {:max_age => 300.0}})
       end
 
       it "should correctly setup a new cache" do
         @locks_mutex.expects(:synchronize).twice.yields
         Cache.setup("rspec1", 300)
-        @cache["rspec1"].should == {:max_age => 300.0}
+        expect(@cache["rspec1"]).to eq({:max_age => 300.0})
 
         Cache.setup("rspec2")
-        @cache["rspec2"].should == {:max_age => 300.0}
+        expect(@cache["rspec2"]).to eq({:max_age => 300.0})
       end
     end
 
     describe "#has_cache?" do
       it "should correctly report presense of a cache" do
         Cache.setup("rspec")
-        Cache.has_cache?("rspec").should == true
-        Cache.has_cache?("fail").should == false
+        expect(Cache.has_cache?("rspec")).to eq(true)
+        expect(Cache.has_cache?("fail")).to eq(false)
       end
     end
 
     describe "#delete!" do
       it "should delete the cache and return true" do
         Cache.setup("rspec")
-        Cache.delete!("rspec").should == true
+        expect(Cache.delete!("rspec")).to eq(true)
       end
     end
 
@@ -52,10 +52,10 @@ module MCollective
         Time.expects(:now).returns(time)
 
         Cache.setup("rspec")
-        Cache.write("rspec", :key, :val).should == :val
+        expect(Cache.write("rspec", :key, :val)).to eq(:val)
 
-        @cache["rspec"][:key][:value].should == :val
-        @cache["rspec"][:key][:cache_create_time].should == time
+        expect(@cache["rspec"][:key][:value]).to eq(:val)
+        expect(@cache["rspec"][:key][:cache_create_time]).to eq(time)
       end
     end
 
@@ -63,7 +63,7 @@ module MCollective
       it "should read a written entry correctly" do
         Cache.setup("rspec")
         Cache.write("rspec", :key, :val)
-        Cache.read("rspec", :key).should == :val
+        expect(Cache.read("rspec", :key)).to eq(:val)
       end
 
       it "should raise on expired reads" do
@@ -80,7 +80,7 @@ module MCollective
       it "should return a positive value for an unexpired item" do
         Cache.setup("rspec", 300)
         Cache.write("rspec", :key, :val)
-        Cache.ttl("rspec", :key).should >= 0
+        expect(Cache.ttl("rspec", :key)).to be >= 0
       end
 
       it "should return <0 for an expired item" do
@@ -90,7 +90,7 @@ module MCollective
         time = Time.now + 600
         Time.expects(:now).returns(time)
 
-        Cache.ttl("rspec", :key).should <= 0
+        expect(Cache.ttl("rspec", :key)).to be <= 0
       end
     end
 
@@ -108,7 +108,7 @@ module MCollective
           ran = 1
         end
 
-        ran.should == 1
+        expect(ran).to eq(1)
       end
     end
   end

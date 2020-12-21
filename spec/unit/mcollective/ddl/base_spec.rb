@@ -13,7 +13,7 @@ module MCollective
 
       describe "#template_for_plugintype" do
         it "should return the backward compat path for agent ddls" do
-          @ddl.template_for_plugintype.should == "rpc-help.erb"
+          expect(@ddl.template_for_plugintype).to eq("rpc-help.erb")
         end
 
         it "should return correct new path for other ddls" do
@@ -21,7 +21,7 @@ module MCollective
           @ddl.stubs(:helptemplatedir).returns("/etc/mcollective")
           Util.stubs(:templatepath).with("data-help.erb").returns("/etc/mcollective/data-help.erb")
           File.expects(:exist?).with("/etc/mcollective/data-help.erb").returns(true)
-          @ddl.template_for_plugintype.should == "data-help.erb"
+          expect(@ddl.template_for_plugintype).to eq("data-help.erb")
         end
       end
 
@@ -29,7 +29,7 @@ module MCollective
         it "should use conventional template paths when none is provided" do
           File.expects(:read).with("/etc/mcollective/rpc-help.erb").returns("rspec")
           File.expects(:read).with("/etc/mcollective/metadata-help.erb").returns("rspec")
-          @ddl.help.should == "rspec"
+          expect(@ddl.help).to eq("rspec")
         end
 
         it "should use template from help template path when provided template name is not an absolute file path" do
@@ -37,13 +37,13 @@ module MCollective
           Util.stubs(:templatepath).returns("/etc/mcollective/foo", "/etc/mcollective/metadata-help.erb")
           File.expects(:read).with("/etc/mcollective/foo").returns("rspec")
           File.expects(:read).with("/etc/mcollective/metadata-help.erb").returns("rspec")
-          @ddl.help("foo").should == "rspec"
+          expect(@ddl.help("foo")).to eq("rspec")
         end
 
         it "should use supplied template path when one is provided" do
           File.expects(:read).with("/foo").returns("rspec")
           File.expects(:read).with("/etc/mcollective/metadata-help.erb").returns("rspec")
-          @ddl.help("/foo").should == "rspec"
+          expect(@ddl.help("/foo")).to eq("rspec")
         end
 
         it "should correctly execute the template with a valid binding" do
@@ -51,7 +51,7 @@ module MCollective
           @ddl.instance_variable_set("@entities", "actions")
           File.expects(:read).with("/template").returns("<%= meta %>:<%= entities %>")
           File.expects(:read).with("/etc/mcollective/metadata-help.erb").returns("rspec")
-          @ddl.help("/template").should == "meta:actions"
+          expect(@ddl.help("/template")).to eq("meta:actions")
         end
       end
 
@@ -216,7 +216,7 @@ module MCollective
         it "should save the requirement" do
           @ddl.requires(:mcollective => "1.0.0")
 
-          @ddl.requirements.should == {:mcollective => "1.0.0"}
+          expect(@ddl.requirements).to eq({:mcollective => "1.0.0"})
         end
       end
 
@@ -229,7 +229,7 @@ module MCollective
         it "should pass for newer versions of mcollective" do
           Util.stubs(:mcollective_version).returns("2.0")
           @ddl.requires(:mcollective => "0.1")
-          @ddl.validate_requirements.should == true
+          expect(@ddl.validate_requirements).to eq(true)
         end
       end
 
@@ -245,7 +245,7 @@ module MCollective
           Config.instance.expects(:libdir).returns(["/nonexisting"])
           File.expects("exist?").with("/nonexisting/mcollective/agent/foo.ddl").returns(false)
 
-          @ddl.findddlfile("foo").should == false
+          expect(@ddl.findddlfile("foo")).to eq(false)
         end
 
         it "should check each libdir for a ddl file" do
@@ -253,7 +253,7 @@ module MCollective
           File.expects("exist?").with("/nonexisting1/mcollective/agent/foo.ddl").returns(false)
           File.expects("exist?").with("/nonexisting2/mcollective/agent/foo.ddl").returns(false)
 
-          @ddl.findddlfile("foo").should == false
+          expect(@ddl.findddlfile("foo")).to eq(false)
         end
 
         it "should return the ddl file path if found" do
@@ -261,14 +261,14 @@ module MCollective
           File.expects("exist?").with("/nonexisting/mcollective/agent/foo.ddl").returns(true)
           Log.expects(:debug).with("Found foo ddl at /nonexisting/mcollective/agent/foo.ddl")
 
-          @ddl.findddlfile("foo").should == "/nonexisting/mcollective/agent/foo.ddl"
+          expect(@ddl.findddlfile("foo")).to eq("/nonexisting/mcollective/agent/foo.ddl")
         end
 
         it "should default to the current plugin and type" do
           Config.instance.expects(:libdir).returns(["/nonexisting"])
           File.expects("exist?").with("/nonexisting/mcollective/agent/rspec.ddl").returns(true)
 
-          @ddl.findddlfile.should == "/nonexisting/mcollective/agent/rspec.ddl"
+          expect(@ddl.findddlfile).to eq("/nonexisting/mcollective/agent/rspec.ddl")
         end
       end
 
@@ -291,7 +291,7 @@ module MCollective
                       :version => "version", :url => "url", :timeout => "timeout", :foo => "bar"}
 
           @ddl.metadata(metadata)
-          @ddl.meta.should == metadata
+          expect(@ddl.meta).to eq(metadata)
         end
       end
 
@@ -351,11 +351,11 @@ module MCollective
 
           action = @ddl.action_interface(:test)
 
-          action[:input][:test][:prompt].should == "prompt"
-          action[:input][:test][:description].should == "descr"
-          action[:input][:test][:type].should == :list
-          action[:input][:test][:optional].should == true
-          action[:input][:test][:list].should == []
+          expect(action[:input][:test][:prompt]).to eq("prompt")
+          expect(action[:input][:test][:description]).to eq("descr")
+          expect(action[:input][:test][:type]).to eq(:list)
+          expect(action[:input][:test][:optional]).to eq(true)
+          expect(action[:input][:test][:list]).to eq([])
         end
 
         it "should save correct data for a string input" do
@@ -367,12 +367,12 @@ module MCollective
 
           action = @ddl.action_interface(:test)
 
-          action[:input][:test][:prompt].should == "prompt"
-          action[:input][:test][:description].should == "descr"
-          action[:input][:test][:type].should == :string
-          action[:input][:test][:optional].should == true
-          action[:input][:test][:validation].should == ""
-          action[:input][:test][:maxlength].should == 1
+          expect(action[:input][:test][:prompt]).to eq("prompt")
+          expect(action[:input][:test][:description]).to eq("descr")
+          expect(action[:input][:test][:type]).to eq(:string)
+          expect(action[:input][:test][:optional]).to eq(true)
+          expect(action[:input][:test][:validation]).to eq("")
+          expect(action[:input][:test][:maxlength]).to eq(1)
         end
       end
 
@@ -403,9 +403,9 @@ module MCollective
 
           action = @ddl.action_interface(:test)
 
-          action[:output][:test][:description].should == "rspec"
-          action[:output][:test][:display_as].should == "RSpec"
-          action[:output][:test][:default].should == "default"
+          expect(action[:output][:test][:description]).to eq("rspec")
+          expect(action[:output][:test][:display_as]).to eq("RSpec")
+          expect(action[:output][:test][:default]).to eq("default")
         end
 
         it "should set unsupplied defaults to our internal unset representation" do
@@ -416,7 +416,7 @@ module MCollective
 
           action = @ddl.action_interface(:test)
 
-          action[:output][:test][:default].should == nil
+          expect(action[:output][:test][:default]).to eq(nil)
         end
       end
 

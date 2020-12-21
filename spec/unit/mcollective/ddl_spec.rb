@@ -15,11 +15,11 @@ module MCollective
       end
 
       it "should return the correct plugin ddl class" do
-        DDL.new("rspec", :agent, false).class.should == DDL::AgentDDL
+        expect(DDL.new("rspec", :agent, false).class).to eq(DDL::AgentDDL)
       end
 
       it "should default to base when no specific class exist" do
-        DDL.new("rspec", :rspec, false).class.should == DDL::Base
+        expect(DDL.new("rspec", :rspec, false).class).to eq(DDL::Base)
       end
     end
 
@@ -34,7 +34,7 @@ module MCollective
       it "should attempt to read from the cache and return found ddl" do
         Cache.expects(:setup)
         Cache.expects(:read).with(:ddl, "agent/rspec").returns("rspec")
-        DDL.load_and_cache("rspec", :agent, false).should == "rspec"
+        expect(DDL.load_and_cache("rspec", :agent, false)).to eq("rspec")
       end
 
       it "should handle cache misses then create and save a new ddl object" do
@@ -42,7 +42,7 @@ module MCollective
         Cache.expects(:read).with(:ddl, "agent/rspec").raises("failed")
         Cache.expects(:write).with(:ddl, "agent/rspec", kind_of(DDL::AgentDDL)).returns("rspec")
 
-        DDL.load_and_cache("rspec", :agent, false).should == "rspec"
+        expect(DDL.load_and_cache("rspec", :agent, false)).to eq("rspec")
       end
     end
 
@@ -53,7 +53,7 @@ module MCollective
         end
 
         ["1.1", "0.0", "9999.99"].each do |i|
-          DDL.string_to_number(i).class.should == Float
+          expect(DDL.string_to_number(i).class).to eq(Float)
         end
       end
 
@@ -65,13 +65,13 @@ module MCollective
     describe "#string_to_boolean" do
       it "should turn valid strings into boolean" do
         ["true", "yes", "1"].each do |t|
-          DDL.string_to_boolean(t).should == true
-          DDL.string_to_boolean(t.upcase).should == true
+          expect(DDL.string_to_boolean(t)).to eq(true)
+          expect(DDL.string_to_boolean(t.upcase)).to eq(true)
         end
 
         ["false", "no", "0"].each do |f|
-          DDL.string_to_boolean(f).should == false
-          DDL.string_to_boolean(f.upcase).should == false
+          expect(DDL.string_to_boolean(f)).to eq(false)
+          expect(DDL.string_to_boolean(f.upcase)).to eq(false)
         end
       end
 

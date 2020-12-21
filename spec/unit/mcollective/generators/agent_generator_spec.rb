@@ -17,13 +17,13 @@ module MCollective
 
           it "should create a ddl with nothing but metadata if no actions are specified" do
             result = AgentGenerator.new("foo").ddl
-            result.should == "metadata\n"
+            expect(result).to eq("metadata\n")
           end
 
           it "should add action strings to metadata if there are actions specfied" do
             result = AgentGenerator.new("foo", ["action1", "action2"]).ddl
             expected = File.read(File.join(File.dirname(__FILE__), "snippets", "agent_ddl"))
-            result.should == expected
+            expect(result).to eq(expected)
           end
         end
 
@@ -38,7 +38,7 @@ module MCollective
           it "should create the correct pluginf ile content with actions if they are specified" do
             AgentGenerator.any_instance.stubs(:create_metadata_string).returns("meta\n")
             result = AgentGenerator.new("foo", ["action1", "action2"]).content
-            result.should == "      action \"action1\" do\n      end\n\n      action \"action2\" do\n      end\n"
+            expect(result).to eq("      action \"action1\" do\n      end\n\n      action \"action2\" do\n      end\n")
           end
         end
 

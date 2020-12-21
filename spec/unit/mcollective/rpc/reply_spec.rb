@@ -18,15 +18,15 @@ module MCollective
 
       describe "#initialize" do
         it "should set an empty data hash" do
-          @reply.data.should == {}
+          expect(@reply.data).to eq({})
         end
 
         it "should set statuscode to zero" do
-          @reply.statuscode.should == 0
+          expect(@reply.statuscode).to eq(0)
         end
 
         it "should set statusmsg to OK" do
-          @reply.statusmsg.should == "OK"
+          expect(@reply.statusmsg).to eq("OK")
         end
       end
 
@@ -44,7 +44,7 @@ module MCollective
           end
 
           reply = Reply.new(:rspec, @ddl)
-          reply.data.should == {:one => "default", :two => nil, :three => []}
+          expect(reply.data).to eq({:one => "default", :two => nil, :three => []})
         end
 
         it "should detect missing actions" do
@@ -56,17 +56,17 @@ module MCollective
       describe "#fail" do
         it "should set statusmsg" do
           @reply.fail "foo"
-          @reply.statusmsg.should == "foo"
+          expect(@reply.statusmsg).to eq("foo")
         end
 
         it "should set statuscode to 1 by default" do
           @reply.fail("foo")
-          @reply.statuscode.should == 1
+          expect(@reply.statuscode).to eq(1)
         end
 
         it "should set statuscode" do
           @reply.fail("foo", 2)
-          @reply.statuscode.should == 2
+          expect(@reply.statuscode).to eq(2)
         end
       end
 
@@ -76,7 +76,7 @@ module MCollective
             @reply.fail! "foo"
           }.to raise_error(RPCAborted, "foo")
 
-          @reply.statusmsg.should == "foo"
+          expect(@reply.statusmsg).to eq("foo")
         end
 
         it "should set statuscode to 1 by default" do
@@ -90,7 +90,7 @@ module MCollective
             @reply.fail! "foo", 2
           }.to raise_error(UnknownRPCAction)
 
-          @reply.statuscode.should == 2
+          expect(@reply.statuscode).to eq(2)
         end
 
         it "should raise RPCAborted for code 1" do
@@ -133,8 +133,8 @@ module MCollective
           @reply[:foo] = "foo1"
           @reply["foo"] = "foo2"
 
-          @reply.data[:foo].should == "foo1"
-          @reply.data["foo"].should == "foo2"
+          expect(@reply.data[:foo]).to eq("foo1")
+          expect(@reply.data["foo"]).to eq("foo2")
         end
       end
 
@@ -143,29 +143,29 @@ module MCollective
           @reply[:foo] = "foo1"
           @reply["foo"] = "foo2"
 
-          @reply[:foo].should == "foo1"
-          @reply["foo"].should == "foo2"
+          expect(@reply[:foo]).to eq("foo1")
+          expect(@reply["foo"]).to eq("foo2")
         end
       end
 
       describe "#to_hash" do
         it "should have the correct keys" do
-          @reply.to_hash.keys.sort.should == [:data, :statuscode, :statusmsg]
+          expect(@reply.to_hash.keys.sort).to eq([:data, :statuscode, :statusmsg])
         end
 
         it "should have the correct statuscode" do
           @reply.fail "meh", 2
-          @reply.to_hash[:statuscode].should == 2
+          expect(@reply.to_hash[:statuscode]).to eq(2)
         end
 
         it "should have the correct statusmsg" do
           @reply.fail "meh", 2
-          @reply.to_hash[:statusmsg].should == "meh"
+          expect(@reply.to_hash[:statusmsg]).to eq("meh")
         end
 
         it "should have the correct data" do
           @reply[:foo] = :bar
-          @reply.to_hash[:data][:foo].should == :bar
+          expect(@reply.to_hash[:data][:foo]).to eq(:bar)
         end
       end
     end

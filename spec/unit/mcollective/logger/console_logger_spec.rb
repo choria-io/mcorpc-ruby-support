@@ -22,15 +22,15 @@ module MCollective
         it "should not colorize if color was disabled" do
           logger = Console_logger.new
           Config.instance.stubs(:color).returns(false)
-          logger.color(:error).should == ""
-          logger.color(:reset).should == ""
+          expect(logger.color(:error)).to eq("")
+          expect(logger.color(:reset)).to eq("")
         end
 
         it "should correctly colorize by level" do
           logger = Console_logger.new
           Config.instance.stubs(:color).returns(true)
-          logger.color(:error).should == Util.color(:red)
-          logger.color(:reset).should == Util.color(:reset)
+          expect(logger.color(:error)).to eq(Util.color(:red))
+          expect(logger.color(:reset)).to eq(Util.color(:reset))
         end
       end
 

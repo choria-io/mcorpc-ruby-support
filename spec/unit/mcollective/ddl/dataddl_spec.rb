@@ -33,9 +33,9 @@ module MCollective
             @ddl.input :query, input
           end
 
-          @ddl.dataquery_interface.should == {:description => "rspec",
+          expect(@ddl.dataquery_interface).to eq({:description => "rspec",
                                               :input => {:query => input.merge(:optional => nil, :default => nil)},
-                                              :output => {:rspec => output}}
+                                              :output => {:rspec => output}})
         end
       end
 
@@ -53,11 +53,11 @@ module MCollective
         it "should create the default structure" do
           @ddl.dataquery(:description => "rspec")
           @ddl.instance_variable_set("@plugintype", :data)
-          @ddl.dataquery_interface.should == {:description => "rspec", :input => {}, :output => {}}
+          expect(@ddl.dataquery_interface).to eq({:description => "rspec", :input => {}, :output => {}})
         end
 
         it "should call the block if given" do
-          @ddl.dataquery(:description => "rspec") { @ddl.instance_variable_get("@current_entity").should == :data }
+          @ddl.dataquery(:description => "rspec") { expect(@ddl.instance_variable_get("@current_entity")).to eq(:data) }
         end
       end
     end

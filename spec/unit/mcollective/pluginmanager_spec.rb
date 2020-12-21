@@ -14,14 +14,14 @@ module MCollective
     describe "#<<" do
       it "should store a plugin by name" do
         PluginManager << {:type => "foo", :class => "MCollective::Foo"}
-        PluginManager.instance_variable_get("@plugins").include?("foo").should == true
+        expect(PluginManager.instance_variable_get("@plugins").include?("foo")).to eq(true)
       end
 
       it "should store a plugin instance" do
         f = MCollective::Foo.new
 
         PluginManager << {:type => "foo", :class => f}
-        PluginManager.instance_variable_get("@plugins")["foo"][:instance].object_id.should == f.object_id
+        expect(PluginManager.instance_variable_get("@plugins")["foo"][:instance].object_id).to eq(f.object_id)
       end
 
       it "should detect duplicate plugins" do
@@ -34,29 +34,29 @@ module MCollective
 
       it "should store single instance preference correctly" do
         PluginManager << {:type => "foo", :class => "MCollective::Foo", :single_instance => false}
-        PluginManager.instance_variable_get("@plugins")["foo"][:single].should == false
+        expect(PluginManager.instance_variable_get("@plugins")["foo"][:single]).to eq(false)
       end
 
       it "should always set single to true when supplied an instance" do
         PluginManager << {:type => "foo", :class => MCollective::Foo.new, :single_instance => false}
-        PluginManager.instance_variable_get("@plugins")["foo"][:single].should == true
+        expect(PluginManager.instance_variable_get("@plugins")["foo"][:single]).to eq(true)
       end
     end
 
     describe "#delete" do
       it "should remove plugins" do
         PluginManager << {:type => "foo", :class => MCollective::Foo.new}
-        PluginManager.instance_variable_get("@plugins").include?("foo").should == true
+        expect(PluginManager.instance_variable_get("@plugins").include?("foo")).to eq(true)
         PluginManager.delete("foo")
-        PluginManager.instance_variable_get("@plugins").include?("foo").should == false
+        expect(PluginManager.instance_variable_get("@plugins").include?("foo")).to eq(false)
       end
     end
 
     describe "#include?" do
       it "should correctly check if plugins were added" do
         PluginManager << {:type => "foo", :class => MCollective::Foo.new}
-        PluginManager.include?("foo").should == true
-        PluginManager.include?("bar").should == false
+        expect(PluginManager.include?("foo")).to eq(true)
+        expect(PluginManager.include?("bar")).to eq(false)
       end
     end
 
@@ -65,7 +65,7 @@ module MCollective
         PluginManager << {:type => "foo", :class => MCollective::Foo.new}
         PluginManager << {:type => "bar", :class => MCollective::Foo.new}
 
-        PluginManager.pluginlist.sort.should == ["bar", "foo"]
+        expect(PluginManager.pluginlist.sort).to eq(["bar", "foo"])
       end
     end
 
@@ -78,19 +78,19 @@ module MCollective
 
       it "should create new instances on demand" do
         PluginManager << {:type => "foo", :class => "MCollective::Foo"}
-        PluginManager["foo"].class.should == MCollective::Foo
+        expect(PluginManager["foo"].class).to eq(MCollective::Foo)
       end
 
       it "should return the cached instance" do
         f = MCollective::Foo.new
 
         PluginManager << {:type => "foo", :class => f}
-        PluginManager["foo"].object_id.should == f.object_id
+        expect(PluginManager["foo"].object_id).to eq(f.object_id)
       end
 
       it "should create new instances on every request if requested" do
         PluginManager << {:type => "foo", :class => "MCollective::Foo", :single_instance => false}
-        PluginManager["foo"].object_id.should_not == PluginManager["foo"].object_id
+        expect(PluginManager["foo"].object_id).not_to eq(PluginManager["foo"].object_id)
       end
     end
 
@@ -104,14 +104,14 @@ module MCollective
         File.expects(:join).with(["/libdir/", "mcollective", "test"]).returns("/plugindir/")
         File.expects(:directory?).with("/plugindir/").returns(true)
         Dir.expects(:new).with("/plugindir/").returns(["plugin.rb"])
-        PluginManager.find("test").should == ["plugin"]
+        expect(PluginManager.find("test")).to eq(["plugin"])
       end
 
       it "should find all plugins with a given file extension" do
         File.expects(:join).with(["/libdir/", "mcollective", "test"]).returns("/plugindir/")
         File.expects(:directory?).with("/plugindir/").returns(true)
         Dir.expects(:new).with("/plugindir/").returns(["plugin.ddl"])
-        PluginManager.find("test", "ddl").should == ["plugin"]
+        expect(PluginManager.find("test", "ddl")).to eq(["plugin"])
       end
 
       it "should skip libdirs that do not have the plugin type directories" do
@@ -121,7 +121,7 @@ module MCollective
         File.expects(:directory?).with("/plugindir/").returns(true)
         File.expects(:directory?).with("/tmpdir/").returns(false)
         Dir.expects(:new).with("/plugindir/").returns(["plugin.ddl"])
-        PluginManager.find("test", "ddl").should == ["plugin"]
+        expect(PluginManager.find("test", "ddl")).to eq(["plugin"])
       end
     end
 
@@ -167,7 +167,7 @@ module MCollective
         PluginManager << {:type => "foo", :class => MCollective::Foo.new}
         PluginManager << {:type => "bar", :class => MCollective::Foo.new}
 
-        PluginManager.grep(/oo/).should == ["foo"]
+        expect(PluginManager.grep(/oo/)).to eq(["foo"])
       end
     end
   end

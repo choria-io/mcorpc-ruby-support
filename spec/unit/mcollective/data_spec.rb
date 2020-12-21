@@ -52,8 +52,8 @@ module MCollective
 
     describe "#pluginname" do
       it "should return the correct plugin name" do
-        Data.pluginname("Rspec").should == "rspec_data"
-        Data.pluginname("Rspec_data").should == "rspec_data"
+        expect(Data.pluginname("Rspec")).to eq("rspec_data")
+        expect(Data.pluginname("Rspec_data")).to eq("rspec_data")
       end
     end
 
@@ -80,7 +80,7 @@ module MCollective
         PluginManager.expects("include?").with("rspec_data").returns(true)
         PluginManager.expects("[]").with("rspec_data").returns(rspec_data)
 
-        Data.rspec_data("rspec").should == "rspec"
+        expect(Data.rspec_data("rspec")).to eq("rspec")
       end
     end
 
@@ -88,22 +88,22 @@ module MCollective
       it "should convert boolean data" do
         ddl = mock
         ddl.stubs(:entities).returns({:data => {:input => {:query => {:type => :boolean}}}})
-        Data.ddl_transform_input(ddl, "1").should == true
-        Data.ddl_transform_input(ddl, "0").should == false
+        expect(Data.ddl_transform_input(ddl, "1")).to eq(true)
+        expect(Data.ddl_transform_input(ddl, "0")).to eq(false)
       end
 
       it "should conver numeric data" do
         ddl = mock
         ddl.stubs(:entities).returns({:data => {:input => {:query => {:type => :number}}}})
-        Data.ddl_transform_input(ddl, "1").should == 1
-        Data.ddl_transform_input(ddl, "0").should == 0
-        Data.ddl_transform_input(ddl, "1.1").should == 1.1
+        expect(Data.ddl_transform_input(ddl, "1")).to eq(1)
+        expect(Data.ddl_transform_input(ddl, "0")).to eq(0)
+        expect(Data.ddl_transform_input(ddl, "1.1")).to eq(1.1)
       end
 
       it "should return the original input on any failure" do
         ddl = mock
         ddl.expects(:entities).raises("rspec failure")
-        Data.ddl_transform_input(ddl, 1).should == 1
+        expect(Data.ddl_transform_input(ddl, 1)).to eq(1)
       end
     end
 
@@ -111,16 +111,16 @@ module MCollective
       it "should correctly verify output keys" do
         ddl = mock
         ddl.stubs(:entities).returns({:data => {:output => {:rspec => {}}}})
-        Data.ddl_has_output?(ddl, "rspec").should == true
-        Data.ddl_has_output?(ddl, :rspec).should == true
-        Data.ddl_has_output?(ddl, :foo).should == false
-        Data.ddl_has_output?(ddl, "foo").should == false
+        expect(Data.ddl_has_output?(ddl, "rspec")).to eq(true)
+        expect(Data.ddl_has_output?(ddl, :rspec)).to eq(true)
+        expect(Data.ddl_has_output?(ddl, :foo)).to eq(false)
+        expect(Data.ddl_has_output?(ddl, "foo")).to eq(false)
       end
 
       it "should return false for any exception" do
         ddl = mock
         ddl.stubs(:entities).returns(nil)
-        Data.ddl_has_output?(ddl, "rspec").should == false
+        expect(Data.ddl_has_output?(ddl, "rspec")).to eq(false)
       end
     end
 
@@ -153,13 +153,13 @@ module MCollective
       it "should skip optional arguments that were not supplied" do
         @ddl.expects(:entities).returns({:data => {:input => {:query => {:optional => true}}, :output => {:test => {}}}})
         @ddl.expects(:validate_input_argument).never
-        Data.ddl_validate(@ddl, nil).should == true
+        expect(Data.ddl_validate(@ddl, nil)).to eq(true)
       end
 
       it "should validate the argument" do
         @ddl.expects(:entities).returns({:data => {:input => {:query => {}}, :output => {:test => {}}}})
         @ddl.expects(:validate_input_argument).returns("rspec validated")
-        Data.ddl_validate(@ddl, "rspec").should == "rspec validated"
+        expect(Data.ddl_validate(@ddl, "rspec")).to eq("rspec validated")
       end
     end
   end

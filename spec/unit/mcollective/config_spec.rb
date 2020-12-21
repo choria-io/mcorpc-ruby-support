@@ -35,7 +35,7 @@ module MCollective
 
         Config.instance.loadconfig("/nonexisting")
 
-        $LOAD_PATH[0].should == '/test'
+        expect($LOAD_PATH[0]).to eq('/test')
       end
 
       it "should not allow any path like construct for identities" do
@@ -64,7 +64,7 @@ module MCollective
 
         config = Config.instance
         config.loadconfig("/nonexisting")
-        config.identity.should == "your.example.com"
+        expect(config.identity).to eq("your.example.com")
       end
 
       it "should allow valid identities" do
@@ -85,7 +85,7 @@ module MCollective
         PluginManager.stubs("<<")
 
         Config.instance.loadconfig("/nonexisting")
-        Config.instance.direct_addressing.should == true
+        expect(Config.instance.direct_addressing).to eq(true)
       end
 
       it "should allow direct_addressing to be disabled in the config file" do
@@ -95,7 +95,7 @@ module MCollective
         PluginManager.stubs("<<")
 
         Config.instance.loadconfig("/nonexisting")
-        Config.instance.direct_addressing.should == false
+        expect(Config.instance.direct_addressing).to eq(false)
       end
 
       it "should not allow the syslog logger type on windows" do
@@ -115,7 +115,7 @@ module MCollective
         PluginManager.stubs("<<")
 
         Config.instance.loadconfig("/nonexisting")
-        Config.instance.default_discovery_options.should == ["1", "2"]
+        expect(Config.instance.default_discovery_options).to eq(["1", "2"])
       end
 
       it "should not allow non integer values when expecting an integer value" do
@@ -139,7 +139,7 @@ module MCollective
         PluginManager.stubs("<<")
 
         Config.instance.loadconfig("/nonexisting")
-        Config.instance.activate_agents.should == true
+        expect(Config.instance.activate_agents).to eq(true)
       end
     end
 
@@ -155,7 +155,7 @@ module MCollective
       it "should not fail if the supplied directory is missing" do
         File.expects(:directory?).with(@plugindir).returns(false)
         Config.instance.read_plugin_config_dir(@plugindir)
-        Config.instance.pluginconf.should == {}
+        expect(Config.instance.pluginconf).to eq({})
       end
 
       it "should skip files that do not match the expected filename pattern" do
@@ -176,14 +176,14 @@ module MCollective
         Dir.expects(:new).with(@plugindir).returns(["foo.cfg"])
         File.expects(:open).with(File.join(@plugindir, "foo.cfg"), "r").returns(["rspec = test"])
         Config.instance.read_plugin_config_dir(@plugindir)
-        Config.instance.pluginconf.should == {"foo.rspec" => "test"}
+        expect(Config.instance.pluginconf).to eq({"foo.rspec" => "test"})
       end
 
       it "should strip whitespaces from config keys" do
         Dir.expects(:new).with(@plugindir).returns(["foo.cfg"])
         File.expects(:open).with(File.join(@plugindir, "foo.cfg"), "r").returns(["   rspec  = test"])
         Config.instance.read_plugin_config_dir(@plugindir)
-        Config.instance.pluginconf.should == {"foo.rspec" => "test"}
+        expect(Config.instance.pluginconf).to eq({"foo.rspec" => "test"})
       end
 
       it "should override main config file" do
@@ -202,7 +202,7 @@ module MCollective
         File.expects(:open).with(File.join(@plugindir, "rspec.cfg"), "r").returns(["key = overridden"])
 
         Config.instance.loadconfig(servercfg)
-        Config.instance.pluginconf.should == {"rspec.key" => "overridden"}
+        expect(Config.instance.pluginconf).to eq({"rspec.key" => "overridden"})
       end
     end
   end

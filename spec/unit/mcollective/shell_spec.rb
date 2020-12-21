@@ -8,32 +8,32 @@ module MCollective
     describe "#initialize" do
       it "should set locale by default" do
         s = Shell.new("date")
-        s.environment.should == {"LC_ALL" => "C"}
+        expect(s.environment).to eq({"LC_ALL" => "C"})
       end
 
       it "should merge environment and keep locale" do
         s = Shell.new("date", :environment => {"foo" => "bar"})
-        s.environment.should == {"LC_ALL" => "C", "foo" => "bar"}
+        expect(s.environment).to eq({"LC_ALL" => "C", "foo" => "bar"})
       end
 
       it "should allow locale to be overridden" do
         s = Shell.new("date", :environment => {"LC_ALL" => "TEST", "foo" => "bar"})
-        s.environment.should == {"LC_ALL" => "TEST", "foo" => "bar"}
+        expect(s.environment).to eq({"LC_ALL" => "TEST", "foo" => "bar"})
       end
 
       it "should allow locale to be cleared" do
         s = Shell.new("date", :environment => {"LC_ALL" => nil, "foo" => "bar"})
-        s.environment.should == {"foo" => "bar"}
+        expect(s.environment).to eq({"foo" => "bar"})
       end
 
       it "should set no environment when given nil" do
         s = Shell.new("date", :environment => nil)
-        s.environment.should == {}
+        expect(s.environment).to eq({})
       end
 
       it "should save the command" do
         s = Shell.new("date")
-        s.command.should == "date"
+        expect(s.command).to eq("date")
       end
 
       it "should check the cwd exist" do
@@ -62,17 +62,17 @@ module MCollective
 
       it "should set stdout" do
         s = Shell.new("date", :stdout => "stdout")
-        s.stdout.should == "stdout"
+        expect(s.stdout).to eq("stdout")
       end
 
       it "should set stderr" do
         s = Shell.new("date", :stderr => "stderr")
-        s.stderr.should == "stderr"
+        expect(s.stderr).to eq("stderr")
       end
 
       it "should set stdin" do
         s = Shell.new("date", :stdin => "hello world")
-        s.stdin.should == "hello world"
+        expect(s.stdin).to eq("hello world")
       end
     end
 
@@ -101,22 +101,22 @@ module MCollective
       it "should set stdin, stdout and status" do
         s = Shell.new('ruby -e "STDERR.puts \"stderr\"; STDOUT.puts \"stdout\""')
         s.runcommand
-        s.stdout.should == "stdout#{nl}"
-        s.stderr.should == "stderr#{nl}"
-        s.status.exitstatus.should == 0
+        expect(s.stdout).to eq("stdout#{nl}")
+        expect(s.stderr).to eq("stderr#{nl}")
+        expect(s.status.exitstatus).to eq(0)
       end
 
       it "should report correct exitcode" do
         s = Shell.new('ruby -e "exit 1"')
         s.runcommand
 
-        s.status.exitstatus.should == 1
+        expect(s.status.exitstatus).to eq(1)
       end
 
       it "should have correct environment" do
         s = Shell.new('ruby -e "puts ENV[\'LC_ALL\'];puts ENV[\'foo\'];"', :environment => {"foo" => "bar"})
         s.runcommand
-        s.stdout.should == "C#{nl}bar#{nl}"
+        expect(s.stdout).to eq("C#{nl}bar#{nl}")
       end
 
       it "should save stdout in custom stdout variable" do
@@ -125,8 +125,8 @@ module MCollective
         s = Shell.new('echo foo', :stdout => out)
         s.runcommand
 
-        s.stdout.should == "STDOUTfoo#{nl}"
-        out.should == "STDOUTfoo#{nl}"
+        expect(s.stdout).to eq("STDOUTfoo#{nl}")
+        expect(out).to eq("STDOUTfoo#{nl}")
       end
 
       it "should save stderr in custom stderr variable" do
@@ -135,8 +135,8 @@ module MCollective
         s = Shell.new('ruby -e "STDERR.puts \"foo\""', :stderr => out)
         s.runcommand
 
-        s.stderr.should == "STDERRfoo#{nl}"
-        out.should == "STDERRfoo#{nl}"
+        expect(s.stderr).to eq("STDERRfoo#{nl}")
+        expect(out).to eq("STDERRfoo#{nl}")
       end
 
       it "should run in the correct cwd" do
@@ -145,21 +145,21 @@ module MCollective
 
         s.runcommand
 
-        s.stdout.should == "#{tmpdir}#{nl}"
+        expect(s.stdout).to eq("#{tmpdir}#{nl}")
       end
 
       it "should send the stdin" do
         s = Shell.new('ruby -e "puts STDIN.gets"', :stdin => "hello world")
         s.runcommand
 
-        s.stdout.should == "hello world#{nl}"
+        expect(s.stdout).to eq("hello world#{nl}")
       end
 
       it "should support multiple lines of stdin" do
         s = Shell.new('ruby -e "puts STDIN.gets;puts;puts STDIN.gets"', :stdin => "first line\n2nd line")
         s.runcommand
 
-        s.stdout.should == "first line#{nl}#{nl}2nd line#{nl}"
+        expect(s.stdout).to eq("first line#{nl}#{nl}2nd line#{nl}")
       end
 
       it "should quietly catch Errno::ESRCH if the systemu process has completed" do
@@ -223,7 +223,7 @@ module MCollective
         s.expects(:systemu).returns(@systemu)
         @thread.expects(:kill)
         result = s.runcommand
-        result.should == @systemu
+        expect(result).to eq(@systemu)
       end
     end
   end

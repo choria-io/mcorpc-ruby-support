@@ -18,7 +18,7 @@ module MCollective
       describe '#initialize' do
         it 'should initialize a mtimes instance variable' do
           facts = Yaml_facts.new
-          facts.instance_variable_get(:@yaml_file_mtimes).should == {}
+          expect(facts.instance_variable_get(:@yaml_file_mtimes)).to eq({})
         end
       end
 
@@ -26,7 +26,7 @@ module MCollective
         it 'should fail and return empty facts if the source file does not exist' do
           File.stubs(:exist?).with('facts.yaml').returns(false)
           Log.expects(:error)
-          @facts.load_facts_from_source.should == {}
+          expect(@facts.load_facts_from_source).to eq({})
         end
 
         it 'should fail and return empty facts in the yaml cannot be parsed' do
@@ -35,7 +35,7 @@ module MCollective
           File.stubs(:exist?).with('facts.yaml').returns(true)
           File.stubs(:read).with('facts.yaml').returns(yaml)
           Log.expects(:error)
-          @facts.load_facts_from_source.should == {}
+          expect(@facts.load_facts_from_source).to eq({})
         end
 
         it 'should return the facts if the file exists and can be parsed' do
@@ -43,7 +43,7 @@ module MCollective
           File.stubs(:exist?).with('facts.yaml').returns(true)
           File.stubs(:read).with('facts.yaml').returns(yaml)
           Log.expects(:error).never
-          @facts.load_facts_from_source.should == {"osfamily" => "Magic"}
+          expect(@facts.load_facts_from_source).to eq({"osfamily" => "Magic"})
         end
       end
 
@@ -51,13 +51,13 @@ module MCollective
         it 'should return true if the mtime has changed' do
           @facts.instance_variable_get(:@yaml_file_mtimes)['facts.yaml'] = 1234
           @stat.stubs(:mtime).returns(1235)
-          @facts.force_reload?.should be_truthy
+          expect(@facts.force_reload?).to be_truthy
         end
 
         it 'should return false if the mtime is the same' do
           @facts.instance_variable_get(:@yaml_file_mtimes)['facts.yaml'] = 1234
           @stat.stubs(:mtime).returns(1234)
-          @facts.force_reload?.should be_falsey
+          expect(@facts.force_reload?).to be_falsey
         end
       end
     end
