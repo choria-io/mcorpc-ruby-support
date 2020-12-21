@@ -9,13 +9,13 @@ module MCollective
       describe "#startup_hook" do
         it "should set the correct result hash" do
           result = Summary.new(:test, [], "%d", :test_action)
-          result.result.should == {:value => {}, :type => :collection, :output => :test}
-          result.aggregate_format.should == "%d"
+          expect(result.result).to eq({:value => {}, :type => :collection, :output => :test})
+          expect(result.aggregate_format).to eq("%d")
         end
 
         it "should set a defauly aggregate_format if one isn't defined" do
           result = Summary.new(:test, [], nil, :test_action)
-          result.aggregate_format.should == :calculate
+          expect(result.aggregate_format).to eq(:calculate)
         end
       end
 
@@ -23,13 +23,13 @@ module MCollective
         it "should add the value to the result hash" do
           sum = Summary.new(:test, [], "%d", :test_action)
           sum.process_result(:foo, {:test => :foo})
-          sum.result[:value].should == {:foo => 1}
+          expect(sum.result[:value]).to eq({:foo => 1})
         end
 
         it "should add the reply values to the result hash if value is an array" do
           sum = Summary.new(:test, [], "%d", :test_action)
           sum.process_result([:foo, :foo, :bar], {:test => [:foo, :foo, :bar]})
-          sum.result[:value].should == {:foo => 2, :bar => 1}
+          expect(sum.result[:value]).to eq({:foo => 2, :bar => 1})
         end
       end
 
@@ -37,17 +37,17 @@ module MCollective
         it "should calculate an attractive format" do
           sum = Summary.new(:test, [], nil, :test_action)
           sum.result[:value] = {"shrt" => 1, "long key" => 1}
-          sum.summarize.aggregate_format.should == "%8s = %s"
+          expect(sum.summarize.aggregate_format).to eq("%8s = %s")
         end
 
         it "should calculate an attractive format when result type is not a string" do
           sum1 = Summary.new(:test, [], nil, :test_action)
           sum1.result[:value] = {true => 4, false => 5}
-          sum1.summarize.aggregate_format.should == "%5s = %s"
+          expect(sum1.summarize.aggregate_format).to eq("%5s = %s")
 
           sum2 = Summary.new(:test, [], nil, :test_action)
           sum2.result[:value] = {1 => 1, 10 => 2}
-          sum2.summarize.aggregate_format.should == "%2s = %s"
+          expect(sum2.summarize.aggregate_format).to eq("%2s = %s")
         end
       end
     end

@@ -21,7 +21,7 @@ module MCollective
       it "should load the ddl and add the connector to the PluginManager" do
         DDL.stubs(:new)
         class TestConnectorB<Connector::Base;end
-        PluginManager["connector_plugin"].class.should == MCollective::Connector::TestConnectorB
+        expect(PluginManager["connector_plugin"].class).to eq(MCollective::Connector::TestConnectorB)
       end
     end
   end

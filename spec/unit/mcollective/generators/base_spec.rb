@@ -15,13 +15,13 @@ module MCollective
       describe "#initialize" do
         it "should set the correct metaparameters" do
           res = Base.new("name", "description", "author", "license", "version", "url", "timeout")
-          res.meta.should == {:name => "name",
+          expect(res.meta).to eq({:name => "name",
                               :description => "description",
                               :author => "author",
                               :license => "license",
                               :version => "version",
                               :url => "url",
-                              :timeout => "timeout"}
+                              :timeout => "timeout"})
         end
       end
 

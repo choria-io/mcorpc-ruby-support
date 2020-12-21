@@ -83,7 +83,7 @@ module MCollective
 
           @ddl.set_default_input_arguments(:test, args)
 
-          args.should == {:required => "default"}
+          expect(args).to eq({:required => "default"})
         end
 
         it "should not override any existing arguments" do
@@ -91,7 +91,7 @@ module MCollective
 
           @ddl.set_default_input_arguments(:test, args)
 
-          args.should == {:required => "specified"}
+          expect(args).to eq({:required => "specified"})
         end
 
         it "should detect json primitive key names and consider them present as their symbol equivelants" do
@@ -99,7 +99,7 @@ module MCollective
 
           @ddl.set_default_input_arguments(:test, args)
 
-          args.should == {"required" => "specified"}
+          expect(args).to eq({"required" => "specified"})
         end
 
         it "should not consider the string key equiv to the symbol one when both symbol and string keys exist" do
@@ -110,7 +110,7 @@ module MCollective
           args = {"required" => "specified"}
           @ddl.set_default_input_arguments(:test, args)
 
-          args.should == {"required" => "specified", :required=>"default"}
+          expect(args).to eq({"required" => "specified", :required=>"default"})
         end
       end
 
@@ -141,21 +141,21 @@ module MCollective
             @ddl.validate_rpc_request(:test, {})
           }.to raise_error("Action test needs a required argument")
 
-          @ddl.validate_rpc_request(:test, {:required => "f"}).should == true
+          expect(@ddl.validate_rpc_request(:test, {:required => "f"})).to eq(true)
         end
 
         it "should input validate every supplied key" do
           @ddl.expects(:validate_input_argument).with(@ddl.entities[:test][:input], :required, "f")
           @ddl.expects(:validate_input_argument).with(@ddl.entities[:test][:input], :optional, "f")
 
-          @ddl.validate_rpc_request(:test, {:required => "f", :optional => "f"}).should == true
+          expect(@ddl.validate_rpc_request(:test, {:required => "f", :optional => "f"})).to eq(true)
         end
 
         it "should input validate string keys for symbol inputs correctly" do
           @ddl.expects(:validate_input_argument).with(@ddl.entities[:test][:input], :required, "f")
           @ddl.expects(:validate_input_argument).with(@ddl.entities[:test][:input], :optional, "f")
 
-          @ddl.validate_rpc_request(:test, {"required" => "f", "optional" => "f"}).should == true
+          expect(@ddl.validate_rpc_request(:test, {"required" => "f", "optional" => "f"})).to eq(true)
         end
       end
 
@@ -165,11 +165,11 @@ module MCollective
         end
 
         it "should return true if the aggregate function is present" do
-          @ddl.is_function?("plugin").should == true
+          expect(@ddl.is_function?("plugin")).to eq(true)
         end
 
         it "should return false if the aggregate function is not present" do
-          @ddl.is_function?("no_plugin").should == false
+          expect(@ddl.is_function?("no_plugin")).to eq(false)
         end
       end
 
@@ -190,7 +190,7 @@ module MCollective
           Config.instance.mode = :client
           @ddl.instance_variable_set(:@process_aggregate_functions, true)
           result = @ddl.method_missing(:test_function, :rspec)
-          result.should == {:args => [:rspec], :function => :test_function }
+          expect(result).to eq({:args => [:rspec], :function => :test_function })
         end
       end
 
@@ -199,14 +199,14 @@ module MCollective
           @ddl.action(:test1, :description => "rspec")
           @ddl.action(:test2, :description => "rspec")
 
-          @ddl.actions.sort.should == [:test1, :test2]
+          expect(@ddl.actions.sort).to eq([:test1, :test2])
         end
       end
 
       describe "#action_interface" do
         it "should return the correct interface" do
           @ddl.action(:test1, :description => "rspec")
-          @ddl.action_interface(:test1).should == {:description=>"rspec", :output=>{}, :input=>{}, :action=>:test1, :display=>:failed}
+          expect(@ddl.action_interface(:test1)).to eq({:description=>"rspec", :output=>{}, :input=>{}, :action=>:test1, :display=>:failed})
         end
       end
 
@@ -219,7 +219,7 @@ module MCollective
             @ddl.display(display)
 
             action = @ddl.action_interface(:test)
-            action[:display].should == display
+            expect(action[:display]).to eq(display)
           end
 
           expect {
@@ -241,13 +241,13 @@ module MCollective
         it "should call the block parameter if config mode is not server" do
           Config.instance.mode = :client
           result = @ddl.summarize(&@block)
-          @block_result.should == :success
+          expect(@block_result).to eq(:success)
         end
 
         it "should not call the block parameter if config mode is server" do
           Config.instance.mode = :server
           result = @ddl.summarize(&@block)
-          @block_result.should == nil
+          expect(@block_result).to eq(nil)
         end
       end
 
@@ -280,7 +280,7 @@ module MCollective
         it "should correctly add an aggregate function to the function array" do
           @ddl.stubs(:entities).returns({nil => {:aggregate => nil}})
           @ddl.aggregate({:function => :foo, :args => [:bar]})
-          @ddl.entities.should == {nil => {:aggregate => [{:function => :foo, :args => [:bar]}]}}
+          expect(@ddl.entities).to eq({nil => {:aggregate => [{:function => :foo, :args => [:bar]}]}})
         end
       end
 
@@ -296,16 +296,16 @@ module MCollective
 
           action = @ddl.action_interface("act")
 
-          action.class.should == Hash
-          action[:action].should == "act"
-          action[:input].should == {}
-          action[:output].should == {}
-          action[:display].should == :failed
-          action[:description].should == "rspec"
+          expect(action.class).to eq(Hash)
+          expect(action[:action]).to eq("act")
+          expect(action[:input]).to eq({})
+          expect(action[:output]).to eq({})
+          expect(action[:display]).to eq(:failed)
+          expect(action[:description]).to eq("rspec")
         end
 
         it "should call a block if one is given and set the correct action name" do
-          @ddl.action("act", :description => "rspec") { @ddl.instance_variable_get("@current_entity").should == "act" }
+          @ddl.action("act", :description => "rspec") { expect(@ddl.instance_variable_get("@current_entity")).to eq("act") }
         end
       end
     end

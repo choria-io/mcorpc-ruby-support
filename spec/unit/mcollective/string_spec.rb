@@ -5,11 +5,11 @@ require 'spec_helper'
 class String
   describe "#start_with?" do
     it "should return true for matches" do
-      "hello world".start_with?("hello").should == true
+      expect("hello world".start_with?("hello")).to eq(true)
     end
 
     it "should return false for non matches" do
-      "hello world".start_with?("world").should == false
+      expect("hello world".start_with?("world")).to eq(false)
     end
   end
 end

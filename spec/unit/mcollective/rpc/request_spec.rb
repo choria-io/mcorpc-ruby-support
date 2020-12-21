@@ -51,36 +51,36 @@ module MCollective
 
       describe "#initialize" do
         it "should set time" do
-          @request.time.should == @req[:msgtime]
+          expect(@request.time).to eq(@req[:msgtime])
         end
 
         it "should set action" do
-          @request.action.should == "test"
+          expect(@request.action).to eq("test")
         end
 
         it "should set data" do
-          @request.data.should == {:foo => "bar", :process_results => true}
+          expect(@request.data).to eq({:foo => "bar", :process_results => true})
         end
 
         it "should set sender" do
-          @request.sender.should == "spec test"
+          expect(@request.sender).to eq("spec test")
         end
 
         it "should set agent" do
-          @request.agent.should == "tester"
+          expect(@request.agent).to eq("tester")
         end
 
         it "should set uniqid" do
-          @request.uniqid.should == "12345"
+          expect(@request.uniqid).to eq("12345")
         end
 
         it "should set caller" do
-          @request.caller.should == "rip"
+          expect(@request.caller).to eq("rip")
         end
 
         it "should set unknown caller if none is supplied" do
           @req.delete(:callerid)
-          Request.new(@req, @ddl).caller.should == "unknown"
+          expect(Request.new(@req, @ddl).caller).to eq("unknown")
         end
 
         it "should support JSON pure inputs" do
@@ -98,72 +98,72 @@ module MCollective
 
       describe "#include?" do
         it "should correctly report on hash contents" do
-          @request.include?(:foo).should == true
+          expect(@request.include?(:foo)).to eq(true)
         end
 
         it "should return false for non hash data" do
           @req[:body][:data] = "foo"
-          Request.new(@req, @ddl).include?(:foo).should == false
+          expect(Request.new(@req, @ddl).include?(:foo)).to eq(false)
         end
       end
 
       describe "#should_respond?" do
         it "should return true if the header is absent" do
           @req[:body][:data].delete(:process_results)
-          Request.new(@req, @ddl).should_respond?.should == true
+          expect(Request.new(@req, @ddl).should_respond?).to eq(true)
         end
 
         it "should return correct value" do
           @req[:body][:data][:process_results] = false
-          Request.new(@req, @ddl).should_respond?.should == false
+          expect(Request.new(@req, @ddl).should_respond?).to eq(false)
           @req[:body][:data]["process_results"] = false
-          Request.new(@req, @ddl).should_respond?.should == false
+          expect(Request.new(@req, @ddl).should_respond?).to eq(false)
         end
       end
 
       describe "#[]" do
         it "should return nil for non hash data" do
           @req[:body][:data] = "foo"
-          Request.new(@req, @ddl)["foo"].should == nil
+          expect(Request.new(@req, @ddl)["foo"]).to eq(nil)
         end
 
         it "should return correct data" do
-          @request[:foo].should == "bar"
+          expect(@request[:foo]).to eq("bar")
         end
 
         it "should return nil for absent data" do
-          @request[:bar].should == nil
+          expect(@request[:bar]).to eq(nil)
         end
       end
 
       describe "#fetch" do
         it "should return nil for non hash data" do
           @req[:body][:data] = "foo"
-          Request.new(@req, @ddl)["foo"].should == nil
+          expect(Request.new(@req, @ddl)["foo"]).to eq(nil)
         end
 
         it "should fetch data with the correct default behavior" do
-          @request.fetch(:foo, "default").should == "bar"
-          @request.fetch(:rspec, "default").should == "default"
+          expect(@request.fetch(:foo, "default")).to eq("bar")
+          expect(@request.fetch(:rspec, "default")).to eq("default")
         end
       end
 
       describe "#to_hash" do
         it "should have the correct keys" do
-          @request.to_hash.keys.sort.should == [:action, :agent, :data]
+          expect(@request.to_hash.keys.sort).to eq([:action, :agent, :data])
         end
 
         it "should return the correct agent" do
-          @request.to_hash[:agent].should == "tester"
+          expect(@request.to_hash[:agent]).to eq("tester")
         end
 
         it "should return the correct action" do
-          @request.to_hash[:action].should == "test"
+          expect(@request.to_hash[:action]).to eq("test")
         end
 
         it "should return the correct data" do
-          @request.to_hash[:data].should == {:foo => "bar",
-                                             :process_results => true}
+          expect(@request.to_hash[:data]).to eq({:foo => "bar",
+                                             :process_results => true})
         end
       end
     end

@@ -9,10 +9,10 @@ module MCollective
         it "should set the correct instance variables and call the startup hook" do
           Base.any_instance.expects(:startup_hook).once
           base = Base.new("value", [], "%s%s", "rspec")
-          base.name.should == "MCollective::Aggregate::Base"
-          base.output_name.should == "value"
-          base.aggregate_format.should == "%s%s"
-          base.action.should == "rspec"
+          expect(base.name).to eq("MCollective::Aggregate::Base")
+          expect(base.output_name).to eq("value")
+          expect(base.aggregate_format).to eq("%s%s")
+          expect(base.action).to eq("rspec")
         end
       end
 

@@ -39,8 +39,8 @@ module MCollective
 
           reply = @agent.handlemsg(@msg, DDL.new)
 
-          reply[:statuscode].should == 4
-          reply[:statusmsg].should == "Failed to validate"
+          expect(reply[:statuscode]).to eq(4)
+          expect(reply[:statusmsg]).to eq("Failed to validate")
         end
 
         it "should call the authorization hook if set" do
@@ -50,62 +50,62 @@ module MCollective
 
           reply = @agent.handlemsg(@msg, DDL.new)
 
-          reply[:statuscode].should == 5
-          reply[:statusmsg].should == "authorization denied"
+          expect(reply[:statuscode]).to eq(5)
+          expect(reply[:statusmsg]).to eq("authorization denied")
         end
 
         it "should audit the request" do
           @agent.expects(:audit_request)
 
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 0
+          expect(reply[:statuscode]).to eq(0)
         end
 
         it "should call the before_processing_hook" do
           @agent.expects(:before_processing_hook)
 
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 0
+          expect(reply[:statuscode]).to eq(0)
         end
 
         it "should fail if the action does not exist" do
           @agent.expects(:respond_to?).with("rspec_action_action").returns(false)
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 2
+          expect(reply[:statuscode]).to eq(2)
         end
 
         it "should call the action correctly" do
           @agent.expects(:rspec_action_action)
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 0
+          expect(reply[:statuscode]).to eq(0)
         end
 
         it "should handle RPC Aborted errors" do
           @agent.expects(:rspec_action_action).raises(RPCAborted, "rspec test")
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 1
-          reply[:statusmsg].should == "rspec test"
+          expect(reply[:statuscode]).to eq(1)
+          expect(reply[:statusmsg]).to eq("rspec test")
         end
 
         it "should handle Unknown Action errors" do
           @agent.stubs(:respond_to?).with("rspec_action_action").returns(false)
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 2
-          reply[:statusmsg].should == "Unknown action 'rspec_action' for agent 'rspec_agent'"
+          expect(reply[:statuscode]).to eq(2)
+          expect(reply[:statusmsg]).to eq("Unknown action 'rspec_action' for agent 'rspec_agent'")
         end
 
         it "should handle Missing Data errors" do
           @agent.expects(:rspec_action_action).raises(MissingRPCData, "rspec test")
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 3
-          reply[:statusmsg].should == "rspec test"
+          expect(reply[:statuscode]).to eq(3)
+          expect(reply[:statusmsg]).to eq("rspec test")
         end
 
         it "should handle Invalid Data errors" do
           @agent.expects(:rspec_action_action).raises(InvalidRPCData, "rspec test")
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 4
-          reply[:statusmsg].should == "rspec test"
+          expect(reply[:statuscode]).to eq(4)
+          expect(reply[:statusmsg]).to eq("rspec test")
         end
 
         it "should handle unknown errors" do
@@ -113,8 +113,8 @@ module MCollective
           Log.expects(:error).twice
 
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 5
-          reply[:statusmsg].should == "rspec test"
+          expect(reply[:statuscode]).to eq(5)
+          expect(reply[:statusmsg]).to eq("rspec test")
         end
 
         it "should handle arbitrary exceptions" do
@@ -122,8 +122,8 @@ module MCollective
           Log.expects(:error).twice
 
           reply = @agent.handlemsg(@msg, DDL.new)
-          reply[:statuscode].should == 5
-          reply[:statusmsg].should == "rspec test"
+          expect(reply[:statuscode]).to eq(5)
+          expect(reply[:statusmsg]).to eq("rspec test")
         end
 
         it "should call the after_processing_hook" do
@@ -134,13 +134,13 @@ module MCollective
         it "should respond if required" do
           Request.any_instance.expects(:should_respond?).returns(true)
           Reply.any_instance.expects(:to_hash).returns({})
-          @agent.handlemsg(@msg, DDL.new).should == {}
+          expect(@agent.handlemsg(@msg, DDL.new)).to eq({})
         end
 
         it "should not respond when not required" do
           Request.any_instance.expects(:should_respond?).returns(false)
           Reply.any_instance.expects(:to_hash).never
-          @agent.handlemsg(@msg, DDL.new).should == nil
+          expect(@agent.handlemsg(@msg, DDL.new)).to eq(nil)
         end
       end
 
@@ -167,24 +167,24 @@ module MCollective
 
         it "should return true if plugins are globally enabled" do
           config.stubs(:activate_agents).returns(true)
-          Test.activate?.should == true
+          expect(Test.activate?).to eq(true)
         end
 
         it "should return true if plugins are globally disabled but locally enabled" do
           config.stubs(:activate_agents).returns(false)
           config.pluginconf['test.activate_agent'] = true
-          Test.activate?.should == true
+          expect(Test.activate?).to eq(true)
         end
 
         it "should return false if plugins are globally disabled" do
           config.stubs(:activate_agents).returns(false)
-          Test.activate?.should == false
+          expect(Test.activate?).to eq(false)
         end
 
         it "should return false if plugins are globally enabled but locally disabled" do
           config.stubs(:activate_agents).returns(true)
           config.pluginconf['test.activate_agent'] = false
-          Test.activate?.should == false
+          expect(Test.activate?).to eq(false)
         end
       end
 
@@ -195,7 +195,7 @@ module MCollective
 
           DDL.expects(:new).with("agent", :agent).returns(ddl)
 
-          Agent.new.timeout.should == 5
+          expect(Agent.new.timeout).to eq(5)
         end
 
         it "should fail if the DDL isn't loaded" do
@@ -210,7 +210,7 @@ module MCollective
 
           DDL.expects(:new).with("agent", :agent).returns(ddl)
 
-          Agent.new.timeout.should == 10
+          expect(Agent.new.timeout).to eq(10)
         end
       end
 
@@ -226,8 +226,8 @@ module MCollective
         it "should accept stderr and stdout and force them to be strings" do
           Shell.expects(:new).with("rspec", {:stderr => "", :stdout => ""}).returns(@shell)
           @agent.send(:run, "rspec", {:stderr => :err, :stdout => :out})
-          @agent.reply[:err].should == ""
-          @agent.reply[:out].should == ""
+          expect(@agent.reply[:err]).to eq("")
+          expect(@agent.reply[:out]).to eq("")
         end
 
         it "should accept existing variables for stdout and stderr and fail if they dont support <<" do
@@ -236,8 +236,8 @@ module MCollective
 
           Shell.expects(:new).with("rspec", {:stderr => "err", :stdout => "out"}).returns(@shell)
           @agent.send(:run, "rspec", {:stderr => @agent.reply[:err], :stdout => @agent.reply[:out]})
-          @agent.reply[:err].should == "err"
-          @agent.reply[:out].should == "out"
+          expect(@agent.reply[:err]).to eq("err")
+          expect(@agent.reply[:out]).to eq("out")
 
           @agent.reply.expects("fail!").with("stderr should support << while calling run(rspec)").raises("stderr fail")
           expect { @agent.send(:run, "rspec", {:stderr => nil, :stdout => ""}) }.to raise_error("stderr fail")
@@ -270,13 +270,13 @@ module MCollective
 
         it "should return the exitstatus" do
           Shell.expects(:new).with("rspec", {}).returns(@shell)
-          @agent.send(:run, "rspec", {}).should == 0
+          expect(@agent.send(:run, "rspec", {})).to eq(0)
         end
 
         it "should handle nil from the shell handler" do
           @shell.expects(:status).returns(nil)
           Shell.expects(:new).with("rspec", {}).returns(@shell)
-          @agent.send(:run, "rspec", {}).should == -1
+          expect(@agent.send(:run, "rspec", {})).to eq(-1)
         end
       end
 

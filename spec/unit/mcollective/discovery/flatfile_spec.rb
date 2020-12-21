@@ -21,7 +21,7 @@ module MCollective
         it "should use a file specified in discovery_options" do
           File.expects(:readable?).with("/nonexisting").returns(true)
           File.expects(:readlines).with("/nonexisting").returns(["one", "two"])
-          Flatfile.discover(Util.empty_filter, 0, 0, @client).should == ["one", "two"]
+          expect(Flatfile.discover(Util.empty_filter, 0, 0, @client)).to eq(["one", "two"])
         end
 
         it "should fail unless a file is specified" do
@@ -36,11 +36,11 @@ module MCollective
         end
 
         it "should regex filters" do
-          Flatfile.discover(Util.empty_filter.merge("identity" => [/one/]), 0, 0, @client).should == ["one"]
+          expect(Flatfile.discover(Util.empty_filter.merge("identity" => [/one/]), 0, 0, @client)).to eq(["one"])
         end
 
         it "should filter against non regex nodes" do
-          Flatfile.discover(Util.empty_filter.merge("identity" => ["one"]), 0, 0, @client).should == ["one"]
+          expect(Flatfile.discover(Util.empty_filter.merge("identity" => ["one"]), 0, 0, @client)).to eq(["one"])
         end
 
         it "should fail for invalid identities" do
@@ -56,7 +56,7 @@ module MCollective
         it "should skip empty lines and comments" do
           host = ["one", "#two", "", "four"]
           File.expects(:readlines).with("/nonexisting").returns(host)
-          Flatfile.discover(Util.empty_filter, 0, 0, @client).should == ["one", "four"]
+          expect(Flatfile.discover(Util.empty_filter, 0, 0, @client)).to eq(["one", "four"])
         end
       end
     end

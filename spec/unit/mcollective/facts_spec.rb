@@ -15,8 +15,8 @@ module MCollective
       it "should correctly report fact presense" do
         Facts::Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar"})
 
-        Facts.has_fact?("foo", "foo").should == false
-        Facts.has_fact?("foo", "bar").should == true
+        expect(Facts.has_fact?("foo", "foo")).to eq(false)
+        expect(Facts.has_fact?("foo", "bar")).to eq(true)
       end
     end
 
@@ -24,7 +24,7 @@ module MCollective
       it "should return the correct fact" do
         Facts::Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar"})
 
-        Facts.get_fact("foo").should == "bar"
+        expect(Facts.get_fact("foo")).to eq("bar")
       end
     end
 
@@ -32,7 +32,7 @@ module MCollective
       it "should return the correct fact" do
         Facts::Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar"})
 
-        Facts["foo"].should == "bar"
+        expect(Facts["foo"]).to eq("bar")
       end
     end
   end

@@ -37,7 +37,7 @@ module MCollective
           s = Stats.new
 
           @expected.keys.each do |k|
-            @expected[k].should == s.send(k)
+            expect(@expected[k]).to eq(s.send(k))
           end
         end
       end
@@ -47,7 +47,7 @@ module MCollective
           Time.stubs(:now).returns(Time.at(1300031826))
           s = Stats.new
 
-          s.to_hash.should == @expected
+          expect(s.to_hash).to eq(@expected)
         end
       end
 
@@ -57,26 +57,26 @@ module MCollective
           s = Stats.new
 
           @expected.keys.each do |k|
-            @expected[k].should == s[k]
+            expect(@expected[k]).to eq(s[k])
           end
         end
 
         it "should return nil for unknown values" do
-          @stats["foo"].should == nil
+          expect(@stats["foo"]).to eq(nil)
         end
       end
 
       describe "#ok" do
         it "should increment stats" do
           @stats.ok
-          @stats[:okcount].should == 1
+          expect(@stats[:okcount]).to eq(1)
         end
       end
 
       describe "#fail" do
         it "should increment stats" do
           @stats.fail
-          @stats.failcount.should == 1
+          expect(@stats.failcount).to eq(1)
         end
       end
 
@@ -86,7 +86,7 @@ module MCollective
 
           @stats.time_discovery(:start)
 
-          @stats.instance_variable_get("@discovery_start").should == 1300031826.0
+          expect(@stats.instance_variable_get("@discovery_start")).to eq(1300031826.0)
         end
 
         it "should record the difference correctly" do
@@ -96,7 +96,7 @@ module MCollective
           Time.stubs(:now).returns(Time.at(1300031827))
           @stats.time_discovery(:end)
 
-          @stats.discoverytime.should == 1.0
+          expect(@stats.discoverytime).to eq(1.0)
         end
 
         it "should handle unknown actions and set discovery time to 0" do
@@ -106,7 +106,7 @@ module MCollective
           Time.stubs(:now).returns(Time.at(1300031827))
           @stats.time_discovery(:stop)
 
-          @stats.discoverytime.should == 0
+          expect(@stats.discoverytime).to eq(0)
         end
 
       end
@@ -120,7 +120,7 @@ module MCollective
           @stats.client_stats = data
 
           keys.each do |k|
-            @stats[k].should == data[k]
+            expect(@stats[k]).to eq(data[k])
           end
         end
 
@@ -139,7 +139,7 @@ module MCollective
 
           @stats.client_stats = data
 
-          @stats.discoverytime.should == dtime
+          expect(@stats.discoverytime).to eq(dtime)
         end
       end
 
@@ -149,7 +149,7 @@ module MCollective
 
           @stats.time_block_execution(:start)
 
-          @stats.instance_variable_get("@block_start").should == 1300031826.0
+          expect(@stats.instance_variable_get("@block_start")).to eq(1300031826.0)
         end
 
         it "should record the difference correctly" do
@@ -159,7 +159,7 @@ module MCollective
           Time.stubs(:now).returns(Time.at(1300031827))
           @stats.time_block_execution(:end)
 
-          @stats.blocktime.should == 1
+          expect(@stats.blocktime).to eq(1)
         end
 
         it "should handle unknown actions and set discovery time to 0" do
@@ -169,7 +169,7 @@ module MCollective
           Time.stubs(:now).returns(Time.at(1300031827))
           @stats.time_block_execution(:stop)
 
-          @stats.blocktime.should == 0
+          expect(@stats.blocktime).to eq(0)
         end
       end
 
@@ -177,13 +177,13 @@ module MCollective
         it "should set discovered_nodes" do
           nodes = ["one", "two"]
           @stats.discovered_agents(nodes)
-          @stats.discovered_nodes.should == nodes
+          expect(@stats.discovered_nodes).to eq(nodes)
         end
 
         it "should set discovered count" do
           nodes = ["one", "two"]
           @stats.discovered_agents(nodes)
-          @stats.discovered.should == 2
+          expect(@stats.discovered).to eq(2)
         end
       end
 
@@ -207,7 +207,7 @@ module MCollective
 
           @stats.finish_request
 
-          @stats.totaltime.should == 2
+          expect(@stats.totaltime).to eq(2)
         end
 
         it "should calculate no responses correctly" do
@@ -229,7 +229,7 @@ module MCollective
 
           @stats.finish_request
 
-          @stats.noresponsefrom.should == ["three"]
+          expect(@stats.noresponsefrom).to eq(["three"])
         end
 
         it "should calculate unexpected responses correctly" do
@@ -252,7 +252,7 @@ module MCollective
 
           @stats.finish_request
 
-          @stats.unexpectedresponsefrom.should == ["three"]
+          expect(@stats.unexpectedresponsefrom).to eq(["three"])
         end
 
         it "should recover from failure correctly" do
@@ -272,16 +272,16 @@ module MCollective
           @stats.instance_variable_set("@responsesfrom", nil)
           @stats.finish_request
 
-          @stats.noresponsefrom.should == []
-          @stats.unexpectedresponsefrom.should == []
-          @stats.totaltime.should == 0
+          expect(@stats.noresponsefrom).to eq([])
+          expect(@stats.unexpectedresponsefrom).to eq([])
+          expect(@stats.totaltime).to eq(0)
         end
       end
 
       describe "#node_responded" do
         it "should append to the list of nodes" do
           @stats.node_responded "foo"
-          @stats.responsesfrom.should == ["foo"]
+          expect(@stats.responsesfrom).to eq(["foo"])
         end
 
         it "should create a new array if adding fails" do
@@ -289,7 +289,7 @@ module MCollective
           @stats.instance_variable_set("@responsesfrom", nil)
 
           @stats.node_responded "foo"
-          @stats.responsesfrom.should == ["foo"]
+          expect(@stats.responsesfrom).to eq(["foo"])
         end
       end
 
@@ -299,14 +299,14 @@ module MCollective
           @stats.node_responded "foo"
           @stats.finish_request
 
-          @stats.no_response_report.should == ""
+          expect(@stats.no_response_report).to eq("")
         end
 
         it "should list all nodes that did not respond" do
           @stats.discovered_agents ["foo", "bar"]
           @stats.finish_request
 
-          @stats.no_response_report.should match(Regexp.new(/No response from.+bar\s+foo/m))
+          expect(@stats.no_response_report).to match(Regexp.new(/No response from.+bar\s+foo/m))
         end
       end
 
@@ -316,7 +316,7 @@ module MCollective
           @stats.node_responded "foo"
           @stats.finish_request
 
-          @stats.unexpected_response_report.should == ""
+          expect(@stats.unexpected_response_report).to eq("")
         end
 
         it "should list all nodes that did not respond" do
@@ -325,7 +325,7 @@ module MCollective
           @stats.node_responded "bar"
           @stats.finish_request
 
-          @stats.unexpected_response_report.should match(Regexp.new(/Unexpected response from.+bar\s+foo/m))
+          expect(@stats.unexpected_response_report).to match(Regexp.new(/Unexpected response from.+bar\s+foo/m))
         end
       end
 
@@ -340,27 +340,27 @@ module MCollective
         it "should create the correct output text for aggregate functions" do
           @stats.aggregate_summary = [aggregate]
           aggregate.stubs(:is_a?).returns(true)
-          @stats.text_for_aggregates.should =~ /Summary of.*/
+          expect(@stats.text_for_aggregates).to match(/Summary of.*/)
         end
 
         it "should display an error message for a failed statup hook" do
           @stats.aggregate_failures = [{:name => "rspec", :type => :startup}]
-          @stats.text_for_aggregates.should =~  /exception raised while processing startup hook/
+          expect(@stats.text_for_aggregates).to match(/exception raised while processing startup hook/)
         end
 
         it "should display an error message for an unspecified output" do
           @stats.aggregate_failures = [{:name => "rspec", :type => :create}]
-          @stats.text_for_aggregates.should =~  /unspecified output 'rspec' for the action/
+          expect(@stats.text_for_aggregates).to match(/unspecified output 'rspec' for the action/)
         end
 
         it "should display an error message for a failed process_result" do
           @stats.aggregate_failures = [{:name => "rspec", :type => :process_result}]
-          @stats.text_for_aggregates.should =~  /exception raised while processing result data/
+          expect(@stats.text_for_aggregates).to match(/exception raised while processing result data/)
         end
 
         it "should display an error message for a failed summarize" do
           @stats.aggregate_failures = [{:name => "rspec", :type => :summarize}]
-          @stats.text_for_aggregates.should =~  /exception raised while summarizing/
+          expect(@stats.text_for_aggregates).to match(/exception raised while summarizing/)
         end
       end
     end

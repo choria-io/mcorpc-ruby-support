@@ -109,7 +109,7 @@ module MCollective
 
       it "should return false if the agent file is missing" do
         Agents.any_instance.expects(:findagentfile).returns(false).once
-        @a.loadagent("test").should == false
+        expect(@a.loadagent("test")).to eq(false)
       end
 
       it "should delete the agent before loading again" do
@@ -125,7 +125,7 @@ module MCollective
       it "should check if the agent should be activated" do
         Agents.any_instance.expects(:findagentfile).with("test").returns(File.join([@agentsdir, "test.rb"]))
         Agents.any_instance.expects("activate_agent?").with("test").returns(true)
-        @a.loadagent("test").should == true
+        expect(@a.loadagent("test")).to eq(true)
       end
 
       it "should set discovery and registration to be single instance plugins" do
@@ -170,29 +170,29 @@ module MCollective
 
         Log.expects(:error).once.with("Loading agent foo failed: rspec")
 
-        @a.loadagent("foo").should == false
-        Agents.agentlist.include?("foo").should == false
+        expect(@a.loadagent("foo")).to eq(false)
+        expect(Agents.agentlist.include?("foo")).to eq(false)
       end
 
       it "should add the agent to the agent list" do
-        Agents.agentlist.should == ["test"]
+        expect(Agents.agentlist).to eq(["test"])
       end
 
       it "should return true on success" do
-        @a.loadagent("test").should == true
+        expect(@a.loadagent("test")).to eq(true)
       end
 
       it "should handle load exceptions" do
         Agents.any_instance.expects(:findagentfile).with("foo").returns(File.join([@agentsdir, "foo.rb"]))
         Log.expects(:error).with(regexp_matches(/Loading agent foo failed/))
-        @a.loadagent("foo").should == false
+        expect(@a.loadagent("foo")).to eq(false)
       end
 
       it "should delete plugins that failed to load" do
         Agents.any_instance.expects(:findagentfile).with("foo").returns(File.join([@agentsdir, "foo.rb"]))
         PluginManager.expects(:delete).with("foo_agent").twice
 
-        @a.loadagent("foo").should == false
+        expect(@a.loadagent("foo")).to eq(false)
       end
     end
 
@@ -200,7 +200,7 @@ module MCollective
       it "should return the correct class" do
         Config.instance.stubs(:configured).returns(true)
         Agents.any_instance.stubs(:loadagents).returns(true)
-        Agents.new.class_for_agent("foo").should == "MCollective::Agent::Foo"
+        expect(Agents.new.class_for_agent("foo")).to eq("MCollective::Agent::Foo")
       end
     end
 
@@ -229,12 +229,12 @@ module MCollective
         Agent::Test.expects("respond_to?").with("activate?").returns(false).once
         Log.expects(:debug).with("MCollective::Agent::Test does not have an activate? method, activating as default")
 
-        @a.activate_agent?("test").should == true
+        expect(@a.activate_agent?("test")).to eq(true)
       end
 
       it "should handle exceptions in the activation as false" do
         Agent::Test.expects("activate?").raises(RuntimeError)
-        @a.activate_agent?("test").should == false
+        expect(@a.activate_agent?("test")).to eq(false)
       end
     end
 
@@ -260,11 +260,11 @@ module MCollective
       it "should return the full path if the agent is found" do
         agentfile = File.join([@tmpdir, "mcollective", "agent", "test.rb"])
         File.expects("exist?").with(agentfile).returns(true).once
-        @a.findagentfile("test").should == agentfile
+        expect(@a.findagentfile("test")).to eq(agentfile)
       end
 
       it "should return false if no agent is found" do
-        @a.findagentfile("foo").should == false
+        expect(@a.findagentfile("foo")).to eq(false)
       end
     end
 
@@ -277,7 +277,7 @@ module MCollective
 
         @a = Agents.new
 
-        @a.include?("test").should == true
+        expect(@a.include?("test")).to eq(true)
       end
     end
 
@@ -288,7 +288,7 @@ module MCollective
         Agents.any_instance.stubs(:loadagents).returns(true)
 
         @a = Agents.new("test" => true)
-        Agents.agentlist.should == ["test"]
+        expect(Agents.agentlist).to eq(["test"])
       end
     end
   end

@@ -18,7 +18,7 @@ module MCollective
             @ddl.capabilities :identity
           end
 
-          @ddl.discovery_interface.should == {:capabilities => [:identity]}
+          expect(@ddl.discovery_interface).to eq({:capabilities => [:identity]})
         end
       end
 
@@ -28,7 +28,7 @@ module MCollective
           @ddl.discovery do
             @ddl.capabilities :identity
           end
-          @ddl.discovery_interface.should == {:capabilities => [:identity]}
+          expect(@ddl.discovery_interface).to eq({:capabilities => [:identity]})
         end
 
         it "should not accept empty capability lists" do
@@ -50,7 +50,7 @@ module MCollective
           @ddl.discovery do
             @ddl.capabilities [:identity, :classes]
           end
-          @ddl.discovery_interface.should == {:capabilities => [:identity, :classes]}
+          expect(@ddl.discovery_interface).to eq({:capabilities => [:identity, :classes]})
         end
       end
     end

@@ -19,7 +19,7 @@ module MCollective::Facts
       end
 
       it "should be available in the PluginManager" do
-        MCollective::PluginManager["facts_plugin"].class.should == MCollective::Facts::Testfacts
+        expect(MCollective::PluginManager["facts_plugin"].class).to eq(MCollective::Facts::Testfacts)
       end
     end
 
@@ -51,14 +51,14 @@ module MCollective::Facts
         Testfacts.any_instance.stubs("load_facts_from_source").returns({:foo => "bar"})
 
         f = Testfacts.new
-        f.get_fact("foo").should == "bar"
+        expect(f.get_fact("foo")).to eq("bar")
       end
 
       it "should not create duplicate facts while converting to strings" do
         Testfacts.any_instance.stubs("load_facts_from_source").returns({:foo => "bar"})
 
         f = Testfacts.new
-        f.get_fact(nil).include?(:foo).should == false
+        expect(f.get_fact(nil).include?(:foo)).to eq(false)
       end
 
       it "should update last_facts_load on success" do
@@ -67,7 +67,7 @@ module MCollective::Facts
         f = Testfacts.new
         f.get_fact("foo")
 
-        f.instance_variable_get("@last_facts_load").should_not == 0
+        expect(f.instance_variable_get("@last_facts_load")).not_to eq(0)
       end
 
       it "should restore last known good facts on failure" do
@@ -77,21 +77,21 @@ module MCollective::Facts
         f = Testfacts.new
         f.instance_variable_set("@last_good_facts", {"foo" => "bar"})
 
-        f.get_fact("foo").should == "bar"
+        expect(f.get_fact("foo")).to eq("bar")
       end
 
       it "should return all facts for nil parameter" do
         Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar", "bar" => "baz"})
 
         f = Testfacts.new
-        f.get_fact(nil).keys.size.should == 2
+        expect(f.get_fact(nil).keys.size).to eq(2)
       end
 
       it "should return a specific fact when specified" do
         Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar", "bar" => "baz"})
 
         f = Testfacts.new
-        f.get_fact("bar").should == "baz"
+        expect(f.get_fact("bar")).to eq("baz")
       end
     end
 
@@ -100,7 +100,7 @@ module MCollective::Facts
         Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar", "bar" => "baz"})
 
         f = Testfacts.new
-        f.get_facts.should == {"foo" => "bar", "bar" => "baz"}
+        expect(f.get_facts).to eq({"foo" => "bar", "bar" => "baz"})
       end
     end
 
@@ -109,44 +109,44 @@ module MCollective::Facts
         Testfacts.any_instance.stubs("load_facts_from_source").returns({"foo" => "bar"})
 
         f = Testfacts.new
-        f.has_fact?("foo").should == true
-        f.has_fact?("bar").should == false
+        expect(f.has_fact?("foo")).to eq(true)
+        expect(f.has_fact?("bar")).to eq(false)
       end
     end
 
     describe '#normalize_facts' do
       it 'should make symbols that are keys be strings' do
-        Testfacts.new.send(:normalize_facts, {
+        expect(Testfacts.new.send(:normalize_facts, {
           :foo  => "1",
           "bar" => "2",
-        }).should == {
+        })).to eq({
           "foo" => "1",
           "bar" => "2",
-        }
+        })
       end
 
       it 'should make values that are not strings be strings' do
-        Testfacts.new.send(:normalize_facts, {
+        expect(Testfacts.new.send(:normalize_facts, {
           "foo" => 1,
           "bar" => :baz,
-        }).should == {
+        })).to eq({
           "foo" => "1",
           "bar" => "baz",
-        }
+        })
       end
 
       it 'should not flatten arrays or hashes' do
-        Testfacts.new.send(:normalize_facts, {
+        expect(Testfacts.new.send(:normalize_facts, {
           "foo" => [ "1", "quux", 2 ],
           "bar" => {
             :baz => "quux",
           },
-        }).should == {
+        })).to eq({
           "foo" => [ "1", "quux", "2" ],
           "bar" => {
             "baz" => "quux",
           },
-        }
+        })
       end
     end
   end

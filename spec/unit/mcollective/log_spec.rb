@@ -24,14 +24,14 @@ module MCollective
       it "should default to console logging if called prior to configuration" do
         Config.instance.instance_variable_set("@configured", false)
         Log.configure
-        Log.logger.should ==  MCollective::Logger::Console_logger
+        expect(Log.logger).to eq(MCollective::Logger::Console_logger)
       end
     end
 
     describe "#instance" do
       it "should return the correct reference" do
         Log.configure(@logger)
-        Log.instance.should == MCollective::Log
+        expect(Log.instance).to eq(MCollective::Log)
       end
     end
 
@@ -80,7 +80,7 @@ module MCollective
 
       it "should return the correct from string when given file, line, block" do
         Log.stubs(:execution_stack).returns(execution_stack)
-        Log.from.should == "test4:52:in `rspec block4'"
+        expect(Log.from).to eq("test4:52:in `rspec block4'")
       end
 
       it "should return the correct from string shen given file and line" do
@@ -91,7 +91,7 @@ module MCollective
         end
 
         Log.stubs(:execution_stack).returns(execution_stack)
-        Log.from.should == "test4:52"
+        expect(Log.from).to eq("test4:52")
       end
     end
   end

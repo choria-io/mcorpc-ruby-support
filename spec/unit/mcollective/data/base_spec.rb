@@ -16,9 +16,9 @@ module MCollective
           DDL.stubs(:new).returns(@ddl)
           Base.any_instance.expects(:startup_hook).once
           plugin = Base.new
-          plugin.name.should == "base"
-          plugin.timeout.should == 1
-          plugin.result.class.should == Result
+          expect(plugin.name).to eq("base")
+          expect(plugin.timeout).to eq(1)
+          expect(plugin.result.class).to eq(Result)
         end
       end
 
@@ -37,7 +37,7 @@ module MCollective
         it "should query the plugin" do
           @plugin.stubs(:ddl_validate)
           @plugin.expects(:query_data).with("hello world")
-          @plugin.lookup("hello world").class.should == Result
+          expect(@plugin.lookup("hello world").class).to eq(Result)
         end
 
         it "should raise MsgTTLExpired errors for Timeout errors" do
@@ -58,7 +58,7 @@ module MCollective
           DDL.stubs(:new).returns(@ddl)
 
           data = Rspec_data.new
-          data.query_data.should == "rspec test"
+          expect(data.query_data).to eq("rspec test")
         end
       end
 
@@ -83,7 +83,7 @@ module MCollective
 
       describe "#activate?" do
         it "should default to true" do
-          Base.activate?.should == true
+          expect(Base.activate?).to eq(true)
         end
       end
     end

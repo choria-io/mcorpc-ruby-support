@@ -35,7 +35,7 @@ module MCollective
           @plugin.query_data("rspec")
 
           [:license, :timeout, :description, :url, :version, :author].each do |item|
-            @plugin.result[item].should == item.to_s
+            expect(@plugin.result[item]).to eq(item.to_s)
           end
         end
       end

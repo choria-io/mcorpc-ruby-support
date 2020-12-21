@@ -27,12 +27,12 @@ module MCollective
 
         it "should stop early if a limit is supplied" do
           @client.stubs(:receive).returns(@reply).times(10)
-          Mc.discover(Util.empty_filter, 1, 10, @client).should == ("rspec," * 10).split(",")
+          expect(Mc.discover(Util.empty_filter, 1, 10, @client)).to eq(("rspec," * 10).split(","))
         end
 
         it "should unsubscribe from the discovery reply source" do
           @client.expects(:unsubscribe).with("discovery", :reply)
-          Mc.discover(Util.empty_filter, 1, 10, @client).should == ("rspec," * 10).split(",")
+          expect(Mc.discover(Util.empty_filter, 1, 10, @client)).to eq(("rspec," * 10).split(","))
         end
       end
     end

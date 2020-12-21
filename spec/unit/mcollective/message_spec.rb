@@ -11,21 +11,21 @@ module MCollective
     describe "#initialize" do
       it "should set defaults" do
         m = Message.new("payload", "message")
-        m.payload.should == "payload"
-        m.message.should == "message"
-        m.request.should == nil
-        m.headers.should == {}
-        m.agent.should == nil
-        m.collective.should == nil
-        m.type.should == :message
-        m.filter.should == Util.empty_filter
-        m.requestid.should == nil
-        m.base64?.should == false
-        m.options.should == {}
-        m.discovered_hosts.should == nil
-        m.ttl.should == 60
-        m.validated.should == false
-        m.msgtime.should == 0
+        expect(m.payload).to eq("payload")
+        expect(m.message).to eq("message")
+        expect(m.request).to eq(nil)
+        expect(m.headers).to eq({})
+        expect(m.agent).to eq(nil)
+        expect(m.collective).to eq(nil)
+        expect(m.type).to eq(:message)
+        expect(m.filter).to eq(Util.empty_filter)
+        expect(m.requestid).to eq(nil)
+        expect(m.base64?).to eq(false)
+        expect(m.options).to eq({})
+        expect(m.discovered_hosts).to eq(nil)
+        expect(m.ttl).to eq(60)
+        expect(m.validated).to eq(false)
+        expect(m.msgtime).to eq(0)
         m.expected_msgid == nil
       end
 
@@ -39,17 +39,17 @@ module MCollective
                         :filter => "filter",
                         :options => {:ttl => 30},
                         :collective => "collective")
-        m.payload.should == "payload"
-        m.message.should == "message"
-        m.request.should == nil
-        m.headers.should == {:rspec => "test"}
-        m.agent.should == "rspecagent"
-        m.collective.should == "collective"
-        m.type.should == :rspec
-        m.filter.should == "filter"
-        m.base64?.should == true
-        m.options.should == {:ttl => 30}
-        m.ttl.should == 30
+        expect(m.payload).to eq("payload")
+        expect(m.message).to eq("message")
+        expect(m.request).to eq(nil)
+        expect(m.headers).to eq({:rspec => "test"})
+        expect(m.agent).to eq("rspecagent")
+        expect(m.collective).to eq("collective")
+        expect(m.type).to eq(:rspec)
+        expect(m.filter).to eq("filter")
+        expect(m.base64?).to eq(true)
+        expect(m.options).to eq({:ttl => 30})
+        expect(m.ttl).to eq(30)
       end
 
       it "if given a request it should set options based on the request" do
@@ -58,10 +58,10 @@ module MCollective
         request.expects(:collective).returns("collective")
 
         m = Message.new("payload", "message", :request => request)
-        m.agent.should == "request"
-        m.collective.should == "collective"
-        m.type.should == :reply
-        m.request.should == request
+        expect(m.agent).to eq("request")
+        expect(m.collective).to eq("collective")
+        expect(m.type).to eq(:reply)
+        expect(m.request).to eq(request)
       end
     end
 
@@ -75,7 +75,7 @@ module MCollective
         [:request, :direct_request].each do |t|
           m.type = t
           m.reply_to = "foo"
-          m.reply_to.should == "foo"
+          expect(m.reply_to).to eq("foo")
         end
       end
     end
@@ -84,7 +84,7 @@ module MCollective
       it "should correctly set the property" do
         m = Message.new("payload", "message", :type => :reply)
         m.expected_msgid = "rspec test"
-        m.expected_msgid.should == "rspec test"
+        expect(m.expected_msgid).to eq("rspec test")
       end
 
       it "should only be set for reply messages" do
@@ -110,7 +110,7 @@ module MCollective
       it "should set base64 to false after decoding" do
         SSL.expects(:base64_decode).with("payload")
         m = Message.new("payload", "message", :base64 => true)
-        m.base64?.should == false
+        expect(m.base64?).to eq(false)
       end
     end
 
@@ -132,14 +132,14 @@ module MCollective
         SSL.expects(:base64_encode)
         m = Message.new("payload", "message")
         m.base64_encode!
-        m.base64?.should == true
+        expect(m.base64?).to eq(true)
       end
     end
 
     describe "#base64?" do
       it "should correctly report base64 state" do
         m = Message.new("payload", "message")
-        m.base64?.should == m.instance_variable_get("@base64")
+        expect(m.base64?).to eq(m.instance_variable_get("@base64"))
       end
     end
 
@@ -179,13 +179,13 @@ module MCollective
         m.filter = Util.empty_filter.merge({"cf_class" => ["test"]})
         m.agent = "rspec"
         m.type = :direct_request
-        m.filter.should == Util.empty_filter.merge({"agent" => ["rspec"]})
+        expect(m.filter).to eq(Util.empty_filter.merge({"agent" => ["rspec"]}))
       end
 
       it "should set the type" do
         m = Message.new("payload", "message")
         m.type = :request
-        m.type.should == :request
+        expect(m.type).to eq(:request)
       end
     end
 
@@ -234,7 +234,7 @@ module MCollective
         m.expects(:create_reqid).never
         m.requestid = "123"
         m.encode!
-        m.requestid.should == "123"
+        expect(m.requestid).to eq("123")
       end
 
       it "should not allow bad callerids when replying" do
@@ -280,11 +280,11 @@ module MCollective
         m = Message.new(msg, "message", :type => :reply)
         m.decode!
 
-        m.collective.should == "collective"
-        m.agent.should == "rspecagent"
-        m.filter.should == "filter"
-        m.requestid.should == "1234"
-        m.ttl.should == 30
+        expect(m.collective).to eq("collective")
+        expect(m.agent).to eq("rspecagent")
+        expect(m.filter).to eq("filter")
+        expect(m.requestid).to eq("1234")
+        expect(m.ttl).to eq(30)
       end
 
       it "should not allow bad callerids from the security plugin on requests" do
@@ -407,9 +407,9 @@ module MCollective
         m = Message.new(payload, "message", :type => :request)
         m.instance_variable_set("@msgtime", Time.now.to_i)
 
-        m.validated.should == false
+        expect(m.validated).to eq(false)
         m.validate
-        m.validated.should == true
+        expect(m.validated).to eq(true)
       end
 
       it "should not validate for messages older than TTL" do
@@ -454,7 +454,7 @@ module MCollective
         PluginManager.expects("[]").returns(connector)
 
         m.publish
-        m.type.should == :direct_request
+        expect(m.type).to eq(:direct_request)
       end
 
       it "should only direct publish below the configured threshold" do
@@ -469,7 +469,7 @@ module MCollective
         PluginManager.expects("[]").returns(connector)
 
         m.publish
-        m.type.should == :request
+        expect(m.type).to eq(:request)
       end
     end
 
@@ -479,7 +479,7 @@ module MCollective
 
         SSL.expects(:uuid).returns("reqid")
 
-        m.create_reqid.should == "reqid"
+        expect(m.create_reqid).to eq("reqid")
       end
     end
   end

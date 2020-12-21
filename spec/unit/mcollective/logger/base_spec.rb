@@ -71,11 +71,11 @@ module MCollective::Logger
       it "should map levels correctly" do
         logger = Base.new
 
-        logger.send(:map_level, :info).should == :info_test
-        logger.send(:map_level, :warn).should == :warning_test
-        logger.send(:map_level, :debug).should == :debug_test
-        logger.send(:map_level, :fatal).should == :crit_test
-        logger.send(:map_level, :error).should == :err_test
+        expect(logger.send(:map_level, :info)).to eq(:info_test)
+        expect(logger.send(:map_level, :warn)).to eq(:warning_test)
+        expect(logger.send(:map_level, :debug)).to eq(:debug_test)
+        expect(logger.send(:map_level, :fatal)).to eq(:crit_test)
+        expect(logger.send(:map_level, :error)).to eq(:err_test)
       end
     end
 
@@ -84,7 +84,7 @@ module MCollective::Logger
         logger = Base.new
         logger.set_level(:fatal)
 
-        logger.send(:get_next_level).should == :debug
+        expect(logger.send(:get_next_level)).to eq(:debug)
       end
     end
 
@@ -107,7 +107,7 @@ module MCollective::Logger
 
         logger.set_level(:error)
 
-        logger.active_level.should == :error
+        expect(logger.active_level).to eq(:error)
       end
 
       it "should set the level on the logger" do

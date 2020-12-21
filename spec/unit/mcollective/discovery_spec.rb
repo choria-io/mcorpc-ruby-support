@@ -22,7 +22,7 @@ module MCollective
         DDL.expects(:new).with("test_data", :data).returns(ddl)
         DDL.expects(:new).with("rspec_data", :data).returns(ddl)
 
-        @discovery.timeout_for_compound_filter(filter).should == 2
+        expect(@discovery.timeout_for_compound_filter(filter)).to eq(2)
       end
     end
 
@@ -61,8 +61,8 @@ module MCollective
 
       it "should handle limits correctly" do
         @discovery.discovery_class.stubs(:discover).returns([1,2,3,4,5])
-        @discovery.discover(Util.empty_filter, 1, 1).should == [1]
-        @discovery.discover(Util.empty_filter, 1, 0).should == [1,2,3,4,5]
+        expect(@discovery.discover(Util.empty_filter, 1, 1)).to eq([1])
+        expect(@discovery.discover(Util.empty_filter, 1, 0)).to eq([1,2,3,4,5])
       end
     end
 
@@ -74,18 +74,18 @@ module MCollective
 
         @discovery.expects(:discovery_method).returns("rspec")
         @client.expects(:options).returns(options)
-        @discovery.force_discovery_method_by_filter({"compound" => ["rspec"]}).should == true
+        expect(@discovery.force_discovery_method_by_filter({"compound" => ["rspec"]})).to eq(true)
 
-        options[:discovery_method].should == "mc"
+        expect(options[:discovery_method]).to eq("mc")
       end
 
       it "should not force mc plugin when no compound filter is used" do
         options = {:discovery_method => "rspec"}
 
         @discovery.expects(:discovery_method).returns("rspec")
-        @discovery.force_discovery_method_by_filter({"compound" => []}).should == false
+        expect(@discovery.force_discovery_method_by_filter({"compound" => []})).to eq(false)
 
-        options[:discovery_method].should == "rspec"
+        expect(options[:discovery_method]).to eq("rspec")
       end
     end
 
@@ -136,7 +136,7 @@ module MCollective
         PluginManager.expects(:loadclass).with("MCollective::Discovery::Mc")
         Discovery.expects(:const_defined?).with("Mc").returns(false)
         Discovery.expects(:const_get).with("Mc").returns("rspec")
-        @discovery.discovery_class.should == "rspec"
+        expect(@discovery.discovery_class).to eq("rspec")
       end
 
       it "should not load the class again if its already loaded" do
@@ -144,52 +144,52 @@ module MCollective
         PluginManager.expects(:loadclass).never
         Discovery.expects(:const_defined?).with("Mc").returns(true)
         Discovery.expects(:const_get).with("Mc").returns("rspec")
-        @discovery.discovery_class.should == "rspec"
+        expect(@discovery.discovery_class).to eq("rspec")
       end
     end
 
     describe "#initialize" do
       it "should load all the known methods" do
-        @discovery.instance_variable_get("@known_methods").should == ["mc"]
+        expect(@discovery.instance_variable_get("@known_methods")).to eq(["mc"])
       end
     end
 
     describe "#find_known_methods" do
       it "should use the PluginManager to find plugins of type 'discovery'" do
-        @discovery.find_known_methods.should == ["mc"]
+        expect(@discovery.find_known_methods).to eq(["mc"])
       end
     end
 
     describe "#has_method?" do
       it "should correctly report the availability of a discovery method" do
-        @discovery.has_method?("mc").should == true
-        @discovery.has_method?("rspec").should == false
+        expect(@discovery.has_method?("mc")).to eq(true)
+        expect(@discovery.has_method?("rspec")).to eq(false)
       end
     end
 
     describe "#discovery_method" do
       it "should default to 'mc'" do
         @client.expects(:options).returns({})
-        @discovery.discovery_method.should == "mc"
+        expect(@discovery.discovery_method).to eq("mc")
       end
 
       it "should give preference to the client options" do
         @client.expects(:options).returns({:discovery_method => "rspec"}).twice
         Config.instance.expects(:direct_addressing).returns(true)
         @discovery.expects(:has_method?).with("rspec").returns(true)
-        @discovery.discovery_method.should == "rspec"
+        expect(@discovery.discovery_method).to eq("rspec")
       end
 
       it "should validate the discovery method exists" do
         @client.expects(:options).returns({:discovery_method => "rspec"}).twice
-        expect { @discovery.discovery_method.should == "rspec" }.to raise_error("Unknown discovery method rspec")
+        expect { expect(@discovery.discovery_method).to eq("rspec") }.to raise_error("Unknown discovery method rspec")
       end
 
       it "should only allow custom discovery methods if direct_addressing is enabled" do
         @client.expects(:options).returns({:discovery_method => "rspec"}).twice
         Config.instance.expects(:direct_addressing).returns(false)
         @discovery.expects(:has_method?).with("rspec").returns(true)
-        expect { @discovery.discovery_method.should == "rspec" }.to raise_error("Custom discovery methods require direct addressing mode")
+        expect { expect(@discovery.discovery_method).to eq("rspec") }.to raise_error("Custom discovery methods require direct addressing mode")
       end
     end
   end

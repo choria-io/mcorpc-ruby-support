@@ -11,39 +11,39 @@ module MCollective
 
     describe "#application_options" do
       it "should return the application options" do
-        Application.application_options.should == {:description          => nil,
+        expect(Application.application_options).to eq({:description          => nil,
                                                    :usage                => [],
                                                    :cli_arguments        => [],
-                                                   :exclude_arg_sections => []}
+                                                   :exclude_arg_sections => []})
       end
     end
 
     describe "#[]=" do
       it "should set the application option" do
         Application["foo"] = "bar"
-        Application.application_options["foo"].should == "bar"
+        expect(Application.application_options["foo"]).to eq("bar")
       end
     end
 
     describe "#[]" do
       it "should set the application option" do
-        Application[:cli_arguments].should == []
+        expect(Application[:cli_arguments]).to eq([])
       end
     end
 
     describe "#intialize_application_options" do
       it "should initialize application options correctly" do
-        Application.intialize_application_options.should == {:description          => nil,
+        expect(Application.intialize_application_options).to eq({:description          => nil,
                                                              :usage                => [],
                                                              :cli_arguments        => [],
-                                                             :exclude_arg_sections => []}
+                                                             :exclude_arg_sections => []})
       end
     end
 
     describe "#description" do
       it "should set the description correctly" do
         Application.description "meh"
-        Application[:description].should == "meh"
+        expect(Application[:description]).to eq("meh")
       end
     end
 
@@ -52,16 +52,16 @@ module MCollective
         Application.usage "meh"
         Application.usage "foo"
 
-        Application[:usage].should == ["meh", "foo"]
+        expect(Application[:usage]).to eq(["meh", "foo"])
       end
     end
 
     describe "#exclude_argument_sections" do
       it "should set the excluded sections correctly" do
         Application.exclude_argument_sections "common", "rpc", "filter"
-        Application[:exclude_arg_sections].should == ["common", "rpc", "filter"]
+        expect(Application[:exclude_arg_sections]).to eq(["common", "rpc", "filter"])
         Application.exclude_argument_sections ["common", "rpc", "filter"]
-        Application[:exclude_arg_sections].should == ["common", "rpc", "filter"]
+        expect(Application[:exclude_arg_sections]).to eq(["common", "rpc", "filter"])
       end
 
       it "should detect unknown sections" do
@@ -80,11 +80,11 @@ module MCollective
         args = Application[:cli_arguments].first
         args.delete(:validate)
 
-        args.should == {:name=>:test,
+        expect(args).to eq({:name=>:test,
                         :arguments=>"--config CONFIG",
                         :required=>true,
                         :type=>Integer,
-                        :description=>"description"}
+                        :description=>"description"})
       end
 
       it "should set correct defaults" do
@@ -93,11 +93,11 @@ module MCollective
         args = Application[:cli_arguments].first
         args.delete(:validate)
 
-        args.should == {:name=>:test,
+        expect(args).to eq({:name=>:test,
                         :arguments=>[],
                         :required=>false,
                         :type=>String,
-                        :description=>nil}
+                        :description=>nil})
       end
     end
 
@@ -149,7 +149,7 @@ module MCollective
 
         a = Application.new
         a.run
-        a.configuration.should == {:foo=>["bar", "baz"]}
+        expect(a.configuration).to eq({:foo=>["bar", "baz"]})
 
         ARGV.clear
         @argv_backup.each{|a| ARGV << a}
@@ -168,7 +168,7 @@ module MCollective
 
         a = Application.new
         a.run
-        a.configuration.should == {:foo=>true}
+        expect(a.configuration).to eq({:foo=>true})
 
         ARGV.clear
         @argv_backup.each{|a| ARGV << a}
@@ -187,7 +187,7 @@ module MCollective
 
         a = Application.new
         a.run
-        a.configuration.should == {:foo=>false}
+        expect(a.configuration).to eq({:foo=>false})
 
         ARGV.clear
         @argv_backup.each{|a| ARGV << a}
@@ -250,7 +250,7 @@ module MCollective
 
         a = Application.new
         a.run
-        a.configuration.should == {:foo => "meh"}
+        expect(a.configuration).to eq({:foo => "meh"})
       end
 
       it "should enforce required options" do
@@ -323,21 +323,21 @@ module MCollective
 
     describe "#application_options" do
       it "sshould return the application options" do
-        Application.new.application_options.should == Application.application_options
+        expect(Application.new.application_options).to eq(Application.application_options)
       end
     end
 
     describe "#application_description" do
       it "should provide the right description" do
         Application.description "Foo"
-        Application.new.application_description.should == "Foo"
+        expect(Application.new.application_description).to eq("Foo")
       end
     end
 
     describe "#application_usage" do
       it "should provide the right usage" do
         Application.usage "Foo"
-        Application.new.application_usage.should == ["Foo"]
+        expect(Application.new.application_usage).to eq(["Foo"])
       end
     end
 
@@ -352,11 +352,11 @@ module MCollective
         # need to remove this cos we cant validate procs for equality afaik
         args.delete(:validate)
 
-        args.should == {:description=>"meh",
+        expect(args).to eq({:description=>"meh",
                         :name=>:foo,
                         :arguments=>"--foo [FOO]",
                         :type=>String,
-                        :required=>false}
+                        :required=>false})
       end
     end
 
@@ -405,7 +405,7 @@ module MCollective
         a = Application.new
         a.run
 
-        a.configuration.should == {:foo => "bar"}
+        expect(a.configuration).to eq({:foo => "bar"})
 
         ARGV.clear
         @argv_backup.each{|a| ARGV << a}
@@ -425,7 +425,7 @@ module MCollective
         @stats[:responses] = 2
         @stats[:okcount] = 2
 
-        app.halt_code(@stats).should == 0
+        expect(app.halt_code(@stats)).to eq(0)
       end
 
       it "should exit with code 0 if no discovery were done but responses were received" do
@@ -435,13 +435,13 @@ module MCollective
         @stats[:okcount] = 1
         @stats[:discovered] = 1
 
-        app.halt_code(@stats).should == 0
+        expect(app.halt_code(@stats)).to eq(0)
       end
 
       it "should exit with code 1 if discovery info is missing" do
         app = Application.new
 
-        app.halt_code({}).should == 1
+        expect(app.halt_code({})).to eq(1)
       end
 
       it "should exit with code 1 if no nodes were discovered and discovery was done" do
@@ -449,7 +449,7 @@ module MCollective
 
         @stats[:discoverytime] = 2
 
-        app.halt_code(@stats).should == 1
+        expect(app.halt_code(@stats)).to eq(1)
       end
 
       it "should exit with code 2 if a request failed for some nodes" do
@@ -460,7 +460,7 @@ module MCollective
         @stats[:discoverytime] = 2
         @stats[:responses] = 2
 
-        app.halt_code(@stats).should == 2
+        expect(app.halt_code(@stats)).to eq(2)
       end
 
       it "should exit with code 2 when no discovery were done and there were failure results" do
@@ -471,7 +471,7 @@ module MCollective
         @stats[:discoverytime] = 0
         @stats[:responses] = 1
 
-        app.halt_code(@stats).should == 2
+        expect(app.halt_code(@stats)).to eq(2)
       end
 
       it "should exit with code 3 if no responses were received after discovery" do
@@ -480,13 +480,13 @@ module MCollective
         @stats[:discovered] = 1
         @stats[:discoverytime] = 2
 
-        app.halt_code(@stats).should == 3
+        expect(app.halt_code(@stats)).to eq(3)
       end
 
       it "should exit with code 4 if no discovery was done and no responses were received" do
         app = Application.new
 
-        app.halt_code(@stats).should == 4
+        expect(app.halt_code(@stats)).to eq(4)
       end
     end
 

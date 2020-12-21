@@ -12,20 +12,20 @@ module MCollective
       describe "#initialize" do
         it "should initialize empty values for all output fields" do
           result = Result.new({:rspec1 => {}, :rspec2 => {}})
-          result[:rspec1].should == nil
-          result[:rspec2].should == nil
+          expect(result[:rspec1]).to eq(nil)
+          expect(result[:rspec2]).to eq(nil)
         end
 
         it "should set default values for all output fields" do
           result = Result.new({:rspec1 => {:default => 1}, :rspec2 => {}})
-          result[:rspec1].should == 1
-          result[:rspec2].should == nil
+          expect(result[:rspec1]).to eq(1)
+          expect(result[:rspec2]).to eq(nil)
         end
       end
 
       describe "#[]=" do
         it "should only allow trusted types of data to be saved" do
-          expect { @result["rspec"] = Time.now }.to raise_error
+          expect { @result["rspec"] = Time.now }.to raise_error("Can only store String, Integer, Float or Boolean data but got Time for key rspec")
           @result["rspec"] = 1
           @result["rspec"] = 1.1
           @result["rspec"] = "rspec"
@@ -35,7 +35,7 @@ module MCollective
 
         it "should set the correct value" do
           @result["rspec"] = "rspec value"
-          @result.instance_variable_get("@data").should == {:rspec => "rspec value"}
+          expect(@result.instance_variable_get("@data")).to eq({:rspec => "rspec value"})
         end
 
         it "should only allow valid data types" do
@@ -47,27 +47,27 @@ module MCollective
         it "should return the correct list of keys" do
           @result["x"] = "1"
           @result[:y] = "2"
-          @result.keys.sort.should == [:x, :y]
+          expect(@result.keys.sort).to eq([:x, :y])
         end
       end
 
       describe "#include?" do
         it "should correctly report that a key is present or absent" do
-          @result.include?("rspec").should == false
-          @result.include?(:rspec).should == false
+          expect(@result.include?("rspec")).to eq(false)
+          expect(@result.include?(:rspec)).to eq(false)
           @result["rspec"] = "rspec"
-          @result.include?("rspec").should == true
-          @result.include?(:rspec).should == true
+          expect(@result.include?("rspec")).to eq(true)
+          expect(@result.include?(:rspec)).to eq(true)
         end
       end
 
       describe "#[]" do
         it "should retrieve the correct information" do
-          @result["rspec"].should == nil
-          @result[:rspec].should == nil
+          expect(@result["rspec"]).to eq(nil)
+          expect(@result[:rspec]).to eq(nil)
           @result["rspec"] = "rspec value"
-          @result["rspec"].should == "rspec value"
-          @result[:rspec].should == "rspec value"
+          expect(@result["rspec"]).to eq("rspec value")
+          expect(@result[:rspec]).to eq("rspec value")
         end
       end
 
@@ -78,7 +78,7 @@ module MCollective
 
         it "should retrieve the correct data" do
           @result["rspec"] = "rspec value"
-          @result.rspec.should == "rspec value"
+          expect(@result.rspec).to eq("rspec value")
         end
       end
     end

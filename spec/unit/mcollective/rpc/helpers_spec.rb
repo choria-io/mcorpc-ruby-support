@@ -31,23 +31,23 @@ module MCollective
         it "should return all found unique senders" do
           senders = [{"sender" => "sender1"}, {"sender" => "sender3"}, {"sender" => "sender1"}].to_json
 
-          Helpers.extract_hosts_from_json(senders).should == ["sender1", "sender3"]
+          expect(Helpers.extract_hosts_from_json(senders)).to eq(["sender1", "sender3"])
         end
 
         it "should support puppet query output" do
           senders = [{"certname" => "sender1"}, {"certname" => "sender3"}, {"certname" => "sender1"}].to_json
 
-          Helpers.extract_hosts_from_json(senders).should == ["sender1", "sender3"]
+          expect(Helpers.extract_hosts_from_json(senders)).to eq(["sender1", "sender3"])
         end
       end
 
       describe "#extract_hosts_from_array" do
         it "should support single string lists" do
-          Helpers.extract_hosts_from_array("foo").should == ["foo"]
+          expect(Helpers.extract_hosts_from_array("foo")).to eq(["foo"])
         end
 
         it "should support arrays" do
-          Helpers.extract_hosts_from_array(["foo", "bar"]).should == ["foo", "bar"]
+          expect(Helpers.extract_hosts_from_array(["foo", "bar"])).to eq(["foo", "bar"])
         end
 
         it "should fail for non string array members" do

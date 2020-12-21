@@ -51,7 +51,7 @@ module MCollective
         request.expects(:publish)
         request.expects(:requestid).returns("13fegbcw").twice
         result = client.sendreq(request, "rspec")
-        result.should == "13fegbcw"
+        expect(result).to eq("13fegbcw")
       end
     end
 
@@ -62,7 +62,7 @@ module MCollective
         client.stubs(:subscribe)
         message.stubs(:reply_to)
         result = client.createreq(message, "rspec")
-        result.should == message
+        expect(result).to eq(message)
       end
 
       it "should create a new request if the message if not of type Message" do
@@ -72,7 +72,7 @@ module MCollective
         message.stubs(:reply_to)
         Message.expects(:new).returns(message)
         result = client.createreq("message", "rspec")
-        result.should == message
+        expect(result).to eq(message)
       end
 
       it "should subscripe to the reply queue unless has been specified" do
@@ -98,7 +98,7 @@ module MCollective
         Util.stubs(:make_subscriptions).returns(subscription)
         Util.expects(:subscribe).with(subscription)
         client.subscribe("rspec", :queue)
-        client.instance_variable_get(:@subscriptions).should == {"rspec" => 1}
+        expect(client.instance_variable_get(:@subscriptions)).to eq({"rspec" => 1})
       end
 
       it "should not subscribe to a destination if it already has" do
@@ -147,7 +147,7 @@ module MCollective
       it "should receive a message" do
         @connector.stubs(:receive).returns(message)
         result = client.receive("erfs123")
-        result.should == message
+        expect(result).to eq(message)
       end
 
       it 'should log who the message was from' do
@@ -175,7 +175,7 @@ module MCollective
     describe "#discover" do
       it "should delegate to the discovery plugins" do
         @discoverer.expects(:discover).with({'collective' => 'mcollective'}, 1, 0).returns([])
-        client.discover({}, 1).should == []
+        expect(client.discover({}, 1)).to eq([])
       end
     end
 
@@ -250,7 +250,7 @@ module MCollective
         client.expects(:start_receiver).with("erfs123", 2, 15).returns(2)
         p_thread.expects(:join)
         result = client.threaded_req(request, 5, 10, 2)
-        result.should == 2
+        expect(result).to eq(2)
       end
     end
 
@@ -288,7 +288,7 @@ module MCollective
           client.start_receiver("erfs123", 3, 5) do |msg|
             results << msg
           end
-          results.should == ["msg1", "msg2", "msg3"]
+          expect(results).to eq(["msg1", "msg2", "msg3"])
         end
 
         it "should support responding with the payload and the Message" do
@@ -304,7 +304,7 @@ module MCollective
             results << [payload, message]
           end
 
-          results.should == [["msg1", msg1], ["msg2", msg2], ["msg3", msg3]]
+          expect(results).to eq([["msg1", msg1], ["msg2", msg2], ["msg3", msg3]])
         end
 
         it "should log a warning if a timeout occurs" do
@@ -320,8 +320,8 @@ module MCollective
             end
             results << msg
           end
-          results.should == ["msg1", "msg2"]
-          responded.should == 2
+          expect(results).to eq(["msg1", "msg2"])
+          expect(responded).to eq(2)
         end
 
         it "should not log a warning if a the response count is larger or equal to the expected number of responses" do
@@ -337,8 +337,8 @@ module MCollective
             end
             results << msg
           end
-          results.should == ["msg1", "msg2"]
-          responded.should == 2
+          expect(results).to eq(["msg1", "msg2"])
+          expect(responded).to eq(2)
         end
       end
 
@@ -352,7 +352,7 @@ module MCollective
           client.start_receiver("erfs123", senders[0,3], 5) do |msg|
             results << msg
           end
-          results.should == expected[0,3].map {|m| m.payload}
+          expect(results).to eq(expected[0,3].map {|m| m.payload})
         end
 
         it "receive until it gets all expected responses" do
@@ -364,7 +364,7 @@ module MCollective
           client.start_receiver("erfs123", senders[1,3], 5) do |msg|
             results << msg
           end
-          results.should == expected.map {|m| m.payload}
+          expect(results).to eq(expected.map {|m| m.payload})
         end
 
         it "should log a warning if a timeout occurs" do
@@ -381,8 +381,8 @@ module MCollective
             end
             results << msg
           end
-          results.should == expected[0,2].map {|m| m.payload}
-          responded.should == 2
+          expect(results).to eq(expected[0,2].map {|m| m.payload})
+          expect(responded).to eq(2)
         end
 
         it "should not log a warning if accepting all responses" do
@@ -399,8 +399,8 @@ module MCollective
             end
             results << msg
           end
-          results.should == expected[0,2].map {|m| m.payload}
-          responded.should == 2
+          expect(results).to eq(expected[0,2].map {|m| m.payload})
+          expect(responded).to eq(2)
         end
 
         it "should not log a warning if the response count is larger or equal to the expected number of responses" do
@@ -417,8 +417,8 @@ module MCollective
             end
             results << msg
           end
-          results.should == expected[0,2].map {|m| m.payload}
-          responded.should == 2
+          expect(results).to eq(expected[0,2].map {|m| m.payload})
+          expect(responded).to eq(2)
         end
       end
     end
@@ -444,7 +444,7 @@ module MCollective
 
       it "should update stats and return the stats hash" do
         Time.stubs(:now).returns(10, 20)
-        client.update_stat(before, 5, "erfs123").should == after
+        expect(client.update_stat(before, 5, "erfs123")).to eq(after)
       end
     end
 

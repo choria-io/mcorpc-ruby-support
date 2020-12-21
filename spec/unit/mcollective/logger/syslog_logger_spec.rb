@@ -40,14 +40,14 @@ module MCollective
         describe "#syslog_facility" do
           it "should support valid facilities" do
             logger = Syslog_logger.new
-            logger.syslog_facility("LOCAL1").should == Syslog::LOG_LOCAL1
-            logger.syslog_facility("local1").should == Syslog::LOG_LOCAL1
+            expect(logger.syslog_facility("LOCAL1")).to eq(Syslog::LOG_LOCAL1)
+            expect(logger.syslog_facility("local1")).to eq(Syslog::LOG_LOCAL1)
           end
 
           it "should set LOG_USER for unknown facilities" do
             logger = Syslog_logger.new
             logger.expects(:warn).with("Invalid syslog facility rspec supplied, reverting to USER")
-            logger.syslog_facility("rspec").should == Syslog::LOG_USER
+            expect(logger.syslog_facility("rspec")).to eq(Syslog::LOG_USER)
           end
         end
 

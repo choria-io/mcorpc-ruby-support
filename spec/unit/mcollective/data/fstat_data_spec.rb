@@ -36,7 +36,7 @@ module MCollective
         it "should detect missing files" do
           File.expects(:exist?).with("/nonexisting").returns(false)
           @plugin.query_data("/nonexisting")
-          @plugin.result.output.should == "not present"
+          expect(@plugin.result.output).to eq("not present")
         end
 
         it "should provide correct file stats" do
@@ -48,22 +48,22 @@ module MCollective
           @stat.stubs(:file?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.size.should == 123
-          @plugin.result.uid.should == 0
-          @plugin.result.gid.should == 0
-          @plugin.result.mtime.should == @time.strftime("%F %T")
-          @plugin.result.mtime_seconds.should == @time.to_i
-          @plugin.result.mtime_age.should <= 5
-          @plugin.result.ctime.should == @time.strftime("%F %T")
-          @plugin.result.ctime_seconds.should == @time.to_i
-          @plugin.result.ctime_age.should <= 5
-          @plugin.result.atime.should == @time.strftime("%F %T")
-          @plugin.result.atime_seconds.should == @time.to_i
-          @plugin.result.atime_age.should <= 5
-          @plugin.result.mode.should == "100644"
-          @plugin.result.md5.should == "2bc84dc69b73db9383b9c6711d2011b7"
-          @plugin.result.type.should == "file"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.size).to eq(123)
+          expect(@plugin.result.uid).to eq(0)
+          expect(@plugin.result.gid).to eq(0)
+          expect(@plugin.result.mtime).to eq(@time.strftime("%F %T"))
+          expect(@plugin.result.mtime_seconds).to eq(@time.to_i)
+          expect(@plugin.result.mtime_age).to be <= 5
+          expect(@plugin.result.ctime).to eq(@time.strftime("%F %T"))
+          expect(@plugin.result.ctime_seconds).to eq(@time.to_i)
+          expect(@plugin.result.ctime_age).to be <= 5
+          expect(@plugin.result.atime).to eq(@time.strftime("%F %T"))
+          expect(@plugin.result.atime_seconds).to eq(@time.to_i)
+          expect(@plugin.result.atime_age).to be <= 5
+          expect(@plugin.result.mode).to eq("100644")
+          expect(@plugin.result.md5).to eq("2bc84dc69b73db9383b9c6711d2011b7")
+          expect(@plugin.result.type).to eq("file")
         end
 
         it "should provide correct link stats" do
@@ -74,9 +74,9 @@ module MCollective
           @stat.stubs(:symlink?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.md5.should == 0
-          @plugin.result.type.should == "symlink"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.md5).to eq(0)
+          expect(@plugin.result.type).to eq("symlink")
         end
 
         it "should provide correct directory stats" do
@@ -87,9 +87,9 @@ module MCollective
           @stat.stubs(:directory?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.md5.should == 0
-          @plugin.result.type.should == "directory"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.md5).to eq(0)
+          expect(@plugin.result.type).to eq("directory")
         end
 
         it "should provide correct socket stats" do
@@ -100,9 +100,9 @@ module MCollective
           @stat.stubs(:socket?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.md5.should == 0
-          @plugin.result.type.should == "socket"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.md5).to eq(0)
+          expect(@plugin.result.type).to eq("socket")
         end
 
         it "should provide correct chardev stats" do
@@ -113,9 +113,9 @@ module MCollective
           @stat.stubs(:chardev?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.md5.should == 0
-          @plugin.result.type.should == "chardev"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.md5).to eq(0)
+          expect(@plugin.result.type).to eq("chardev")
         end
 
         it "should provide correct blockdev stats" do
@@ -126,9 +126,9 @@ module MCollective
           @stat.stubs(:blockdev?).returns(true)
 
           @plugin.query_data("rspec")
-          @plugin.result.output.should == "present"
-          @plugin.result.md5.should == 0
-          @plugin.result.type.should == "blockdev"
+          expect(@plugin.result.output).to eq("present")
+          expect(@plugin.result.md5).to eq(0)
+          expect(@plugin.result.type).to eq("blockdev")
         end
       end
     end

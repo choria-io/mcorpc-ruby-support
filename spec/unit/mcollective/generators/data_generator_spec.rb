@@ -18,7 +18,7 @@ module MCollective
 
             ddl = DataGenerator.new("foo", ["output"]).ddl
             expected = File.read(File.join(File.dirname(__FILE__), "snippets", "data_ddl")).chop
-            ddl.should == expected
+            expect(ddl).to eq(expected)
           end
         end
 
@@ -29,7 +29,7 @@ module MCollective
             DataGenerator.any_instance.stubs(:write_plugins)
 
             ddl = DataGenerator.new("foo", ["output"]).content
-            ddl.should == "      query do |what|\n        result[:output] = nil\n      end\n"
+            expect(ddl).to eq("      query do |what|\n        result[:output] = nil\n      end\n")
           end
         end
       end

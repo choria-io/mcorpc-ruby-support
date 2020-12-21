@@ -37,54 +37,54 @@ module MCollective
         it 'should return an unfound fact as false' do
           @plugin.query_data("bar")
 
-          @plugin.result[:exists].should == false
-          @plugin.result[:value].should == false
-          @plugin.result[:value_encoding].should == false
+          expect(@plugin.result[:exists]).to eq(false)
+          expect(@plugin.result[:value]).to eq(false)
+          expect(@plugin.result[:value_encoding]).to eq(false)
         end
 
         it "should be able to find a value at top level" do
           @plugin.query_data("foo")
 
-          @plugin.result[:exists].should == true
-          @plugin.result[:value].should == "foo-value"
-          @plugin.result[:value_encoding].should == 'text/plain'
+          expect(@plugin.result[:exists]).to eq(true)
+          expect(@plugin.result[:value]).to eq("foo-value")
+          expect(@plugin.result[:value_encoding]).to eq('text/plain')
         end
 
         it 'should be able to walk down to a hash element' do
           @plugin.query_data("one.one")
 
-          @plugin.result[:exists].should == true
-          @plugin.result[:value].should == "one-one"
-          @plugin.result[:value_encoding].should == 'text/plain'
+          expect(@plugin.result[:exists]).to eq(true)
+          expect(@plugin.result[:value]).to eq("one-one")
+          expect(@plugin.result[:value_encoding]).to eq('text/plain')
         end
 
         it 'should be able to walk down to a hash' do
           @plugin.query_data("one.two")
 
-          @plugin.result[:exists].should == true
+          expect(@plugin.result[:exists]).to eq(true)
 
-          @plugin.result[:value].should == {
+          expect(@plugin.result[:value]).to eq({
             "one" => "one-two-one",
             "two" => "one-two-two",
-          }.to_json
-          @plugin.result[:value_encoding].should == 'application/json'
+          }.to_json)
+          expect(@plugin.result[:value_encoding]).to eq('application/json')
 
         end
 
         it 'should be able to walk down to an array' do
           @plugin.query_data("some_array")
 
-          @plugin.result[:exists].should == true
-          @plugin.result[:value].should == [ "a", "b" ].to_json
-          @plugin.result[:value_encoding].should == 'application/json'
+          expect(@plugin.result[:exists]).to eq(true)
+          expect(@plugin.result[:value]).to eq([ "a", "b" ].to_json)
+          expect(@plugin.result[:value_encoding]).to eq('application/json')
         end
 
         it 'should be able to walk down to an array element' do
           @plugin.query_data("some_array.0")
 
-          @plugin.result[:exists].should == true
-          @plugin.result[:value].should == "a"
-          @plugin.result[:value_encoding].should == 'text/plain'
+          expect(@plugin.result[:exists]).to eq(true)
+          expect(@plugin.result[:value]).to eq("a")
+          expect(@plugin.result[:value_encoding]).to eq('text/plain')
         end
       end
     end

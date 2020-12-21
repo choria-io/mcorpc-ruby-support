@@ -149,12 +149,12 @@ module MCollective
 
         it "should default the discovery_timeout to nil" do
           c = Client.new("rspec", :options => {:config => "/nonexisting"})
-          c.instance_variable_get("@discovery_timeout").should == nil
+          expect(c.instance_variable_get("@discovery_timeout")).to eq(nil)
         end
 
         it "should accept a supplied discovery_timeout" do
           c = Client.new("rspec", :options => {:config => "/nonexisting", :disctimeout => 10})
-          c.instance_variable_get("@discovery_timeout").should == 10
+          expect(c.instance_variable_get("@discovery_timeout")).to eq(10)
         end
 
         it "should default to configured batch options" do
@@ -195,7 +195,7 @@ module MCollective
 
           blk = Proc.new {}
 
-          @client.process_results_with_block("rspec", response, blk, "").should == "aggregate stub"
+          expect(@client.process_results_with_block("rspec", response, blk, "")).to eq("aggregate stub")
         end
 
         it "should inform the stats object correctly for failed requests" do
@@ -210,7 +210,7 @@ module MCollective
 
         it "should pass raw results for single arity blocks" do
           response = {:senderid => "rspec", :body => {:statuscode => 1}}
-          blk = Proc.new {|r| r.should == response}
+          blk = Proc.new {|r| expect(r).to eq(response)}
 
           @client.process_results_with_block("rspec", response, blk, nil)
         end
@@ -218,8 +218,8 @@ module MCollective
         it "should pass raw and rpc style results for 2 arity blocks" do
           response = {:senderid => "rspec", :body => {:statuscode => 1}}
           blk = Proc.new do |r, s|
-            r.should == response
-            s.should.class == RPC::Result
+            expect(r).to eq(response)
+            expect(s.class).to eq(RPC::Result)
           end
 
           @client.process_results_with_block("rspec", response, blk, nil)
@@ -252,19 +252,19 @@ module MCollective
           result = @client.rpc_result_from_reply("foo", "rspec", response)
 
           @client.stubs(:rpc_result_from_reply).with("foo", "rspec", response).returns(result)
-          @client.process_results_without_block(response, "rspec", "").should == [result, "aggregate stub"]
+          expect(@client.process_results_without_block(response, "rspec", "")).to eq([result, "aggregate stub"])
         end
       end
 
       describe "#load_aggregate_functions" do
         it "should not load if the ddl is not set" do
-          @client.load_aggregate_functions("rspec", nil).should == nil
+          expect(@client.load_aggregate_functions("rspec", nil)).to eq(nil)
         end
 
         it "should create the aggregate for the right action" do
           @client.ddl.expects(:action_interface).with("rspec").returns({:aggregate => []}).twice
           Aggregate.expects(:new).with(:aggregate => []).returns("rspec aggregate")
-          @client.load_aggregate_functions("rspec", @client.ddl).should == "rspec aggregate"
+          expect(@client.load_aggregate_functions("rspec", @client.ddl)).to eq("rspec aggregate")
         end
 
         it "should log and return nil on failure" do
@@ -276,7 +276,7 @@ module MCollective
 
       describe "#aggregate_reply" do
         it "should not call anything if the aggregate isnt set" do
-          @client.aggregate_reply(nil, nil).should == nil
+          expect(@client.aggregate_reply(nil, nil)).to eq(nil)
         end
 
         it "should call the aggregate functions with the right data" do
@@ -285,7 +285,7 @@ module MCollective
           aggregate = mock
           aggregate.expects(:call_functions).with(result).returns(aggregate)
 
-          @client.aggregate_reply(result, aggregate).should == aggregate
+          expect(@client.aggregate_reply(result, aggregate)).to eq(aggregate)
         end
 
         it "should log and return nil on failure" do
@@ -294,7 +294,7 @@ module MCollective
 
           Log.expects(:error).with(regexp_matches(/Failed to calculate aggregate summaries/))
 
-          @client.aggregate_reply({}, aggregate).should == nil
+          expect(@client.aggregate_reply({}, aggregate)).to eq(nil)
         end
       end
 
@@ -305,9 +305,9 @@ module MCollective
         end
 
         it "should set the collective" do
-          @client.options[:collective].should == "mcollective"
+          expect(@client.options[:collective]).to eq("mcollective")
           @client.collective = "rspec"
-          @client.options[:collective].should == "rspec"
+          expect(@client.options[:collective]).to eq("rspec")
         end
 
         it "should reset the client" do
@@ -318,24 +318,24 @@ module MCollective
 
       describe "#discovery_method=" do
         it "should set the method" do
-          @client.default_discovery_method.should == true
+          expect(@client.default_discovery_method).to eq(true)
           @client.discovery_method = "rspec"
-          @client.default_discovery_method.should == false
-          @client.discovery_method.should == "rspec"
+          expect(@client.default_discovery_method).to eq(false)
+          expect(@client.discovery_method).to eq("rspec")
         end
 
         it "should set initial options if provided" do
           client = Client.new("rspec", {:options => {:discovery_options => ["rspec"], :filter => Util.empty_filter, :config => "/nonexisting"}})
           client.discovery_method = "rspec"
-          client.discovery_method.should == "rspec"
-          client.discovery_options.should == ["rspec"]
-          client.default_discovery_method.should == false
+          expect(client.discovery_method).to eq("rspec")
+          expect(client.discovery_options).to eq(["rspec"])
+          expect(client.default_discovery_method).to eq(false)
         end
 
         it "should clear the options if none are given initially" do
           @client.discovery_options = ["rspec"]
           @client.discovery_method = "rspec"
-          @client.discovery_options.should == []
+          expect(@client.discovery_options).to eq([])
         end
 
         it "should set the client options" do
@@ -347,13 +347,13 @@ module MCollective
         it "should adjust timeout for the new method" do
           @client.expects(:discovery_timeout).once.returns(1)
           @client.discovery_method = "rspec"
-          @client.instance_variable_get("@timeout").should == 4
+          expect(@client.instance_variable_get("@timeout")).to eq(4)
         end
 
         it "should preserve any user supplied discovery timeout" do
           @client.discovery_timeout = 10
           @client.discovery_method = "rspec"
-          @client.discovery_timeout.should == 10
+          expect(@client.discovery_timeout).to eq(10)
         end
 
         it "should reset the rpc client" do
@@ -365,20 +365,20 @@ module MCollective
       describe "#discovery_options=" do
         it "should flatten the options array" do
           @client.discovery_options = "foo"
-          @client.discovery_options.should == ["foo"]
+          expect(@client.discovery_options).to eq(["foo"])
         end
       end
 
       describe "#class_filter" do
         it "should add a class to the filter" do
           @client.class_filter("rspec")
-          @client.filter["cf_class"].should == ["rspec"]
+          expect(@client.filter["cf_class"]).to eq(["rspec"])
         end
 
         it "should be idempotent" do
           @client.class_filter("rspec")
           @client.class_filter("rspec")
-          @client.filter["cf_class"].should == ["rspec"]
+          expect(@client.filter["cf_class"]).to eq(["rspec"])
         end
       end
 
@@ -389,37 +389,37 @@ module MCollective
 
         it "should add a fact to the filter" do
           @client.fact_filter("rspec", "present", "=")
-          @client.filter["fact"].should == [{:value=>"present", :fact=>"rspec", :operator=>"=="}]
+          expect(@client.filter["fact"]).to eq([{:value=>"present", :fact=>"rspec", :operator=>"=="}])
         end
 
         it "should be idempotent" do
           @client.fact_filter("rspec", "present", "=")
           @client.fact_filter("rspec", "present", "=")
-          @client.filter["fact"].should == [{:value=>"present", :fact=>"rspec", :operator=>"=="}]
+          expect(@client.filter["fact"]).to eq([{:value=>"present", :fact=>"rspec", :operator=>"=="}])
         end
       end
 
       describe "#agent_filter" do
         it "should add an agent to the filter" do
-          @client.filter["agent"].should == ["foo"]
+          expect(@client.filter["agent"]).to eq(["foo"])
         end
 
         it "should be idempotent" do
           @client.agent_filter("foo")
-          @client.filter["agent"].should == ["foo"]
+          expect(@client.filter["agent"]).to eq(["foo"])
         end
       end
 
       describe "#identity_filter" do
         it "should add a node to the filter" do
           @client.identity_filter("rspec_node")
-          @client.filter["identity"].should == ["rspec_node"]
+          expect(@client.filter["identity"]).to eq(["rspec_node"])
         end
 
         it "should be idempotent" do
           @client.identity_filter("rspec_node")
           @client.identity_filter("rspec_node")
-          @client.filter["identity"].should == ["rspec_node"]
+          expect(@client.filter["identity"]).to eq(["rspec_node"])
         end
       end
 
@@ -430,54 +430,54 @@ module MCollective
 
         it "should add a compound filter" do
           @client.compound_filter("filter")
-          @client.filter["compound"].should == ["filter"]
+          expect(@client.filter["compound"]).to eq(["filter"])
         end
 
         it "should be idempotent" do
           @client.compound_filter("filter")
           @client.compound_filter("filter")
-          @client.filter["compound"].should == ["filter"]
+          expect(@client.filter["compound"]).to eq(["filter"])
         end
       end
 
       describe "#discovery_timeout" do
         it "should favour the initial options supplied timeout" do
           client = Client.new("rspec", {:options => {:disctimeout => 3, :filter => Util.empty_filter, :config => "/nonexisting"}})
-          client.discovery_timeout.should == 3
+          expect(client.discovery_timeout).to eq(3)
         end
 
         it "should return the DDL data if no specific options are supplied" do
           client = Client.new("rspec", {:options => {:disctimeout => nil, :filter => Util.empty_filter, :config => "/nonexisting"}})
-          client.discovery_timeout.should == 2
+          expect(client.discovery_timeout).to eq(2)
         end
       end
 
       describe "#discovery_timeout=" do
         it "should store the discovery timeout" do
           @client.discovery_timeout = 10
-          @client.discovery_timeout.should == 10
+          expect(@client.discovery_timeout).to eq(10)
         end
 
         it "should update the overall timeout with the new discovery timeout" do
-          @client.instance_variable_get("@timeout").should == 4
+          expect(@client.instance_variable_get("@timeout")).to eq(4)
 
           @client.discovery_timeout = 10
 
-          @client.instance_variable_get("@timeout").should == 12
+          expect(@client.instance_variable_get("@timeout")).to eq(12)
         end
       end
 
       describe "#limit_method" do
         it "should force strings to symbols" do
           @client.limit_method = "first"
-          @client.limit_method.should == :first
+          expect(@client.limit_method).to eq(:first)
         end
 
         it "should only allow valid methods" do
           @client.limit_method = :first
-          @client.limit_method.should == :first
+          expect(@client.limit_method).to eq(:first)
           @client.limit_method = :random
-          @client.limit_method.should == :random
+          expect(@client.limit_method).to eq(:random)
 
           expect { @client.limit_method = :fail }.to raise_error(/Unknown/)
           expect { @client.limit_method = "fail" }.to raise_error(/Unknown/)
@@ -589,25 +589,25 @@ module MCollective
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
           client.stubs(:discover).returns((1..10).map{|i| i.to_s})
           client.limit_method = :first
-          client.pick_nodes_from_discovered("20%").should == ["1", "2"]
+          expect(client.pick_nodes_from_discovered("20%")).to eq(["1", "2"])
         end
 
         it "should return the same list when a random seed is supplied" do
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting", :limit_seed => 5}})
           client.stubs(:discover).returns((1..10).map{|i| i.to_s})
           client.limit_method = :random
-          client.pick_nodes_from_discovered("30%").should == ["3", "7", "8"]
-          client.pick_nodes_from_discovered("30%").should == ["3", "7", "8"]
-          client.pick_nodes_from_discovered("3").should == ["3", "7", "8"]
-          client.pick_nodes_from_discovered("3").should == ["3", "7", "8"]
+          expect(client.pick_nodes_from_discovered("30%")).to eq(["3", "7", "8"])
+          expect(client.pick_nodes_from_discovered("30%")).to eq(["3", "7", "8"])
+          expect(client.pick_nodes_from_discovered("3")).to eq(["3", "7", "8"])
+          expect(client.pick_nodes_from_discovered("3")).to eq(["3", "7", "8"])
         end
 
         it "should correctly pick a numeric amount of discovered nodes" do
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting", :limit_seed => 5}})
           client.stubs(:discover).returns((1..10).map{|i| i.to_s})
           client.limit_method = :first
-          client.pick_nodes_from_discovered(5).should == (1..5).map{|i| i.to_s}
-          client.pick_nodes_from_discovered(5).should == (1..5).map{|i| i.to_s}
+          expect(client.pick_nodes_from_discovered(5)).to eq((1..5).map{|i| i.to_s})
+          expect(client.pick_nodes_from_discovered(5)).to eq((1..5).map{|i| i.to_s})
         end
       end
 
@@ -636,18 +636,18 @@ module MCollective
 
         it "should support percentages" do
           @client.limit_targets = "10%"
-          @client.limit_targets.should == "10%"
+          expect(@client.limit_targets).to eq("10%")
         end
 
         it "should support integers" do
           @client.limit_targets = 10
-          @client.limit_targets.should == 10
+          expect(@client.limit_targets).to eq(10)
           @client.limit_targets = "20"
-          @client.limit_targets.should == 20
+          expect(@client.limit_targets).to eq(20)
           @client.limit_targets = 1.1
-          @client.limit_targets.should == 1
+          expect(@client.limit_targets).to eq(1)
           @client.limit_targets = 1.7
-          @client.limit_targets.should == 1
+          expect(@client.limit_targets).to eq(1)
         end
 
         it "should not allow invalid limits to be set" do
@@ -658,12 +658,12 @@ module MCollective
 
         it "should reset @limit_targets" do
           @client.limit_targets = 10
-          @client.limit_targets.should == 10
+          expect(@client.limit_targets).to eq(10)
           @client.limit_targets = nil
-          @client.limit_targets.should == nil
+          expect(@client.limit_targets).to eq(nil)
           @client.limit_targets = 10
           @client.limit_targets = false
-          @client.limit_targets.should == nil
+          expect(@client.limit_targets).to eq(nil)
         end
       end
 
@@ -856,8 +856,8 @@ module MCollective
           client.expects(:process_results_with_block).with("foo", "result", instance_of(Proc), nil).times(10)
 
           result = client.send(:call_agent_batched, "foo", {}, {}, 1, 1) { }
-          result[:requestid].should == "823a3419a0975c3facbde121f72ab61f"
-          result.class.should == Stats
+          expect(result[:requestid]).to eq("823a3419a0975c3facbde121f72ab61f")
+          expect(result.class).to eq(Stats)
         end
 
         it "should return an array of results in array mode" do
@@ -885,9 +885,9 @@ module MCollective
 
           client.expects(:process_results_without_block).with("result", "foo", nil).returns("rspec").times(10)
 
-          client.send(:call_agent_batched, "foo", {}, {}, 1, 1).should == ["rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec"]
+          expect(client.send(:call_agent_batched, "foo", {}, {}, 1, 1)).to eq(["rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec", "rspec"])
 
-          client.stats[:requestid].should == "823a3419a0975c3facbde121f72ab61f"
+          expect(client.stats[:requestid]).to eq("823a3419a0975c3facbde121f72ab61f")
         end
       end
 
@@ -897,7 +897,7 @@ module MCollective
 
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
           client.batch_sleep_time = 5
-          client.batch_sleep_time.should == 5
+          expect(client.batch_sleep_time).to eq(5)
         end
 
         it "should only allow batch sleep to be set for direct addressing capable clients" do
@@ -914,10 +914,10 @@ module MCollective
           Config.instance.stubs(:direct_addressing).returns(true)
 
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
-          client.batch_mode.should == false
+          expect(client.batch_mode).to eq(false)
           client.batch_size = 5
-          client.batch_size.should == 5
-          client.batch_mode.should == true
+          expect(client.batch_size).to eq(5)
+          expect(client.batch_mode).to eq(true)
         end
 
         it "should only allow batch size to be set for direct addressing capable clients" do
@@ -931,7 +931,7 @@ module MCollective
         it "should accept batch sizes as percentage strings" do
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
           client.batch_size = "50%"
-          client.batch_size.should == "50%"
+          expect(client.batch_size).to eq("50%")
         end
 
         it "should support disabling batch mode when supplied a batch size of 0" do
@@ -939,9 +939,9 @@ module MCollective
 
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
           client.batch_size = 5
-          client.batch_mode.should == true
+          expect(client.batch_mode).to eq(true)
           client.batch_size = 0
-          client.batch_mode.should == false
+          expect(client.batch_mode).to eq(false)
         end
       end
 
@@ -977,10 +977,10 @@ module MCollective
           Helpers.expects(:extract_hosts_from_array).with(["one"]).returns(["one"]).twice
 
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
-          client.discover(:nodes => ["one"]).should == ["one"]
-          client.discover(:hosts => ["one"]).should == ["one"]
-          client.instance_variable_get("@force_direct_request").should == true
-          client.instance_variable_get("@discovered_agents").should == ["one"]
+          expect(client.discover(:nodes => ["one"])).to eq(["one"])
+          expect(client.discover(:hosts => ["one"])).to eq(["one"])
+          expect(client.instance_variable_get("@force_direct_request")).to eq(true)
+          expect(client.instance_variable_get("@discovered_agents")).to eq(["one"])
         end
 
         it "should parse :json and force direct requests" do
@@ -988,9 +988,9 @@ module MCollective
           Helpers.expects(:extract_hosts_from_json).with('["one"]').returns(["one"]).once
 
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting"}})
-          client.discover(:json => '["one"]').should == ["one"]
-          client.instance_variable_get("@force_direct_request").should == true
-          client.instance_variable_get("@discovered_agents").should == ["one"]
+          expect(client.discover(:json => '["one"]')).to eq(["one"])
+          expect(client.instance_variable_get("@force_direct_request")).to eq(true)
+          expect(client.instance_variable_get("@discovered_agents")).to eq(["one"])
         end
 
         it "should not set direct mode for non 'mc' discovery methods" do
@@ -1000,8 +1000,8 @@ module MCollective
           @coreclient.expects(:discover).returns(["foo"])
 
           client.discover
-          client.instance_variable_get("@discovered_agents").should == ["foo"]
-          client.instance_variable_get("@force_direct_request").should == false
+          expect(client.instance_variable_get("@discovered_agents")).to eq(["foo"])
+          expect(client.instance_variable_get("@force_direct_request")).to eq(false)
         end
 
         it "should force direct mode for non regex identity filters" do
@@ -1009,8 +1009,8 @@ module MCollective
 
           client = Client.new("foo", {:options => {:discovery_method => "mc", :filter => {"identity" => ["foo"], "agent" => []}, :config => "/nonexisting"}})
           client.discover
-          client.instance_variable_get("@discovered_agents").should == ["foo"]
-          client.instance_variable_get("@force_direct_request").should == true
+          expect(client.instance_variable_get("@discovered_agents")).to eq(["foo"])
+          expect(client.instance_variable_get("@force_direct_request")).to eq(true)
         end
 
         it "should not set direct mode if its disabled" do
@@ -1019,8 +1019,8 @@ module MCollective
           client = Client.new("foo", {:options => {:discovery_method => "mc", :filter => {"identity" => ["foo"], "agent" => []}, :config => "/nonexisting"}})
 
           client.discover
-          client.instance_variable_get("@force_direct_request").should == false
-          client.instance_variable_get("@discovered_agents").should == ["foo"]
+          expect(client.instance_variable_get("@force_direct_request")).to eq(false)
+          expect(client.instance_variable_get("@discovered_agents")).to eq(["foo"])
         end
 
         it "should not set direct mode for regex identities" do
@@ -1035,8 +1035,8 @@ module MCollective
           }, 2).once.returns(["foo"])
 
           rpcclient.discover
-          rpcclient.instance_variable_get("@force_direct_request").should == false
-          rpcclient.instance_variable_get("@discovered_agents").should == ["foo"]
+          expect(rpcclient.instance_variable_get("@force_direct_request")).to eq(false)
+          expect(rpcclient.instance_variable_get("@discovered_agents")).to eq(["foo"])
         end
 
         it "should print status to stderr if in verbose mode" do
@@ -1207,7 +1207,7 @@ module MCollective
 
           rpcclient.instance_variable_set("@force_direct_request", true)
           rpcclient.discover
-          rpcclient.instance_variable_get("@force_direct_request").should == false
+          expect(rpcclient.instance_variable_get("@force_direct_request")).to eq(false)
         end
 
         it "should store discovered nodes in stats" do
@@ -1229,7 +1229,7 @@ module MCollective
           }, 2).returns(["foo"])
 
           rpcclient.discover
-          rpcclient.stats.discovered_nodes.should == ["foo"]
+          expect(rpcclient.stats.discovered_nodes).to eq(["foo"])
         end
 
         it "should save discovered nodes in RPC" do
@@ -1265,14 +1265,14 @@ module MCollective
         end
 
         it "should return true when batch_mode should be set" do
-          rpcclient.send(:determine_batch_mode, "1").should == true
-          rpcclient.send(:determine_batch_mode, 1).should == true
-          rpcclient.send(:determine_batch_mode, "1%").should == true
+          expect(rpcclient.send(:determine_batch_mode, "1")).to eq(true)
+          expect(rpcclient.send(:determine_batch_mode, 1)).to eq(true)
+          expect(rpcclient.send(:determine_batch_mode, "1%")).to eq(true)
         end
 
         it "should return false when batch_mode shouldn't be set" do
-          rpcclient.send(:determine_batch_mode, "0").should == false
-          rpcclient.send(:determine_batch_mode, 0).should == false
+          expect(rpcclient.send(:determine_batch_mode, "0")).to eq(false)
+          expect(rpcclient.send(:determine_batch_mode, 0)).to eq(false)
         end
       end
 
@@ -1288,19 +1288,19 @@ module MCollective
         it "should fail when batch size is an invalid string" do
           expect {
             rpcclient.send(:validate_batch_size, "foo")
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
 
         it "should fail when batch size is 0%" do
           expect {
             rpcclient.send(:validate_batch_size, "0%")
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
 
         it "should fail when batch size is not a valid string or integer" do
           expect {
             rpcclient.send(:validate_batch_size, true)
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
       end
     end

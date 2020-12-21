@@ -16,7 +16,7 @@ module MCollective
         end
 
         it "should use a simple string list" do
-          Stdin.discover(Util.empty_filter, 0, 0, @client).should == ["one", "two"]
+          expect(Stdin.discover(Util.empty_filter, 0, 0, @client)).to eq(["one", "two"])
         end
 
         ['auto', 'json', 'text', nil].each do |type|
@@ -31,15 +31,15 @@ module MCollective
 
         it "should work for JSON data" do
           STDIN.stubs(:read).with().returns('[{"sender":"example.com"},{"sender":"another.com"}]')
-          Stdin.discover(Util.empty_filter, 0, 0, @client).should == ["example.com", "another.com"]
+          expect(Stdin.discover(Util.empty_filter, 0, 0, @client)).to eq(["example.com", "another.com"])
         end
 
         it "should regex filters" do
-          Stdin.discover(Util.empty_filter.merge("identity" => [/one/]), 0, 0, @client).should == ["one"]
+          expect(Stdin.discover(Util.empty_filter.merge("identity" => [/one/]), 0, 0, @client)).to eq(["one"])
         end
 
         it "should filter against non regex nodes" do
-          Stdin.discover(Util.empty_filter.merge("identity" => ["one"]), 0, 0, @client).should == ["one"]
+          expect(Stdin.discover(Util.empty_filter.merge("identity" => ["one"]), 0, 0, @client)).to eq(["one"])
         end
 
         it "should fail for invalid identities" do
