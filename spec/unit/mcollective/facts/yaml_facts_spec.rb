@@ -51,13 +51,13 @@ module MCollective
         it 'should return true if the mtime has changed' do
           @facts.instance_variable_get(:@yaml_file_mtimes)['facts.yaml'] = 1234
           @stat.stubs(:mtime).returns(1235)
-          @facts.force_reload?.should be_true
+          @facts.force_reload?.should be_truthy
         end
 
         it 'should return false if the mtime is the same' do
           @facts.instance_variable_get(:@yaml_file_mtimes)['facts.yaml'] = 1234
           @stat.stubs(:mtime).returns(1234)
-          @facts.force_reload?.should be_false
+          @facts.force_reload?.should be_falsey
         end
       end
     end

@@ -93,8 +93,8 @@ module MCollective
       end
 
       it "should run the command" do
-        Shell.any_instance.stubs("systemu").returns(@systemu).once.with("date", "stdout" => '', "stderr" => '', "env" => {"LC_ALL" => "C"}, 'cwd' => Dir.tmpdir)
         s = Shell.new("date")
+        s.stubs("systemu").returns(@systemu).once.with("date", "stdout" => '', "stderr" => '', "env" => {"LC_ALL" => "C"}, 'cwd' => Dir.tmpdir)
         s.runcommand
       end
 
@@ -164,7 +164,7 @@ module MCollective
 
       it "should quietly catch Errno::ESRCH if the systemu process has completed" do
         s = Shell.new("echo foo")
-        Thread.any_instance.stubs(:alive?).raises(Errno::ESRCH)
+        Thread.current.stubs(:alive?).raises(Errno::ESRCH)
         s.runcommand
       end
 

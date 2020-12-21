@@ -61,7 +61,7 @@ module MCollective
     end
 
     describe '#contains_ouput?' do
-      before :all do
+      before :each do
         Aggregate.any_instance.stubs(:create_functions)
         @aggregate = Aggregate.new(ddl)
       end
@@ -148,7 +148,7 @@ module MCollective
     end
 
     describe '#load_function' do
-      before :all do
+      before :each do
         Aggregate.any_instance.stubs(:create_functions)
         @aggregate = Aggregate.new(ddl)
       end

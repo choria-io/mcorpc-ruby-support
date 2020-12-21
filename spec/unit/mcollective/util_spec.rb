@@ -57,18 +57,13 @@ module MCollective
       end
 
       it "should support regular expression searches" do
-        File.stubs(:readlines).returns(["test_class_test"])
-        String.any_instance.expects(:start_with?).with("/").returns(true)
-        String.any_instance.expects(:match).with(Regexp.new("class")).returns(true)
-
+        tc = "test_class_test"
+        File.stubs(:readlines).returns([tc])
         Util.has_cf_class?("/class/").should == true
       end
 
       it "should support exact string matches" do
         File.stubs(:readlines).returns(["test_class_test"])
-        String.any_instance.expects(:start_with?).with("/").returns(false)
-        String.any_instance.expects(:match).with(Regexp.new("test_class_test")).never
-
         Util.has_cf_class?("test_class_test").should == true
       end
 
@@ -141,14 +136,14 @@ module MCollective
         subs1 = {:agent => "test_agent", :type => "test_type", :collective => "test_collective"}
         subs2 = {:agent => "test_agent2", :type => "test_type2", :collective => "test_collective2"}
 
-        MCollective::Connector::Stomp.any_instance.expects(:subscribe).with("test_agent", "test_type", "test_collective").once
-        MCollective::Connector::Stomp.any_instance.expects(:subscribe).with("test_agent2", "test_type2", "test_collective2").once
+        MCollective::PluginManager["connector_plugin"].expects(:subscribe).with("test_agent", "test_type", "test_collective").once
+        MCollective::PluginManager["connector_plugin"].expects(:subscribe).with("test_agent2", "test_type2", "test_collective2").once
 
         Util.subscribe([subs1, subs2])
       end
 
       it "should subscribe to a single topic given a hash" do
-        MCollective::Connector::Stomp.any_instance.expects(:subscribe).with("test_agent", "test_type", "test_collective").once
+        MCollective::PluginManager["connector_plugin"].expects(:subscribe).with("test_agent", "test_type", "test_collective").once
         Util.subscribe({:agent => "test_agent", :type => "test_type", :collective => "test_collective"})
       end
     end
@@ -157,14 +152,14 @@ module MCollective
       it "should unsubscribe to multiple topics given an Array" do
         subs1 = {:agent => "test_agent", :type => "test_type", :collective => "test_collective"}
         subs2 = {:agent => "test_agent2", :type => "test_type2", :collective => "test_collective2"}
-        MCollective::Connector::Stomp.any_instance.expects(:unsubscribe).with("test_agent", "test_type", "test_collective").once
-        MCollective::Connector::Stomp.any_instance.expects(:unsubscribe).with("test_agent2", "test_type2", "test_collective2").once
+        MCollective::PluginManager["connector_plugin"].expects(:unsubscribe).with("test_agent", "test_type", "test_collective").once
+        MCollective::PluginManager["connector_plugin"].expects(:unsubscribe).with("test_agent2", "test_type2", "test_collective2").once
 
         Util.unsubscribe([subs1, subs2])
       end
 
       it "should subscribe to a single topic given a hash" do
-        MCollective::Connector::Stomp.any_instance.expects(:unsubscribe).with("test_agent", "test_type", "test_collective").once
+        MCollective::PluginManager["connector_plugin"].expects(:unsubscribe).with("test_agent", "test_type", "test_collective").once
         Util.unsubscribe({:agent => "test_agent", :type => "test_type", :collective => "test_collective"})
       end
     end
@@ -667,7 +662,7 @@ module MCollective
 
       it "should correctly validate paths on Windows" do
         ['C:\foo', '\foo\bar', '\C\FOO\Bar', '/C/FOO/Bar'].each do |path|
-          Util.absolute_path?(path, '/', '\\').should be_true
+          Util.absolute_path?(path, '/', '\\').should be_truthy
         end
       end
     end
@@ -685,13 +680,13 @@ module MCollective
     describe "str_to_bool" do
       it "should transform true like strings into TrueClass" do
         ["1", "y", "yes", "Y", "YES", "t", "true", "T", "TRUE", true].each do |val|
-          Util.str_to_bool(val).should be_true
+          Util.str_to_bool(val).should be_truthy
         end
       end
 
       it "should transform false like strings into FalseClass" do
         ["0", "n", "no", "N", "NO", "f", "false", "F", "FALSE", false].each do |val|
-          Util.str_to_bool(val).should be_false
+          Util.str_to_bool(val).should be_falsey
         end
       end
 

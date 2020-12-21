@@ -161,7 +161,7 @@ module MCollective
       it "should skip files that do not match the expected filename pattern" do
         Dir.expects(:new).with(@plugindir).returns(["foo.txt"])
 
-        IO.expects(:open).with(File.join(@plugindir, "foo.txt")).never
+        File.expects(:open).with(File.join(@plugindir, "foo.txt")).never
 
         Config.instance.read_plugin_config_dir(@plugindir)
       end

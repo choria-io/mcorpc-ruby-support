@@ -4,8 +4,6 @@ gem 'mocha'
 
 require 'rspec'
 require 'mcollective'
-require 'rspec/mocks'
-require 'mocha'
 require 'ostruct'
 require 'tmpdir'
 require 'tempfile'
@@ -15,10 +13,11 @@ require 'mcollective/test'
 require 'monkey_patches/instance_variable_defined'
 
 RSpec.configure do |config|
-  config.mock_with :mocha
+  config.mock_with(:mocha)
+  config.mock_framework = :mocha
   config.include(MCollective::Test::Matchers)
 
-  config.before :each do
+  config.before :each do |example|
     MCollective::Config.instance.set_config_defaults("")
     MCollective::PluginManager.clear
   end
