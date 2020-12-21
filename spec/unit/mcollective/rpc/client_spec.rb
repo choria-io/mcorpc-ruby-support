@@ -1288,19 +1288,19 @@ module MCollective
         it "should fail when batch size is an invalid string" do
           expect {
             rpcclient.send(:validate_batch_size, "foo")
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
 
         it "should fail when batch size is 0%" do
           expect {
             rpcclient.send(:validate_batch_size, "0%")
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
 
         it "should fail when batch size is not a valid string or integer" do
           expect {
             rpcclient.send(:validate_batch_size, true)
-          }.to raise_error
+          }.to raise_error("batch_size must be an integer or match a percentage string (e.g. '24%'")
         end
       end
     end

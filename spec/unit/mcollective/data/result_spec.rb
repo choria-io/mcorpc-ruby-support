@@ -25,7 +25,7 @@ module MCollective
 
       describe "#[]=" do
         it "should only allow trusted types of data to be saved" do
-          expect { @result["rspec"] = Time.now }.to raise_error
+          expect { @result["rspec"] = Time.now }.to raise_error("Can only store String, Integer, Float or Boolean data but got Time for key rspec")
           @result["rspec"] = 1
           @result["rspec"] = 1.1
           @result["rspec"] = "rspec"

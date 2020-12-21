@@ -58,7 +58,7 @@ module MCollective
       end
 
       it "should raise errors for invalid values" do
-        expect { DDL.string_to_number("rspec") }.to raise_error
+        expect { DDL.string_to_number("rspec") }.to raise_error("rspec does not look like a number")
       end
     end
 
@@ -76,9 +76,8 @@ module MCollective
       end
 
       it "should raise errors for invalid values" do
-        expect { DDL.string_to_boolean("rspec") }.to raise_error
+        expect { DDL.string_to_boolean("rspec") }.to raise_error("rspec does not look like a boolean argument")
       end
     end
-
   end
 end
