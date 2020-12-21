@@ -29,5 +29,5 @@ end
 desc "Run spec tests"
 task :test do
   sh "bundle exec rubocop --config .rubocop.yml lib"
-  sh "bundle exec rspec --colour --backtrace"
+  sh "bundle exec rspec"
 end
