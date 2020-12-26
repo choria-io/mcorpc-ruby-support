@@ -14,7 +14,9 @@ module MCollective
         expect(Application.application_options).to eq({:description          => nil,
                                                    :usage                => [],
                                                    :cli_arguments        => [],
-                                                   :exclude_arg_sections => []})
+                                                   :exclude_arg_sections => [],
+                                                   :external => nil,
+                                                   :external_help => nil})
       end
     end
 
@@ -36,7 +38,9 @@ module MCollective
         expect(Application.intialize_application_options).to eq({:description          => nil,
                                                              :usage                => [],
                                                              :cli_arguments        => [],
-                                                             :exclude_arg_sections => []})
+                                                             :exclude_arg_sections => [],
+                                                             :external => nil,
+                                                             :external_help => nil})
       end
     end
 

@@ -1,8 +1,8 @@
 AllCops:
+  TargetRubyVersion: "2.4"
   DisplayCopNames: true
   DisplayStyleGuide: true
   SuggestExtensions: false
-  TargetRubyVersion: 2.4
   Exclude:
     - "module/**/*"
     - "vendor/**/*"

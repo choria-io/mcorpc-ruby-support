@@ -31,6 +31,24 @@ module MCollective
         self[:description] = descr
       end
 
+      # Executes an external program instead of implement the logic in ruby
+      #
+      # @param [Hash] command the command to run
+      # @option command [String] :command the command to run
+      # @option command [Array] :args arguments to pass to the command
+      def external(command)
+        self[:external] = command
+      end
+
+      # Executes an external program to show help instead of supplying options
+      #
+      # @param [Hash] command the command to run
+      # @option command [String] :command the command to run
+      # @option command [Array] :args arguments to pass to the command
+      def external_help(command)
+        self[:external_help] = command
+      end
+
       # Supplies usage information, calling multiple times will
       # create multiple usage lines in --help output
       def usage(usage)
@@ -82,7 +100,9 @@ module MCollective
         @application_options = {:description => nil,
                                 :usage => [],
                                 :cli_arguments => [],
-                                :exclude_arg_sections => []}
+                                :exclude_arg_sections => [],
+                                :external => nil,
+                                :external_help => nil}
       end
     end
 
@@ -267,7 +287,14 @@ module MCollective
       exit 1
     end
 
+    def external_help
+      ext = application_options[:external_help]
+      exec(ext[:command], ext[:args])
+    end
+
     def help
+      return external_help if application_options[:external_help]
+
       application_parse_options(true)
     end
 
@@ -275,6 +302,8 @@ module MCollective
     # the main as supplied by the user.  Disconnects when done and pass any exception
     # onto the application_failure helper
     def run
+      return external_main if application_options[:external]
+
       application_parse_options
 
       validate_configuration(configuration) if respond_to?(:validate_configuration)
@@ -291,6 +320,14 @@ module MCollective
     def disconnect
       MCollective::PluginManager["connector_plugin"].disconnect
     rescue # rubocop:disable Lint/SuppressedException
+    end
+
+    def external_main
+      ext = application_options[:external]
+      args = ext[:args] || []
+      args.concat(ARGV)
+
+      exec(ext[:command], *args)
     end
 
     # Fake abstract class that logs if the user tries to use an application without
