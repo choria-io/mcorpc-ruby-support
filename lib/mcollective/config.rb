@@ -146,7 +146,6 @@ module MCollective
           PluginManager.loadclass("Mcollective::Facts::#{@factsource}_facts")
           PluginManager.loadclass("Mcollective::Connector::#{@connector}")
           PluginManager.loadclass("Mcollective::Security::#{@securityprovider}")
-          PluginManager << {:type => "global_stats", :class => RunnerStats.new}
         end
 
         Log.info("The Marionette Collective version #{MCollective::VERSION} started by #{$0} using config file #{configfile}")
@@ -156,7 +155,6 @@ module MCollective
     end
 
     def set_config_defaults(configfile) # rubocop:disable Naming/AccessorMethodName
-      @stomp = {}
       @subscribe = []
       @pluginconf = {}
       @connector = "base"

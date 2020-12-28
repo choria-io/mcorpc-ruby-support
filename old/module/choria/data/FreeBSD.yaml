@@ -1,3 +1,0 @@
----
-mcollective_choria::config:
-  tasks.wrapper_path: /usr/local/bin/task_wrapper

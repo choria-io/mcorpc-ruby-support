@@ -11,14 +11,11 @@ module MCollective
         @config.stubs(:configured).returns(true)
         @config.stubs(:topicsep).returns(".")
 
-        @stats = mock("stats")
-
         @time = Time.now
         ::Time.stubs(:now).returns(@time)
 
         MCollective::Log.stubs(:debug).returns(true)
 
-        MCollective::PluginManager << {:type => "global_stats", :class => @stats}
         MCollective::Config.stubs("instance").returns(@config)
         MCollective::Util.stubs("empty_filter?").returns(false)
 
@@ -49,10 +46,6 @@ module MCollective
         it "should pass on empty filter" do
           MCollective::Util.stubs("empty_filter?").returns(true)
 
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
-          @stats.stubs(:passed).never
-
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
 
           expect(@plugin.validate_filter?({})).to eq(true)
@@ -60,9 +53,6 @@ module MCollective
 
         it "should pass for known classes" do
           MCollective::Util.stubs("has_cf_class?").with("foo").returns(true)
-
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
 
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on configuration management class foo").once
@@ -73,9 +63,6 @@ module MCollective
         it "should fail for unknown classes" do
           MCollective::Util.stubs("has_cf_class?").with("foo").returns(false)
 
-          @stats.stubs(:filtered).once
-          @stats.stubs(:passed).never
-
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on configuration management class foo").once
 
@@ -84,9 +71,6 @@ module MCollective
 
         it "should pass for known agents" do
           MCollective::Util.stubs("has_agent?").with("foo").returns(true)
-
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
 
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on agent foo").once
@@ -97,9 +81,6 @@ module MCollective
         it "should fail for unknown agents" do
           MCollective::Util.stubs("has_agent?").with("foo").returns(false)
 
-          @stats.stubs(:filtered).once
-          @stats.stubs(:passed).never
-
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on agent foo").once
 
@@ -108,9 +89,6 @@ module MCollective
 
         it "should pass for known facts" do
           MCollective::Util.stubs("has_fact?").with("fact", "value", "operator").returns(true)
-
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
 
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on fact fact operator value").once
@@ -121,9 +99,6 @@ module MCollective
         it "should fail for unknown facts" do
           MCollective::Util.stubs("has_fact?").with("fact", "value", "operator").returns(false)
 
-          @stats.stubs(:filtered).once
-          @stats.stubs(:passed).never
-
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failing based on fact fact operator value").once
 
@@ -133,9 +108,6 @@ module MCollective
         it "should pass for known identity" do
           MCollective::Util.stubs("has_identity?").with("test").returns(true)
 
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
-
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on identity").once
 
@@ -144,9 +116,6 @@ module MCollective
 
         it "should fail for known identity" do
           MCollective::Util.stubs("has_identity?").with("test").returns(false)
-
-          @stats.stubs(:passed).never
-          @stats.stubs(:filtered).once
 
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failed based on identity").once
@@ -158,9 +127,6 @@ module MCollective
           MCollective::Util.stubs("has_identity?").with("foo").returns(false)
           MCollective::Util.stubs("has_identity?").with("bar").returns(true)
 
-          @stats.stubs(:passed).once
-          @stats.stubs(:filtered).never
-
           MCollective::Log.expects(:debug).with("Message passed the filter checks").once
           MCollective::Log.expects(:debug).with("Passing based on identity").once
 
@@ -170,9 +136,6 @@ module MCollective
         it "should fail if no identity matches are found" do
           MCollective::Util.stubs("has_identity?").with("foo").returns(false)
           MCollective::Util.stubs("has_identity?").with("bar").returns(false)
-
-          @stats.stubs(:passed).never
-          @stats.stubs(:filtered).once
 
           MCollective::Log.expects(:debug).with("Message failed the filter checks").once
           MCollective::Log.expects(:debug).with("Failed based on identity").once

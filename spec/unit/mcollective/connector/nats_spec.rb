@@ -10,6 +10,7 @@ module MCollective
     let(:msg) { Message.new(Base64.encode64("rspec"), mock, :base64 => true, :headers => {}, :requestid => "rspec.req.id") }
 
     before(:each) do
+      Client.reset_request_sequence
       connector.stubs(:current_time).returns(Time.at(1466589505))
       connector.stubs(:current_pid).returns(999999)
 

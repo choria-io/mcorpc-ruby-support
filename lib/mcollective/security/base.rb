@@ -25,7 +25,6 @@ module MCollective
     # that takes care of encoding the core requirements.  The best place to see how security
     # works is by looking at the provided MCollective::Security::PSK plugin.
     class Base
-      attr_reader :stats
       attr_accessor :initiated_by
 
       # Register plugins that inherits base
@@ -39,7 +38,6 @@ module MCollective
       def initialize
         @config = Config.instance
         @log = Log
-        @stats = PluginManager["global_stats"]
       end
 
       # Takes a Hash with a filter in it and validates it against host information.
@@ -153,13 +151,9 @@ module MCollective
         if failed == 0 && passed > 0
           Log.debug("Message passed the filter checks")
 
-          @stats.passed
-
           true
         else
           Log.debug("Message failed the filter checks")
-
-          @stats.filtered
 
           false
         end

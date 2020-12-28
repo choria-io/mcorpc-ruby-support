@@ -413,11 +413,6 @@ module MCollective
       end
 
       it "should not validate for messages older than TTL" do
-        stats = mock
-        stats.expects(:ttlexpired).once
-
-        MCollective::PluginManager << {:type => "global_stats", :class => stats}
-
         m = Message.new({:callerid => "caller", :senderid => "sender"}, "message",
                         {:type => :request, :collective => 'collective',
                          :agent => 'rspecagent', :requestid => '1234'})

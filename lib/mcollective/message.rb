@@ -213,11 +213,7 @@ module MCollective
 
       msg_age = Time.now.utc.to_i - msgtime
 
-      if msg_age > ttl
-        PluginManager["global_stats"].ttlexpired
-        raise(MsgTTLExpired, "Message #{description} created at #{msgtime} is #{msg_age} seconds old, TTL is #{ttl}. Rejecting message.")
-      end
-
+      raise(MsgTTLExpired, "Message #{description} created at #{msgtime} is #{msg_age} seconds old, TTL is #{ttl}. Rejecting message.") if msg_age > ttl
       raise(NotTargettedAtUs, "Message #{description} does not pass filters. Ignoring message.") unless PluginManager["security_plugin"].validate_filter?(payload[:filter])
 
       @validated = true

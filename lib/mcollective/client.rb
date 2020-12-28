@@ -44,6 +44,10 @@ module MCollective
 
     @@request_sequence = 0 # rubocop:disable Style/ClassVars
 
+    def self.reset_request_sequence
+      @@request_sequence = 0 # rubocop:disable Style/ClassVars
+    end
+
     def self.request_sequence
       @@request_sequence
     end
