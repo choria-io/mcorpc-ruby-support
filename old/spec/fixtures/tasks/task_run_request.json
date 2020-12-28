@@ -1,0 +1,18 @@
+{
+  "task": "choria::ls",
+  "input_method": "stdin",
+  "input": "{\"directory\": \"/tmp\"}",
+  "files": [
+    {
+      "filename": "ls.rb",
+      "sha256": "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede",
+      "size_bytes": 149,
+      "uri": {
+        "path": "/puppet/v3/file_content/tasks/choria/ls.rb",
+        "params": {
+          "environment": "production"
+        }
+      }
+    }
+  ]
+}
