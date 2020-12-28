@@ -2,6 +2,16 @@ require 'rubygems'
 
 gem 'mocha'
 
+if ENV["CI"] == "true"
+  require "simplecov"
+  require "coveralls"
+
+  SimpleCov.formatter = Coveralls::SimpleCov::Formatter
+  SimpleCov.start do
+    add_filter "spec"
+  end
+end
+
 require 'rspec'
 require 'mcollective'
 require 'ostruct'
@@ -9,6 +19,8 @@ require 'tmpdir'
 require 'tempfile'
 require 'fileutils'
 require 'mcollective/test'
+require "json-schema-rspec"
+require "webmock/rspec"
 
 require 'monkey_patches/instance_variable_defined'
 
@@ -19,7 +31,13 @@ RSpec.configure do |config|
 
   config.before :each do |example|
     MCollective::Config.instance.set_config_defaults("")
+    MCollective::Config.instance.instance_variable_set("@identity", "rspec_identity")
     MCollective::PluginManager.clear
+    MCollective::Connector::Base.stubs(:inherited)
+    MCollective::Log.stubs(:error)
+    MCollective::Log.stubs(:warn)
+    MCollective::Log.stubs(:info)
+    MCollective::Log.stubs(:debug)
   end
 end
 

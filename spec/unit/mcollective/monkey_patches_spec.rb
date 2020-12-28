@@ -4,7 +4,7 @@ require 'mcollective/monkey_patches'
 
 describe OpenSSL::SSL::SSLContext do
   it 'sets parameters on initialization' do
-    described_class.any_instance.expects(:set_params)
+    described_class.any_instance.expects(:set_params).at_least_once
     subject
   end
 

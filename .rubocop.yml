@@ -157,3 +157,6 @@ Style/RescueStandardError:
 
 Style/OptionalBooleanParameter:
   Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false

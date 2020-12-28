@@ -7,7 +7,7 @@ module MCollective
         @result[:type] = :collection
 
         # set default aggregate_format if it is undefined
-        @aggregate_format ||= :calculate # rubocop:disable Naming/MemoizedInstanceVariableName
+        @aggregate_format ||= :calculate
       end
 
       # Increments the value field if value has been seen before

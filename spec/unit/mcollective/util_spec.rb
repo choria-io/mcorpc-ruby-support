@@ -2,14 +2,14 @@
 
 require 'spec_helper'
 
-class MCollective::Connector::Stomp<MCollective::Connector::Base; end
+class MCollective::Connector::Rspec<MCollective::Connector::Base; end
 
 module MCollective
   describe Util do
     before do
-
+      @connector = MCollective::Connector::Rspec.new
       PluginManager.clear
-      PluginManager << {:type => "connector_plugin", :class => MCollective::Connector::Stomp.new}
+      PluginManager << {:type => "connector_plugin", :class => @connector}
     end
 
     describe "#windows?" do
@@ -136,8 +136,8 @@ module MCollective
         subs1 = {:agent => "test_agent", :type => "test_type", :collective => "test_collective"}
         subs2 = {:agent => "test_agent2", :type => "test_type2", :collective => "test_collective2"}
 
-        MCollective::PluginManager["connector_plugin"].expects(:subscribe).with("test_agent", "test_type", "test_collective").once
-        MCollective::PluginManager["connector_plugin"].expects(:subscribe).with("test_agent2", "test_type2", "test_collective2").once
+        @connector.expects(:subscribe).with("test_agent", "test_type", "test_collective").once
+        @connector.expects(:subscribe).with("test_agent2", "test_type2", "test_collective2").once
 
         Util.subscribe([subs1, subs2])
       end
