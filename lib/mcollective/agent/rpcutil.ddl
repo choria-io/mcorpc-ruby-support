@@ -3,8 +3,8 @@ metadata    :name        => "rpcutil",
             :author      => "R.I.Pienaar <rip@devco.net>",
             :license     => "Apache License, Version 2.0",
             :version     => "0.19.0",
-            :url         => "https://docs.puppetlabs.com/mcollective/",
-            :timeout     => 10
+            :url         => "https://choria.io/",
+            :timeout     => 2
 
 action "collective_info", :description => "Info about the main and sub collectives" do
     display :always
