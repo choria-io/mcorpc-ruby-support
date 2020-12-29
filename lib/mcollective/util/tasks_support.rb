@@ -250,8 +250,9 @@ module MCollective
       # @param environment [Hash] environment to run with
       # @param stdin [String] stdin to send to the command
       # @param spooldir [String] path to the spool for this specific request
+      # @param run_as [String] name of the user who will run the command
       # @return [Integer] the pid that was spawned
-      def spawn_command(command, environment, stdin, spooldir)
+      def spawn_command(command, environment, stdin, spooldir, run_as)
         wrapper_input = File.join(spooldir, "wrapper_stdin")
         wrapper_stdout = File.join(spooldir, "wrapper_stdout")
         wrapper_stderr = File.join(spooldir, "wrapper_stderr")
@@ -269,7 +270,24 @@ module MCollective
           options[:in] = wrapper_input
         end
 
-        pid = Process.spawn(environment, command, options)
+        if run_as
+          raise("System does not allow forking.  run_as not usable.") unless Process.respond_to?(:fork)
+
+          require "etc"
+
+          u = Etc.getpwnam(run_as)
+
+          FileUtils.chown_R(u.uid, u.gid, spooldir)
+
+          pid = Process.fork
+          if pid.nil?
+            Process.gid = Process.egid = u.gid
+            Process.uid = Process.euid = u.uid
+            Process.exec(environment, command, options)
+          end
+        else
+          pid = Process.spawn(environment, command, options)
+        end
 
         sleep 0.1 until File.exist?(wrapper_stdout)
 
@@ -353,7 +371,7 @@ module MCollective
           meta.print(data.to_json)
         end
 
-        pid = spawn_command(wrapper_path, task_environment(task, requestid, callerid), wrapper_input.to_json, spool)
+        pid = spawn_command(wrapper_path, task_environment(task, requestid, callerid), wrapper_input.to_json, spool, task["run_as"])
 
         Log.info("Spawned task %s in spool %s with pid %s" % [task["task"], spool, pid])
 
