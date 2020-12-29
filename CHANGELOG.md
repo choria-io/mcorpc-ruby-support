@@ -1,5 +1,11 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/12/29|      |Release 2.23.0                                                                                           |
+|2020/12/27|85    |update `mco choria` to `choria rpc`                                                                      |
+|2020/12/26|83    |Update `mco ping` to call `choria ping`                                                                  |
+|2020/12/26|83    |Support calling an external binary - like choria - for application plugins                               |
+|2020/12/15|63    |Use `choria` in paths for Windows file locations                                                         |
+|2020/12/15|75    |Do not raise issues for unsupport config options when parsing server config                              |
 |2020/11/25|      |Release 2.22.1                                                                                           |
 |2020/10/22|72    |Do not parse registration related settings                                                               |
 |2020/07/07|      |Release 2.22.0                                                                                           |
