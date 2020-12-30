@@ -10,25 +10,9 @@ module MCollective
 
      show_config  - shows the active configuration parameters
 
-  The environment is chosen using --environment and the concurrent
-  runs may be limited using --batch.
-
-  The batching works a bit different than typical, it will only batch
-  based on a sorted list of certificate names, this means the batches
-  will always run in predictable order.
       USAGE
 
       exclude_argument_sections "common", "filter", "rpc"
-
-      option :ca,
-             :arguments => ["--ca SERVER"],
-             :description => "Address of your Puppet CA",
-             :type => String
-
-      option :certname,
-             :arguments => ["--certname CERTNAME"],
-             :description => "Override the default certificate name",
-             :type => String
 
       def post_option_parser(configuration)
         if ARGV.length >= 1
@@ -36,8 +20,6 @@ module MCollective
         else
           abort("Please specify a command, valid commands are: %s" % valid_commands.join(", "))
         end
-
-        ENV["MCOLLECTIVE_CERTNAME"] = configuration[:certname] if configuration[:certname]
       end
 
       # Validates the configuration
@@ -47,10 +29,6 @@ module MCollective
         Util.loadclass("MCollective::Util::Choria")
 
         abort("Unknown command %s, valid commands are: %s" % [configuration[:command], valid_commands.join(", ")]) unless valid_commands.include?(configuration[:command])
-
-        if !choria.has_client_public_cert? && !["request_cert", "show_config"].include?(configuration[:command])
-          abort("A certificate is needed from the Puppet CA for `%s`, please use the `request_cert` command" % choria.certname)
-        end
       end
 
       def main
@@ -59,6 +37,14 @@ module MCollective
         warn("Encountered a critical error: %s" % Util.colorize(:red, $!.to_s))
       rescue Util::Choria::Abort
         exit(1)
+      end
+
+      # Requests a certificate from the CA
+      #
+      # @return [void]
+      def request_cert_command
+        puts("Please use 'choria enroll' to enroll in the security subsystem")
+        raise(Util::Choria::Abort, "1")
       end
 
       def show_config_command # rubocop:disable Metrics/MethodLength
@@ -128,7 +114,7 @@ module MCollective
         if valid_ssl
           puts "     Valid SSL Setup: %s" % [Util.colorize(:green, "yes")]
         else
-          puts "     Valid SSL Setup: %s try running 'mco choria request_cert'" % [Util.colorize(:red, "no")]
+          puts "     Valid SSL Setup: %s try running 'choria enroll'" % [Util.colorize(:red, "no")]
         end
 
         puts "   Security Provider: %s" % [choria.security_provider]

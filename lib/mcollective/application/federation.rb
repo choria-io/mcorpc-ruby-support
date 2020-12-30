@@ -217,9 +217,7 @@ The ACTION can be one of the following:
 
         abort("Unknown command %s, valid commands are: %s" % [configuration[:command], valid_commands.join(", ")]) unless valid_commands.include?(configuration[:command])
 
-        if !choria.has_client_public_cert? && !["request_cert", "show_config"].include?(configuration[:command])
-          abort("A certificate is needed from the Puppet CA for `%s`, please use the `request_cert` command" % choria.certname)
-        end
+        abort("A certificate is needed from the Puppet CA for `%s`, please use the `choria enroll` command" % choria.certname) unless choria.has_client_public_cert?
       end
 
       def main
