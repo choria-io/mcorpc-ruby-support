@@ -86,14 +86,6 @@ module MCollective
         end
       end
 
-      # Which port to provide stats over HTTP on
-      #
-      # @return [Integer,nil]
-      # @raise [StandardError] when not numeric
-      def stats_port
-        Integer(get_option("choria.stats_port", "")) if has_option?("choria.stats_port")
-      end
-
       # Determines if there are any federations configured
       #
       # @return [Boolean]
@@ -888,15 +880,6 @@ module MCollective
         File.exist?(csr_path)
       end
 
-      # The formatted string representation of the CSR fingerprint
-      #
-      # @return [String]
-      def csr_fingerprint
-        require "puppet"
-        csr = OpenSSL::X509::Request.new(File.read(csr_path))
-        Puppet::SSL::Digest.new(nil, csr.to_der)
-      end
-
       # Searches the PATH for an executable command
       #
       # @param command [String] a command to search for
@@ -925,146 +908,6 @@ module MCollective
         return "/opt/puppetlabs/bin/facter" if File.executable?("/opt/puppetlabs/bin/facter")
 
         which("facter")
-      end
-
-      # Creates any missing SSL directories
-      #
-      # This prepares a Puppet like SSL tree in case Puppet
-      # has not been initialized yet
-      #
-      # @return [void]
-      def make_ssl_dirs
-        return if file_security?
-
-        FileUtils.mkdir_p(ssl_dir, :mode => 0o0771)
-
-        ["certificate_requests", "certs", "public_keys"].each do |dir|
-          FileUtils.mkdir_p(File.join(ssl_dir, dir), :mode => 0o0755)
-        end
-
-        ["private_keys", "private"].each do |dir|
-          FileUtils.mkdir_p(File.join(ssl_dir, dir), :mode => 0o0750)
-        end
-      end
-
-      # Creates a RSA key of a certain strenth
-      #
-      # @return [OpenSSL::PKey::RSA]
-      def create_rsa_key(bits)
-        OpenSSL::PKey::RSA.new(bits)
-      end
-
-      # Writes a new 4096 bit key in the puppet default locatioj
-      #
-      # @return [OpenSSL::PKey::RSA]
-      # @raise [StandardError] when the key already exist
-      def write_key
-        raise("Refusing to overwrite existing key in %s" % client_private_key) if has_client_private_key?
-
-        key = create_rsa_key(4096)
-        File.open(client_private_key, "w", 0o0640) {|f| f.write(key.to_pem)}
-
-        key
-      end
-
-      # Creates a basic CSR
-      #
-      # @return [OpenSSL::X509::Request] signed CSR
-      def create_csr(comonname, orgunit, key)
-        csr = OpenSSL::X509::Request.new
-        csr.version = 0
-        csr.public_key = key.public_key
-        csr.subject = OpenSSL::X509::Name.new(
-          [
-            ["CN", comonname, OpenSSL::ASN1::UTF8STRING],
-            ["OU", orgunit, OpenSSL::ASN1::UTF8STRING]
-          ]
-        )
-        csr.sign(key, OpenSSL::Digest.new("SHA1"))
-
-        csr
-      end
-
-      # Creates a new CSR signed by the given key
-      #
-      # @param key [OpenSSL::PKey::RSA]
-      # @return [String] PEM encoded CSR
-      def write_csr(key)
-        raise("Refusing to overwrite existing CSR in %s" % csr_path) if has_csr?
-
-        csr = create_csr(certname, "mcollective", key)
-
-        File.open(csr_path, "w", 0o0644) {|f| f.write(csr.to_pem)}
-
-        csr.to_pem
-      end
-
-      # Fetch and save the CA from Puppet
-      #
-      # @return [Boolean]
-      def fetch_ca
-        return true if has_ca?
-
-        server = puppetca_server
-
-        req = http_get("/puppet-ca/v1/certificate/ca?environment=production", "Accept" => "text/plain")
-        resp, _ = https(server).request(req)
-
-        if resp.code == "200"
-          File.open(ca_path, "w", 0o0644) {|f| f.write(resp.body)}
-        else
-          raise(UserError, "Failed to fetch CA from %s:%s: %s: %s" % [server[:target], server[:port], resp.code, resp.message])
-        end
-
-        has_ca?
-      end
-
-      # Requests a certificate from the Puppet CA
-      #
-      # This will attempt to create a new key, write a CSR and
-      # then sends it to the CA for signing
-      #
-      # @return [Boolean]
-      # @raise [UserError] when requesting the cert fails
-      def request_cert
-        key = write_key
-        csr = write_csr(key)
-
-        server = puppetca_server
-
-        req = Net::HTTP::Put.new("/puppet-ca/v1/certificate_request/%s?environment=production" % certname, "Content-Type" => "text/plain")
-        req.body = csr
-        resp, _ = https(server).request(req)
-
-        if resp.code == "200"
-          true
-        else
-          raise(UserError, "Failed to request certificate from %s:%s: %s: %s: %s" % [server[:target], server[:port], resp.code, resp.message, resp.body])
-        end
-      end
-
-      # Attempts to fetch a cert from the CA
-      #
-      # @return [Boolean]
-      def attempt_fetch_cert
-        return true if has_client_public_cert?
-
-        req = http_get("/puppet-ca/v1/certificate/%s?environment=production" % certname, "Accept" => "text/plain")
-        resp, _ = https(puppetca_server).request(req)
-
-        if resp.code == "200"
-          File.open(client_public_cert, "w", 0o0644) {|f| f.write(resp.body)}
-          true
-        else
-          false
-        end
-      end
-
-      # Determines if a CSR has been sent but not yet retrieved
-      #
-      # @return [Boolean]
-      def waiting_for_cert?
-        !has_client_public_cert? && has_client_private_key?
       end
 
       # Gets a config option
