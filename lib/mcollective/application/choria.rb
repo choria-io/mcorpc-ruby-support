@@ -8,7 +8,6 @@ module MCollective
 
   The ACTION can be one of the following:
 
-     request_cert - requests a certificate from the Puppet CA
      show_config  - shows the active configuration parameters
 
   The environment is chosen using --environment and the concurrent
@@ -60,51 +59,6 @@ module MCollective
         warn("Encountered a critical error: %s" % Util.colorize(:red, $!.to_s))
       rescue Util::Choria::Abort
         exit(1)
-      end
-
-      # Requests a certificate from the CA
-      #
-      # @return [void]
-      def request_cert_command
-        disconnect
-
-        raise(Util::Choria::UserError, "Cannot only request certificates in Puppet security mode") unless choria.puppet_security?
-
-        raise(Util::Choria::UserError, "Already have a certificate '%s', cannot request a new one" % choria.client_public_cert) if choria.has_client_public_cert?
-
-        choria.ca = configuration[:ca] if configuration[:ca]
-
-        certname = choria.client_public_cert
-
-        choria.make_ssl_dirs
-        choria.fetch_ca
-
-        if choria.waiting_for_cert?
-          puts("Certificate %s has already been requested, attempting to retrieve it" % certname)
-        else
-          puts("Requesting certificate for '%s'" % certname)
-          choria.request_cert
-        end
-
-        puts("Waiting up to 240 seconds for it to be signed")
-        puts
-
-        puts("Key fingerprint: %s" % choria.csr_fingerprint)
-        puts
-
-        24.times do |time|
-          print "Attempting to download certificate %s: %d / 24\r" % [certname, time]
-
-          break if choria.attempt_fetch_cert
-
-          sleep 10
-        end
-
-        unless choria.has_client_public_cert?
-          raise(Util::Choria::UserError, "Could not fetch the certificate after 240 seconds, please ensure it gets signed and rerun this command")
-        end
-
-        puts("Certificate %s has been stored in %s" % [certname, choria.ssl_dir])
       end
 
       def show_config_command # rubocop:disable Metrics/MethodLength
