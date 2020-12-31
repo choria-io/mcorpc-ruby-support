@@ -270,7 +270,8 @@ terminate called after throwing an instance of 'leatherman::json_container::data
               "_choria_task_caller" => "choria=local.mcollective"
             },
             instance_of(String),
-            File.join(cache, "test_1")
+            File.join(cache, "test_1"),
+            nil
           )
 
           ts.stubs(:cached?).returns(true)
@@ -323,7 +324,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
         it "should run the command and write all the right files" do
           FileUtils.mkdir_p(spool = File.join(cache, "spawn_test_1"))
 
-          pid = ts.spawn_command("/bin/cat", {}, "hello world", spool)
+          pid = ts.spawn_command("/bin/cat", {}, "hello world", spool, nil)
 
           Timeout.timeout(1) do
             sleep 0.1 until File::Stat.new(File.join(spool, "wrapper_stdout")).size > 0 # rubocop:disable Style/ZeroLengthPredicate
@@ -338,7 +339,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
         it "should set environment" do
           FileUtils.mkdir_p(spool = File.join(cache, "spawn_test_2"))
 
-          pid = ts.spawn_command("/usr/bin/env", {"RSPEC_TEST" => "hello world"}, nil, spool)
+          pid = ts.spawn_command("/usr/bin/env", {"RSPEC_TEST" => "hello world"}, nil, spool, nil)
 
           Timeout.timeout(1) do
             sleep 0.1 until File::Stat.new(File.join(spool, "wrapper_stdout")).size > 0 # rubocop:disable Style/ZeroLengthPredicate
