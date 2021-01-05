@@ -822,7 +822,7 @@ module MCollective
             @stdout.print twirl.twirl(respcount, discovered.size)
           end
 
-          if batch_size =~ /^(\d+)%$/
+          if batch_size.is_a?(String) && batch_size =~ /^(\d+)%$/
             # determine batch_size as a percentage of the discovered array's size
             batch_size = (discovered.size / 100.0 * Integer($1)).ceil
           else
