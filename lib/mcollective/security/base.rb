@@ -72,43 +72,7 @@ module MCollective
             end
 
           when "compound"
-            filter[key].each do |compound|
-              result = false
-              truth_values = []
-
-              begin
-                compound.each do |expression|
-                  case expression.keys.first
-                  when "statement"
-                    truth_values << Matcher.eval_compound_statement(expression).to_s
-                  when "fstatement"
-                    truth_values << Matcher.eval_compound_fstatement(expression.values.first)
-                  when "and"
-                    truth_values << "&&"
-                  when "or"
-                    truth_values << "||"
-                  when "("
-                    truth_values << "("
-                  when ")"
-                    truth_values << ")"
-                  when "not"
-                    truth_values << "!"
-                  end
-                end
-
-                result = eval(truth_values.join(" ")) # rubocop:disable Security/Eval
-              rescue DDLValidationError
-                result = false
-              end
-
-              if result
-                Log.debug("Passing based on class and fact composition")
-                passed += 1
-              else
-                Log.debug("Failing based on class and fact composition")
-                failed += 1
-              end
-            end
+            # removed while rebuilding compound filters, this whole method is probably unused now
 
           when "agent"
             filter[key].each do |f|

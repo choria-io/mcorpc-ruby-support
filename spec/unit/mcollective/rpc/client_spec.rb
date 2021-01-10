@@ -424,19 +424,15 @@ module MCollective
       end
 
       describe "#compound_filter" do
-        before do
-          Matcher.stubs(:create_compound_callstack).with("filter").returns("filter")
-        end
-
         it "should add a compound filter" do
           @client.compound_filter("filter")
-          expect(@client.filter["compound"]).to eq(["filter"])
+          expect(@client.filter["compound"]).to eq([[{"expr"=>"filter"}]])
         end
 
         it "should be idempotent" do
           @client.compound_filter("filter")
           @client.compound_filter("filter")
-          expect(@client.filter["compound"]).to eq(["filter"])
+          expect(@client.filter["compound"]).to eq([[{"expr"=>"filter"}]])
         end
       end
 

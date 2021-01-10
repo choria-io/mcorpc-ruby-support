@@ -442,7 +442,7 @@ module MCollective
 
       # Set a compound filter
       def compound_filter(filter)
-        @filter["compound"] = @filter["compound"] | [Matcher.create_compound_callstack(filter)]
+        @filter["compound"] = @filter["compound"] | [[{"expr" => filter}]]
         reset
       end
 
