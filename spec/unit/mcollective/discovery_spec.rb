@@ -12,20 +12,6 @@ module MCollective
       @discovery = Discovery.new(@client)
     end
 
-    describe "#timeout_for_compound_filter" do
-      it "should return the correct time" do
-        ddl = mock
-        ddl.stubs(:meta).returns({:timeout => 1})
-
-        filter = [Matcher.create_compound_callstack("test().size=1 and rspec().size=1")]
-
-        DDL.expects(:new).with("test_data", :data).returns(ddl)
-        DDL.expects(:new).with("rspec_data", :data).returns(ddl)
-
-        expect(@discovery.timeout_for_compound_filter(filter)).to eq(2)
-      end
-    end
-
     describe "#discover" do
       before do
         ddl = mock

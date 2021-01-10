@@ -85,19 +85,18 @@ module MCollective
     def timeout_for_compound_filter(compound_filter)
       return 0 if compound_filter.nil? || compound_filter.empty?
 
-      timeout = 0
+      # disabled while bringing in new compound filters
+      # compound_filter.each do |filter|
+      #   filter.each do |statement|
+      #     next unless statement["fstatement"]
+      #
+      #     pluginname = Data.pluginname(statement["fstatement"]["name"])
+      #     ddl = DDL.new(pluginname, :data)
+      #     timeout += ddl.meta[:timeout]
+      #   end
+      # end
 
-      compound_filter.each do |filter|
-        filter.each do |statement|
-          next unless statement["fstatement"]
-
-          pluginname = Data.pluginname(statement["fstatement"]["name"])
-          ddl = DDL.new(pluginname, :data)
-          timeout += ddl.meta[:timeout]
-        end
-      end
-
-      timeout
+      0
     end
 
     def discovery_timeout(timeout, filter)

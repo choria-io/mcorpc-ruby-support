@@ -40,7 +40,6 @@ module MCollective
   require "mcollective/facts"
   require "mcollective/logger"
   require "mcollective/log"
-  require "mcollective/matcher"
   require "mcollective/message"
   require "mcollective/optionparser"
   require "mcollective/generators"

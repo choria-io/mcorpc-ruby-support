@@ -148,34 +148,10 @@ module MCollective
         @requestid = request.payload[:requestid]
         @payload = PluginManager["security_plugin"].encodereply(agent, payload, requestid, request.payload[:callerid])
       when :request, :direct_request
-        validate_compound_filter(@filter["compound"]) unless @filter["compound"].empty?
-
         @requestid ||= create_reqid
         @payload = PluginManager["security_plugin"].encoderequest(Config.instance.identity, payload, requestid, filter, agent, collective, ttl)
       else
         raise "Cannot encode #{type} messages"
-      end
-    end
-
-    def validate_compound_filter(compound_filter)
-      compound_filter.each do |filter|
-        filter.each do |statement|
-          next unless statement["fstatement"]
-
-          functionname = statement["fstatement"]["name"]
-          pluginname = Data.pluginname(functionname)
-          value = statement["fstatement"]["value"]
-
-          ddl = DDL.new(pluginname, :data)
-
-          # parses numbers and booleans entered as strings into proper
-          # types of data so that DDL validation will pass
-          statement["fstatement"]["params"] = Data.ddl_transform_input(ddl, statement["fstatement"]["params"])
-
-          Data.ddl_validate(ddl, statement["fstatement"]["params"])
-
-          raise(DDLValidationError, "Data plugin '%s()' does not return a '%s' value" % [functionname, value]) unless value && Data.ddl_has_output?(ddl, value)
-        end
       end
     end
 
