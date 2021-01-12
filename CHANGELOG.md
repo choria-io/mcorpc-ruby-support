@@ -1,5 +1,10 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/01/12|      |Release 2.23.1                                                                                           |
+|2020/01/10|114   |Support `expr` filters and retire old filter logic                                                       |
+|2020/01/05|83    |Restore `mco ping` to being ruby based as a tool for low level testing of the client                     |
+|2020/12/29|      |Allow tasks to be run as another user                                                                    |
+|2020/12/30|92    |Remove the ability to enroll Puppet CA, use `choria enroll`                                              |
 |2020/12/29|      |Release 2.23.0                                                                                           |
 |2020/12/27|85    |update `mco choria` to `choria rpc`                                                                      |
 |2020/12/26|83    |Update `mco ping` to call `choria ping`                                                                  |
