@@ -156,42 +156,26 @@ module MCollective
       File.join(Dir::COMMON_APPDATA, "ChoriaIO", "choria")
     end
 
-    def self.mcollective_config_paths_for_user
+    def self.config_paths_for_user
       config_paths = []
 
-      begin
-        # File.expand_path will raise if HOME isn't set, catch it
-        user_path = File.expand_path("~/.mcollective")
-        config_paths << user_path
-      rescue Exception # rubocop:disable Lint/RescueException, Lint/SuppressedException
-      end
-
-      if windows?
-        config_paths << File.join(windows_prefix, "etc", "client.cfg")
-      else
-        config_paths << "/etc/puppetlabs/mcollective/client.cfg"
-        config_paths << "/etc/mcollective/client.cfg"
-        config_paths << "/usr/local/etc/mcollective/client.cfg"
-      end
-
-      config_paths
-    end
-
-    def self.choria_config_paths_for_user
-      config_paths = []
-
-      begin
-        # File.expand_path will raise if HOME isn't set, catch it
-        user_path = File.expand_path("~/.choriarc")
-        config_paths << user_path
-      rescue Exception # rubocop:disable Lint/RescueException, Lint/SuppressedException
+      ["~/.choriarc", "~/.mcollective"].each do |f|
+        begin
+          # File.expand_path will raise if HOME isn't set, catch it
+          config_paths << File.expand_path(f)
+        rescue ArgumentError # rubocop:disable Lint/SuppressedException
+        end
       end
 
       if windows?
         config_paths << File.join(choria_windows_prefix, "etc", "client.conf")
+        config_paths << File.join(windows_prefix, "etc", "client.cfg")
       else
         config_paths << "/etc/choria/client.conf"
         config_paths << "/usr/local/etc/choria/client.conf"
+        config_paths << "/etc/puppetlabs/mcollective/client.cfg"
+        config_paths << "/etc/mcollective/client.cfg"
+        config_paths << "/usr/local/etc/mcollective/client.cfg"
       end
 
       config_paths
@@ -202,17 +186,25 @@ module MCollective
     # In roughly this order, first to exist is used:
     #
     # - ~/.choriarc
-    # - APPData/ChoriaIO/choria/etc/client.conf on windows
-    # - /etc/choria/client.conf then
-    # - /usr/local/etc/choria/client.conf on unix
     # - ~/.mcollective
-    # - APPData/PuppetLabs/mcollective/etc/client.cfg on windows
+    #
+    # On Unix:
+    #
+    # - /etc/choria/client.conf
+    # - /usr/local/etc/choria/client.conf
     # - /etc/puppetlabs/mcollective/client.cfg
     # - /etc/mcollective/client.cfg
     # - /usr/local/etc/mcollective/client.cfg
+    #
+    # On Windows:
+    #
+    # - APPData/ChoriaIO/choria/etc/client.conf on windows
+    # - APPData/PuppetLabs/mcollective/etc/client.cfg on windows
     def self.config_file_for_user
-      config_paths = choria_config_paths_for_user + mcollective_config_paths_for_user
+      config_paths = config_paths_for_user
+
       found = config_paths.find_index { |file| File.readable?(file) } || 0
+
       config_paths[found]
     end
 

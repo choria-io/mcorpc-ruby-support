@@ -188,12 +188,15 @@ module MCollective
       end
     end
 
-    describe "#mcollective_config_paths_for_user" do
+    describe "#config_paths_for_user" do
       it "should support unix" do
         Util.stubs(:windows?).returns(false)
 
-        expect(Util.mcollective_config_paths_for_user).to eq([
+        expect(Util.config_paths_for_user).to eq([
+          File.expand_path("~/.choriarc"),
           File.expand_path("~/.mcollective"),
+          "/etc/choria/client.conf",
+          "/usr/local/etc/choria/client.conf",
           "/etc/puppetlabs/mcollective/client.cfg",
           "/etc/mcollective/client.cfg",
           "/usr/local/etc/mcollective/client.cfg"
@@ -203,35 +206,14 @@ module MCollective
       if Util.windows?
         it "should support windows" do
           Util.stubs(:windows?).returns(true)
-          Util.stubs(:choria_windows_prefix).returns("C:/temp")
-
-          expect(Util.choria_config_paths_for_user).to eq([
-            File.expand_path("~/.mcollective"),
-            File.join("c:/temp", "etc", "client.cfg")
-          ])
-        end
-      end
-    end
-
-    describe "#choria_config_paths_for_user" do
-      it "should support unix" do
-        Util.stubs(:windows?).returns(false)
-
-        expect(Util.choria_config_paths_for_user).to eq([
-          File.expand_path("~/.choriarc"),
-          "/etc/choria/client.conf",
-          "/usr/local/etc/choria/client.conf"
-        ])
-      end
-
-      if Util.windows?
-        it "should support windows" do
-          Util.stubs(:windows?).returns(true)
-          Util.stubs(:choria_windows_prefix).returns("C:/temp")
+          Util.stubs(:choria_windows_prefix).returns("C:/temp/choria")
+          Util.stubs(:windows_prefix).returns("C:/temp/mcollective")
 
           expect(Util.choria_config_paths_for_user).to eq([
             File.expand_path("~/.choriarc"),
-            File.join("c:/temp", "etc", "client.conf")
+            File.expand_path("~/.mcollective"),
+            File.join("c:/", "temp", "choria", "etc", "client.conf"),
+            File.join("c:/", "temp", "mcollective", "etc", "client.cfg")
           ])
         end
       end
@@ -239,8 +221,7 @@ module MCollective
 
     describe '#config_file_for_user' do
       it "should pick the first path that exist" do
-        Util.expects(:choria_config_paths_for_user).returns(["choria1", "choria2"])
-        Util.expects(:mcollective_config_paths_for_user).returns(["mcollective1", "mcollective2"])
+        Util.expects(:config_paths_for_user).returns(["choria1", "choria2", "mcollective1", "mcollective2"])
 
         File.expects(:readable?).with("choria1").returns(false)
         File.expects(:readable?).with("choria2").returns(false)
