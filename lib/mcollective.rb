@@ -53,7 +53,7 @@ module MCollective
   require "mcollective/util"
   require "mcollective/validator"
 
-  VERSION = "2.23.1".freeze
+  VERSION = "2.23.2".freeze
 
   def self.version
     VERSION

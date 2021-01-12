@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/01/12|      |Release 2.23.2                                                                                           |
+|2020/01/12|117   |Improve handling of user configuration paths                                                             |
 |2020/01/12|      |Release 2.23.1                                                                                           |
 |2020/01/10|114   |Support `expr` filters and retire old filter logic                                                       |
 |2020/01/05|83    |Restore `mco ping` to being ruby based as a tool for low level testing of the client                     |
