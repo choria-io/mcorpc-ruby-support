@@ -283,6 +283,7 @@ module MCollective
           if pid.nil?
             Process.gid = Process.egid = u.gid
             Process.uid = Process.euid = u.uid
+            ENV.delete_if { |name| name !~ /^LC_/ }
             Process.exec(environment, command, options)
           end
         else
