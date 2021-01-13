@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/01/12|      |Release 2.23.3                                                                                           |
+|2020/01/12|120   |Retire `mco facts` and redirect to `choria facts`                                                        |
 |2020/01/12|      |Release 2.23.2                                                                                           |
 |2020/01/12|117   |Improve handling of user configuration paths                                                             |
 |2020/01/12|      |Release 2.23.1                                                                                           |
