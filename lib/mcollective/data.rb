@@ -54,8 +54,6 @@ module MCollective
       raise DDLValidationError, "No output has been defined in the DDL for data plugin #{name}" if output.keys.empty?
 
       if input[:query]
-        return true if argument.nil? && input[:query][:optional]
-
         ddl.validate_input_argument(input, :query, argument)
       else
         raise("No data plugin argument was declared in the %s DDL but an input was supplied" % name) if argument
