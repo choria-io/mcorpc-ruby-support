@@ -123,13 +123,14 @@ module MCollective
       # all the use cases are clear
       #
       # only does validation for arguments actually given, since some might
-      # be optional.  We validate the presense of the argument earlier so
-      # this is a safe assumption, just to skip them.
+      # be optional.
       #
       # :string can have maxlength and regex.  A maxlength of 0 will bypasss checks
       # :list has a array of valid values
       def validate_input_argument(input, key, argument)
         Validator.load_validators
+
+        return true if argument.nil? && input[key][:optional]
 
         case input[key][:type]
         when :string

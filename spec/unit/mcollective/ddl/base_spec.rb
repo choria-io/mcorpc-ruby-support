@@ -61,6 +61,28 @@ module MCollective
           Config.instance.stubs(:libdir).returns([File.join(File.dirname(__FILE__), "../../../plugins")])
         end
 
+        it "should ensure optional parameters are accepted when nil" do
+          @ddl.action(:string, :description => "rspec")
+          @ddl.instance_variable_set("@current_entity", :string)
+          @ddl.input(:string, :prompt => "prompt", :description => "descr",
+                     :type => :string, :optional => true, :validation => "",
+                     :maxlength => 1)
+
+          @ddl.validate_input_argument(@ddl.entities[:string][:input], :string, nil)
+        end
+
+        it "should ensure non-optional parameters are rejected when nil" do
+          @ddl.action(:string, :description => "rspec")
+          @ddl.instance_variable_set("@current_entity", :string)
+          @ddl.input(:string, :prompt => "prompt", :description => "descr",
+                     :type => :string, :optional => false, :validation => "",
+                     :maxlength => 1)
+
+          expect {
+            @ddl.validate_input_argument(@ddl.entities[:string][:input], :string, nil)
+          }.to raise_error("Cannot validate input string: value should be a string")
+        end
+
         it "should ensure strings are String" do
           @ddl.action(:string, :description => "rspec")
           @ddl.instance_variable_set("@current_entity", :string)
