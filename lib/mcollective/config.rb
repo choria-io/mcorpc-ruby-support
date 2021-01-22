@@ -17,123 +17,130 @@ module MCollective
       @configured = false
     end
 
-    def loadconfig(configfile) # rubocop:disable Metrics/MethodLength
+    def parse_config_file(configfile, libdirs) # rubocop:disable Metrics/MethodLength
+      File.readlines(configfile).each do |line|
+        # strip blank spaces, tabs etc off the end of all lines
+        line.gsub!(/\s*$/, "")
+
+        next if line =~ /^#|^$/
+        next unless line =~ /(.+?)\s*=\s*(.+)/
+
+        key = $1.strip
+        val = $2
+
+        begin
+          case key
+          when "collectives"
+            @collectives = val.split(",").map(&:strip)
+          when "main_collective"
+            @main_collective = val
+          when "logfile"
+            @logfile = val
+          when "keeplogs"
+            @keeplogs = Integer(val)
+          when "max_log_size"
+            @max_log_size = Integer(val)
+          when "loglevel"
+            @loglevel = val
+          when "logfacility"
+            @logfacility = val
+          when "libdir"
+            paths = val.split(File::PATH_SEPARATOR)
+            paths.each do |path|
+              raise("libdir paths should be absolute paths but '%s' is relative" % path) unless Util.absolute_path?(path)
+
+              libdirs << path
+            end
+          when "identity"
+            @identity = val
+          when "direct_addressing"
+            @direct_addressing = Util.str_to_bool(val)
+          when "direct_addressing_threshold"
+            @direct_addressing_threshold = Integer(val)
+          when "color"
+            @color = Util.str_to_bool(val)
+          when "daemonize"
+            @daemonize = Util.str_to_bool(val)
+          when "securityprovider"
+            @securityprovider = val.capitalize
+          when "factsource"
+            @factsource = val.capitalize
+          when "connector"
+            @connector = val.capitalize
+          when "classesfile"
+            @classesfile = val
+          when /^plugin.(.+)$/
+            @pluginconf[$1] = val
+          when "discovery_timeout"
+            @discovery_timeout = Integer(val)
+          when "publish_timeout"
+            @publish_timeout = Integer(val)
+          when "connection_timeout"
+            @connection_timeout = Integer(val)
+          when "rpcaudit"
+            @rpcaudit = Util.str_to_bool(val)
+          when "rpcauditprovider"
+            @rpcauditprovider = val.capitalize
+          when "rpcauthorization"
+            @rpcauthorization = Util.str_to_bool(val)
+          when "rpcauthprovider"
+            @rpcauthprovider = val.capitalize
+          when "rpclimitmethod"
+            @rpclimitmethod = val.to_sym
+          when "logger_type"
+            @logger_type = val
+          when "fact_cache_time"
+            @fact_cache_time = Integer(val)
+          when "ssl_cipher"
+            @ssl_cipher = val
+          when "threaded"
+            @threaded = Util.str_to_bool(val)
+          when "ttl"
+            @ttl = Integer(val)
+          when "default_discovery_options"
+            @default_discovery_options << val
+          when "default_discovery_method"
+            @default_discovery_method = val
+          when "soft_shutdown"
+            @soft_shutdown = Util.str_to_bool(val)
+          when "soft_shutdown_timeout"
+            @soft_shutdown_timeout = Integer(val)
+          when "activate_agents"
+            @activate_agents = Util.str_to_bool(val)
+          when "default_batch_size"
+            @default_batch_size = Integer(val)
+          when "default_batch_sleep_time"
+            @default_batch_sleep_time = Float(val)
+          else
+            # server config might now be choria config which will divirge from mcollective
+            # in time, so we only raise this error when it looks like we aren't loading
+            # a server config else we try our best to load as much as we can
+            raise("Unknown config parameter '#{key}'") unless configfile =~ /server/
+          end
+        rescue ArgumentError
+          raise("Could not parse value for configuration option '%s' with value '%s'" % [key, val])
+        end
+      end
+    end
+
+    def loadconfig(configfile)
       set_config_defaults(configfile)
 
       if File.exist?(configfile)
         libdirs = []
-        File.readlines(configfile).each do |line|
-          # strip blank spaces, tabs etc off the end of all lines
-          line.gsub!(/\s*$/, "")
 
-          next if line =~ /^#|^$/
-          next unless line =~ /(.+?)\s*=\s*(.+)/
-
-          key = $1.strip
-          val = $2
-
-          begin
-            case key
-            when "collectives"
-              @collectives = val.split(",").map(&:strip)
-            when "main_collective"
-              @main_collective = val
-            when "logfile"
-              @logfile = val
-            when "keeplogs"
-              @keeplogs = Integer(val)
-            when "max_log_size"
-              @max_log_size = Integer(val)
-            when "loglevel"
-              @loglevel = val
-            when "logfacility"
-              @logfacility = val
-            when "libdir"
-              paths = val.split(File::PATH_SEPARATOR)
-              paths.each do |path|
-                raise("libdir paths should be absolute paths but '%s' is relative" % path) unless Util.absolute_path?(path)
-
-                libdirs << path
-              end
-            when "identity"
-              @identity = val
-            when "direct_addressing"
-              @direct_addressing = Util.str_to_bool(val)
-            when "direct_addressing_threshold"
-              @direct_addressing_threshold = Integer(val)
-            when "color"
-              @color = Util.str_to_bool(val)
-            when "daemonize"
-              @daemonize = Util.str_to_bool(val)
-            when "securityprovider"
-              @securityprovider = val.capitalize
-            when "factsource"
-              @factsource = val.capitalize
-            when "connector"
-              @connector = val.capitalize
-            when "classesfile"
-              @classesfile = val
-            when /^plugin.(.+)$/
-              @pluginconf[$1] = val
-            when "discovery_timeout"
-              @discovery_timeout = Integer(val)
-            when "publish_timeout"
-              @publish_timeout = Integer(val)
-            when "connection_timeout"
-              @connection_timeout = Integer(val)
-            when "rpcaudit"
-              @rpcaudit = Util.str_to_bool(val)
-            when "rpcauditprovider"
-              @rpcauditprovider = val.capitalize
-            when "rpcauthorization"
-              @rpcauthorization = Util.str_to_bool(val)
-            when "rpcauthprovider"
-              @rpcauthprovider = val.capitalize
-            when "rpclimitmethod"
-              @rpclimitmethod = val.to_sym
-            when "logger_type"
-              @logger_type = val
-            when "fact_cache_time"
-              @fact_cache_time = Integer(val)
-            when "ssl_cipher"
-              @ssl_cipher = val
-            when "threaded"
-              @threaded = Util.str_to_bool(val)
-            when "ttl"
-              @ttl = Integer(val)
-            when "default_discovery_options"
-              @default_discovery_options << val
-            when "default_discovery_method"
-              @default_discovery_method = val
-            when "soft_shutdown"
-              @soft_shutdown = Util.str_to_bool(val)
-            when "soft_shutdown_timeout"
-              @soft_shutdown_timeout = Integer(val)
-            when "activate_agents"
-              @activate_agents = Util.str_to_bool(val)
-            when "default_batch_size"
-              @default_batch_size = Integer(val)
-            when "default_batch_sleep_time"
-              @default_batch_sleep_time = Float(val)
-            else
-              # server config might now be choria config which will divirge from mcollective
-              # in time, so we only raise this error when it looks like we aren't loading
-              # a server config else we try our best to load as much as we can
-              raise("Unknown config parameter '#{key}'") unless configfile =~ /server/
-            end
-          rescue ArgumentError
-            raise("Could not parse value for configuration option '%s' with value '%s'" % [key, val])
-          end
-        end
+        parse_config_file(configfile, libdirs)
 
         read_plugin_config_dir("#{@configdir}/plugin.d")
 
-        raise 'Identities can only match /\w\.\-/' unless @identity =~ /^[\w.\-]+$/
+        parse_project_config(libdirs)
+
+        raise('Identities can only match /\w\.\-/') unless @identity =~ /^[\w.\-]+$/
 
         @configured = true
 
         libdirs.each do |dir|
-          Log.debug("Cannot find libdir: #{dir}") unless File.directory?(dir)
+          Log.debug("Cannot find libdir: %s" % dir) unless File.directory?(dir)
 
           # remove the old one if it exists, we're moving it to the front
           $LOAD_PATH.reject! { |elem| elem == dir }
@@ -152,6 +159,31 @@ module MCollective
       else
         raise("Cannot find config file '#{configfile}'")
       end
+    end
+
+    def project_root
+      Dir.pwd
+    end
+
+    def parse_project_config(libdirs)
+      project_config_files(project_root).each do |pfile|
+        parse_config_file(pfile, libdirs)
+      end
+    end
+
+    def project_config_files(path)
+      paths = []
+
+      path = File.expand_path(path)
+      parent = File.expand_path("..", path)
+
+      paths << project_config_files(parent) if parent != path
+
+      config = File.join(path, "choria.conf")
+
+      paths << config if File.exist?(config)
+
+      paths.flatten
     end
 
     def set_config_defaults(configfile) # rubocop:disable Naming/AccessorMethodName
