@@ -16,7 +16,7 @@ class MCollective::Application::Find < MCollective::Application # rubocop:disabl
 
     nodes.each {|c| puts c}
 
-    warn "\nDiscovered %s nodes in %.2f seconds using the %s discovery plugin" % [nodes.size, discoverytime, mc.client.discoverer.discovery_method] if options[:verbose]
+    warn "\nDiscovered %s nodes in %.2f seconds using the %s discovery plugin" % [nodes.size, discoverytime, mc.client.options[:discovery_method]] if options[:verbose]
 
     !nodes.empty? ? exit(0) : exit(1)
   end

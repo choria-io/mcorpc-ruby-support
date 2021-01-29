@@ -26,72 +26,24 @@ module MCollective
       end
 
       it "should error for non fixnum limits" do
-        expect { @discovery.discover(nil, 0, 1.1) }.to raise_error("Limit has to be an integer")
+        expect { @discovery.discover(nil, 0, 1.1, @client) }.to raise_error("Limit has to be an integer")
       end
 
       it "should use the DDL timeout if none is specified" do
         filter = Util.empty_filter
         @discovery.discovery_class.expects(:discover).with(filter, 2, 0, @client)
-        @discovery.discover(filter, nil, 0)
-      end
-
-      it "should check the discovery method is capable of serving the filter" do
-        @discovery.expects(:check_capabilities).with("filter").raises("capabilities check failed")
-        expect { @discovery.discover("filter", nil, 0) }.to raise_error("capabilities check failed")
+        @discovery.discover(filter, nil, 0, @client)
       end
 
       it "should call the correct discovery plugin" do
         @discovery.discovery_class.expects(:discover).with("filter", 2, 0, @client)
-        @discovery.discover("filter", nil, 0)
+        @discovery.discover("filter", nil, 0, @client)
       end
 
       it "should handle limits correctly" do
         @discovery.discovery_class.stubs(:discover).returns([1,2,3,4,5])
-        expect(@discovery.discover(Util.empty_filter, 1, 1)).to eq([1])
-        expect(@discovery.discover(Util.empty_filter, 1, 0)).to eq([1,2,3,4,5])
-      end
-    end
-
-    describe "#force_discovery_method_by_filter" do
-      it "should force mc plugin when needed" do
-        options = {:discovery_method => "rspec"}
-
-        Log.expects(:info).with("Switching to mc discovery method because compound filters are used")
-
-        @discovery.expects(:discovery_method).returns("rspec")
-        @client.expects(:options).returns(options)
-        expect(@discovery.force_discovery_method_by_filter({"compound" => ["rspec"]})).to eq(true)
-
-        expect(options[:discovery_method]).to eq("mc")
-      end
-
-      it "should not force mc plugin when no compound filter is used" do
-        options = {:discovery_method => "rspec"}
-
-        @discovery.expects(:discovery_method).returns("rspec")
-        expect(@discovery.force_discovery_method_by_filter({"compound" => []})).to eq(false)
-
-        expect(options[:discovery_method]).to eq("rspec")
-      end
-    end
-
-    describe "#check_capabilities" do
-      before do
-        @ddl = mock
-        @discovery.stubs(:ddl).returns(@ddl)
-        @discovery.stubs(:discovery_method).returns("rspec")
-      end
-
-      it "should fail for unsupported capabilities" do
-        @ddl.stubs(:discovery_interface).returns({:capabilities => []})
-
-        filter = Util.empty_filter
-
-        expect { @discovery.check_capabilities(filter.merge({"cf_class" => ["filter"]})) }.to raise_error(/Cannot use class filters/)
-
-        ["fact", "identity", "compound"].each do |type|
-          expect { @discovery.check_capabilities(filter.merge({type => ["filter"]})) }.to raise_error(/Cannot use #{type} filters/)
-        end
+        expect(@discovery.discover(Util.empty_filter, 1, 1, @client)).to eq([1])
+        expect(@discovery.discover(Util.empty_filter, 1, 0, @client)).to eq([1,2,3,4,5])
       end
     end
 
@@ -116,27 +68,9 @@ module MCollective
       end
     end
 
-    describe "#discovery_class" do
-      it "should try to load the class if not already loaded" do
-        @discovery.expects(:discovery_method).returns("mc")
-        PluginManager.expects(:loadclass).with("MCollective::Discovery::Mc")
-        Discovery.expects(:const_defined?).with("Mc").returns(false)
-        Discovery.expects(:const_get).with("Mc").returns("rspec")
-        expect(@discovery.discovery_class).to eq("rspec")
-      end
-
-      it "should not load the class again if its already loaded" do
-        @discovery.expects(:discovery_method).returns("mc")
-        PluginManager.expects(:loadclass).never
-        Discovery.expects(:const_defined?).with("Mc").returns(true)
-        Discovery.expects(:const_get).with("Mc").returns("rspec")
-        expect(@discovery.discovery_class).to eq("rspec")
-      end
-    end
-
     describe "#initialize" do
       it "should load all the known methods" do
-        expect(@discovery.instance_variable_get("@known_methods")).to eq(["mc"])
+        expect(@discovery.find_known_methods).to eq(["mc"])
       end
     end
 

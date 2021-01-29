@@ -150,7 +150,7 @@ module MCollective
     # of the discovery being cancelled soon as it reached the
     # requested limit of hosts
     def discover(filter, timeout, limit=0)
-      @discoverer.discover(filter.merge("collective" => collective), timeout, limit)
+      @discoverer.discover(filter.merge("collective" => collective), timeout, limit, self)
     end
 
     # Send a request, performs the passed block for each response

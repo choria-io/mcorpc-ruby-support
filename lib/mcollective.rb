@@ -15,6 +15,7 @@ require "mcollective/monkey_patches"
 require "mcollective/cache"
 require "mcollective/exceptions"
 require "systemu"
+require "open3"
 
 # == The Marionette Collective
 #
@@ -37,6 +38,7 @@ module MCollective
   require "mcollective/data"
   require "mcollective/ddl"
   require "mcollective/discovery"
+  require "mcollective/discovery/delegate"
   require "mcollective/facts"
   require "mcollective/logger"
   require "mcollective/log"
