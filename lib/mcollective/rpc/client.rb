@@ -533,6 +533,8 @@ module MCollective
 
         # All else fails we do it the hard way using a traditional broadcast
         unless @discovered_agents
+          raise("Invalid discovery method %s" % discovery_method) unless @client.discoverer.find_known_methods.include?(discovery_method)
+
           @stats.time_discovery :start
 
           @client.options = options
@@ -548,9 +550,9 @@ module MCollective
             actual_timeout = @client.discoverer.discovery_timeout(discovery_timeout, options[:filter])
 
             if actual_timeout > 0
-              @stderr.print("Discovering hosts using the %s method for %d second(s) .... " % [@client.discoverer.discovery_method, actual_timeout])
+              @stderr.print("Discovering hosts using the %s method for %d second(s) .... " % [discovery_method, actual_timeout])
             else
-              @stderr.print("Discovering hosts using the %s method .... " % [@client.discoverer.discovery_method])
+              @stderr.print("Discovering hosts using the %s method .... " % discovery_method)
             end
           end
 

@@ -20,6 +20,7 @@ module MCollective
         @discoverer.stubs(:force_discovery_method_by_filter).returns(false)
         @discoverer.stubs(:discovery_timeout).returns(2)
         @discoverer.stubs(:ddl).returns(ddl)
+        @discoverer.stubs(:find_known_methods).returns(["mc", "rspec"])
 
         @coreclient.stubs("options=")
         @coreclient.stubs(:collective).returns("mcollective")

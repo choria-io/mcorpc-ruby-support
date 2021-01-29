@@ -174,7 +174,7 @@ module MCollective
 
     describe "#discover" do
       it "should delegate to the discovery plugins" do
-        @discoverer.expects(:discover).with({'collective' => 'mcollective'}, 1, 0).returns([])
+        @discoverer.expects(:discover).with({'collective' => 'mcollective'}, 1, 0, client).returns([])
         expect(client.discover({}, 1)).to eq([])
       end
     end
