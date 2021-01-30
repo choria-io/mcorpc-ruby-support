@@ -194,7 +194,7 @@ module MCollective
         ARGV << '--nodes=nodes.txt'
         @parser.parse
         expect(@parser.instance_variable_get(:@options)[:discovery_method]).to eq('flatfile')
-        expect(@parser.instance_variable_get(:@options)[:discovery_options]).to eq(['nodes.txt'])
+        expect(@parser.instance_variable_get(:@options)[:discovery_options]).to eq(['file=nodes.txt'])
       end
 
       it 'should parse the --nodes option' do

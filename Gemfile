@@ -5,7 +5,6 @@ gem "systemu", "~> 2.6.4"
 
 group :development, :test do
   gem "choria-mcorpc-support"
-  gem "coveralls"
   gem "diplomat", "~> 2"
   gem "etcdv3"
   gem "jgrep", ">= 1.5.0"
