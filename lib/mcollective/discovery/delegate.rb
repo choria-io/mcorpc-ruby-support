@@ -2,7 +2,7 @@ module MCollective
   class Discovery
     class Delegate
       def self.binary_name
-        "/home/rip/go-choria"
+        "choria"
       end
 
       def self.discover(filter, timeout, limit, client)
