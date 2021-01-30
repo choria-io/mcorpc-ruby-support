@@ -1,5 +1,5 @@
-metadata    :name        => "delegate",
-            :description => "Choria CLI based delegated discovery",
+metadata    :name        => "choria",
+            :description => "PuppetDB based discovery method",
             :author      => "R.I.Pienaar <rip@devco.net>",
             :license     => "Apache-2.0",
             :version     => "0.1",
@@ -7,7 +7,7 @@ metadata    :name        => "delegate",
             :timeout     => 2
 
 discovery do
-    capabilities [:classes, :facts, :identity, :agents, :compound]
+    capabilities [:classes, :facts, :identity, :agents]
 end
 
 

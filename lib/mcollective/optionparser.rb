@@ -168,7 +168,7 @@ module MCollective
         raise "Cannot read the discovery file #{v}" unless File.readable?(v)
 
         @options[:discovery_method] = "flatfile"
-        @options[:discovery_options] << v
+        @options[:discovery_options] << "file=%s" % v
       end
 
       @parser.on("--publish_timeout TIMEOUT", Integer, "Timeout for publishing requests to remote agents.") do |pt|
