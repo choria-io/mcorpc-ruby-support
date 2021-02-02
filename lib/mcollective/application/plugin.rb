@@ -9,7 +9,6 @@ mco plugin package [options] <directory>
        mco plugin doc <plugin>
        mco plugin doc <type/plugin>
        mco plugin generate agent <pluginname> [actions=val,val]
-       mco plugin generate data <pluginname> [outputs=val,val]
 
           info : Display plugin information including package details.
        package : Create all available plugin packages.
@@ -116,11 +115,6 @@ mco plugin package [options] <directory>
            :arguments => ["--actions [ACTIONS]"],
            :type => Array
 
-    option :outputs,
-           :description => "Outputs to be generated for an Data Plugin",
-           :arguments => ["--outputs [OUTPUTS]"],
-           :type => Array
-
     option :keep_artifacts,
            :description => "Don't remove artifacts after building packages",
            :arguments => ["--keep-artifacts"],
@@ -167,7 +161,7 @@ mco plugin package [options] <directory>
 
     # Generate a plugin skeleton
     def generate_command
-      raise "undefined plugin type. cannot generate plugin. valid types are 'agent' and 'data'" if configuration["target"] == "."
+      raise "undefined plugin type. cannot generate plugin. valid types are 'agent'" if configuration["target"] == "."
 
       unless configuration[:pluginname]
         puts "No plugin name specified. Using 'new_plugin'"
@@ -181,12 +175,6 @@ mco plugin package [options] <directory>
         Generators::AgentGenerator.new(configuration[:pluginname], configuration[:actions], configuration[:pluginname],
                                        configuration[:description], configuration[:author], configuration[:license],
                                        configuration[:version], configuration[:url], configuration[:timeout])
-      when "data"
-        raise "data plugin must have at least one output" unless configuration[:outputs]
-
-        Generators::DataGenerator.new(configuration[:pluginname], configuration[:outputs], configuration[:pluginname],
-                                      configuration[:description], configuration[:author], configuration[:license],
-                                      configuration[:version], configuration[:url], configuration[:timeout])
       else
         raise "invalid plugin type. cannot generate plugin '#{configuration[:target]}'"
       end
@@ -228,7 +216,6 @@ mco plugin package [options] <directory>
         ["Agents", :agent],
         ["Aggregate", :aggregate],
         ["Connectors", :connector],
-        ["Data Queries", :data],
         ["Discovery Methods", :discovery],
         ["Validator Plugins", :validator]
       ]
@@ -345,7 +332,7 @@ mco plugin package [options] <directory>
     # Return the name of the type of plugin as a string
     def identify_plugin
       plugintype = Dir.glob(File.join(configuration[:target], "*")).select do |file|
-        File.directory?(file) && file.match(/(connector|facts|registration|security|audit|pluginpackager|data|discovery|validator)/)
+        File.directory?(file) && file.match(/(connector|facts|registration|security|audit|pluginpackager|discovery|validator)/)
       end
 
       raise "more than one plugin type detected in directory" if plugintype.size > 1
