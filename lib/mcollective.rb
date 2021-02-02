@@ -35,7 +35,6 @@ module MCollective
   require "mcollective/client"
   require "mcollective/config"
   require "mcollective/connector"
-  require "mcollective/data"
   require "mcollective/ddl"
   require "mcollective/discovery"
   require "mcollective/discovery/delegate"
