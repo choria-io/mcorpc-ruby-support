@@ -1,5 +1,10 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/02/03|      |Release 2.24.0                                                                                           |
+|2020/02/02|137   |Remove legacy Data plugins                                                                               |
+|2020/01/29|133   |Delegate all discovery methods to the choria binary                                                      |
+|2020/01/22|130   |Support project based configuration files                                                                |
+|2020/01/20|127   |Improve rendering of packaged plugin README documents                                                    |
 |2020/01/12|      |Release 2.23.3                                                                                           |
 |2020/01/12|120   |Retire `mco facts` and redirect to `choria facts`                                                        |
 |2020/01/12|      |Release 2.23.2                                                                                           |
