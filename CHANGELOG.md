@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/02/03|      |Release 2.24.1                                                                                           |
+|2020/02/03|137   |Remove further data related files                                                                        |
 |2020/02/03|      |Release 2.24.0                                                                                           |
 |2020/02/02|137   |Remove legacy Data plugins                                                                               |
 |2020/01/29|133   |Delegate all discovery methods to the choria binary                                                      |
