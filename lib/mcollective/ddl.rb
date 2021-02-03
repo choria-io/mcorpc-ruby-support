@@ -50,7 +50,6 @@ module MCollective
   module DDL
     require "mcollective/ddl/base"
     require "mcollective/ddl/agentddl"
-    require "mcollective/ddl/dataddl"
     require "mcollective/ddl/discoveryddl"
 
     # There used to be only one big nasty DDL class with a bunch of mashed
