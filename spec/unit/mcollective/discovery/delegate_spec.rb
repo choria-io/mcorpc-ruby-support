@@ -1,7 +1,5 @@
 require "spec_helper"
 
-require "mcollective/discovery/flatfile"
-
 module MCollective
   class Discovery
     describe Delegate do
