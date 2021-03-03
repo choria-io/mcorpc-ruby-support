@@ -157,7 +157,7 @@ module MCollective
       # @return [String] path to the command
       def task_command(spooldir, task)
         file_spec = task["files"][0]
-        file_name = File.join(spooldir, "files", file_spec["filename"])
+        file_name = File.join(spooldir, "files", task_module(task["task"]), "tasks", file_spec["filename"])
 
         command = platform_specific_command(file_name)
 
@@ -220,7 +220,10 @@ module MCollective
       # @param task [Hash] task specification
       def populate_spooldir(spooldir, task)
         task["files"].each do |file|
-          spool_filename = File.join(spooldir, "files", file["filename"])
+          filename = file["filename"]
+          filename = File.join(task_module(task["task"]), "tasks", filename) unless filename.index("/")
+
+          spool_filename = File.join(spooldir, "files", filename)
 
           FileUtils.mkdir_p(File.dirname(spool_filename), :mode => 0o0750)
           FileUtils.cp(task_file_name(file), spool_filename)
@@ -567,6 +570,15 @@ module MCollective
         parts << "init" if parts.size == 1
 
         parts
+      end
+
+      # Return a task's module
+      #
+      # @param task [String]
+      # @return [String] the module name
+      # @raise [StandardError] for invalid task names
+      def task_module(task)
+        parse_task(task)[0]
       end
 
       # Determines the cache path for a task file

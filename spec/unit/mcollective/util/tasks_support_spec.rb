@@ -379,8 +379,8 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           "/tmp/tasks-spool-#{$$}"
         end
         it "should copy files" do
-          FileUtils.expects(:mkdir_p).with(File.join(spooldir, "files"), :mode => 0o750)
-          FileUtils.expects(:cp).with(File.join(cache, "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede"), File.join(spooldir, "files", "ls.rb"))
+          FileUtils.expects(:mkdir_p).with(File.join(spooldir, "files", "choria", "tasks"), :mode => 0o750)
+          FileUtils.expects(:cp).with(File.join(cache, "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede"), File.join(spooldir, "files", "choria", "tasks", "ls.rb"))
           ts.populate_spooldir(spooldir, task_fixture)
         end
       end
@@ -422,13 +422,13 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           expect(ts.task_command(cache, task_run_request_fixture)).to eq(
             [
               "/opt/puppetlabs/puppet/bin/PowershellShim.ps1",
-              "#{cache}/files/test.ps1"
+              "#{cache}/files/choria/tasks/test.ps1"
             ]
           )
         end
 
         it "should use the platform specific command otherwise" do
-          expect(ts.task_command(cache, task_run_request_fixture)).to eq(["#{cache}/files/ls.rb"])
+          expect(ts.task_command(cache, task_run_request_fixture)).to eq(["#{cache}/files/choria/tasks/ls.rb"])
         end
       end
 
