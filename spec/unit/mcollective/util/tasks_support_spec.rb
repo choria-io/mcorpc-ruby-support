@@ -630,13 +630,13 @@ terminate called after throwing an instance of 'leatherman::json_container::data
 
       describe "#file_size" do
         it "should calculate the correct size" do
-          expect(ts.file_size("spec/fixtures/tasks/choria_ls_metadata.json")).to eq(569)
+          expect(ts.file_size("spec/fixtures/tasks/choria_ls_metadata.json")).to eq(563)
         end
       end
 
       describe "#file_sha256" do
         it "should calculate the right sha256" do
-          expect(ts.file_sha256("spec/fixtures/tasks/choria_ls_metadata.json")).to eq("9c98b23902538c0c1483eee76f14c9b96320289a82b9f848cdc3d17e4802e195")
+          expect(ts.file_sha256("spec/fixtures/tasks/choria_ls_metadata.json")).to eq("37d20c3daf13d6347c1bc566e36a54e608abce7394fbbcb23f1785573675ea1f")
         end
       end
 
