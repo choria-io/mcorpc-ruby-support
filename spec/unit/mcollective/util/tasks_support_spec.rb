@@ -381,7 +381,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
         it "should copy files" do
           FileUtils.expects(:mkdir_p).with(File.join(spooldir, "files", "choria", "tasks"), :mode => 0o750)
           FileUtils.expects(:cp).with(File.join(cache, "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede"), File.join(spooldir, "files", "choria", "tasks", "ls.rb"))
-          ts.populate_spooldir(spooldir, task_fixture)
+          ts.populate_spooldir(spooldir, task_run_request_fixture)
         end
       end
 
