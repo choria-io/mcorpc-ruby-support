@@ -1,6 +1,5 @@
 {
   "metadata": {
-    "puppet_task_version": 1,
     "description": "Get directory contents",
     "input_method": "stdin",
     "parameters": {
@@ -10,6 +9,7 @@
       }
     }
   },
+  "name": "choria::ls",
   "files": [
     {
       "filename": "ls.rb",

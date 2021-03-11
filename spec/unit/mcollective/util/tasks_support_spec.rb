@@ -379,9 +379,9 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           "/tmp/tasks-spool-#{$$}"
         end
         it "should copy files" do
-          FileUtils.expects(:mkdir_p).with(File.join(spooldir, "files"), :mode => 0o750)
-          FileUtils.expects(:cp).with(File.join(cache, "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede"), File.join(spooldir, "files", "ls.rb"))
-          ts.populate_spooldir(spooldir, task_fixture)
+          FileUtils.expects(:mkdir_p).with(File.join(spooldir, "files", "choria", "tasks"), :mode => 0o750)
+          FileUtils.expects(:cp).with(File.join(cache, "f3b4821836cf7fe6fe17dfb2924ff6897eba43a44cc4cba0e0ed136b27934ede"), File.join(spooldir, "files", "choria", "tasks", "ls.rb"))
+          ts.populate_spooldir(spooldir, task_run_request_fixture)
         end
       end
 
@@ -422,13 +422,13 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           expect(ts.task_command(cache, task_run_request_fixture)).to eq(
             [
               "/opt/puppetlabs/puppet/bin/PowershellShim.ps1",
-              "#{cache}/files/test.ps1"
+              "#{cache}/files/choria/tasks/test.ps1"
             ]
           )
         end
 
         it "should use the platform specific command otherwise" do
-          expect(ts.task_command(cache, task_run_request_fixture)).to eq(["#{cache}/files/ls.rb"])
+          expect(ts.task_command(cache, task_run_request_fixture)).to eq(["#{cache}/files/choria/tasks/ls.rb"])
         end
       end
 
@@ -630,13 +630,13 @@ terminate called after throwing an instance of 'leatherman::json_container::data
 
       describe "#file_size" do
         it "should calculate the correct size" do
-          expect(ts.file_size("spec/fixtures/tasks/choria_ls_metadata.json")).to eq(569)
+          expect(ts.file_size("spec/fixtures/tasks/choria_ls_metadata.json")).to eq(563)
         end
       end
 
       describe "#file_sha256" do
         it "should calculate the right sha256" do
-          expect(ts.file_sha256("spec/fixtures/tasks/choria_ls_metadata.json")).to eq("9c98b23902538c0c1483eee76f14c9b96320289a82b9f848cdc3d17e4802e195")
+          expect(ts.file_sha256("spec/fixtures/tasks/choria_ls_metadata.json")).to eq("37d20c3daf13d6347c1bc566e36a54e608abce7394fbbcb23f1785573675ea1f")
         end
       end
 
