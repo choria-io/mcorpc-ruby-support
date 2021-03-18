@@ -151,7 +151,7 @@ module MCollective
     end
 
     def self.choria_windows_prefix
-      File.join(ENV["ALLUSERSPROFILE"], "ChoriaIO", "choria")
+      File.join(ENV["ALLUSERSPROFILE"], "choria")
     end
 
     def self.config_paths_for_user
