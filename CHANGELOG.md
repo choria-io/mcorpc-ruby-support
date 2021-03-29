@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/03/29|      |Release 2.24.2                                                                                           |
+|2021/03/18|146   |Drop dependency on win32-dir gem                                                                         |
+|2021/03/03|142   |Relocate task cache locations to improve multi script support                                            |
 |2020/02/03|      |Release 2.24.1                                                                                           |
 |2020/02/03|137   |Remove further data related files                                                                        |
 |2020/02/03|      |Release 2.24.0                                                                                           |
