@@ -322,13 +322,13 @@ module MCollective
 
         it "should support common 'on' settings" do
           ["t", "true", "yes", "1"].each do |setting|
-            Config.instance.stubs(:pluginconf).returns("choria.use_srv_records" => setting)
+            Config.instance.stubs(:pluginconf).returns("choria.use_srv" => setting)
             expect(choria.should_use_srv?).to be(true)
           end
         end
 
         it "should support disabling SRV" do
-          Config.instance.stubs(:pluginconf).returns("choria.use_srv_records" => "false")
+          Config.instance.stubs(:pluginconf).returns("choria.use_srv" => "false")
           expect(choria.should_use_srv?).to be(false)
         end
       end
@@ -402,7 +402,7 @@ module MCollective
         end
 
         it "should support defaults" do
-          Config.instance.stubs(:pluginconf).returns("choria.puppetdb_host" => "puppet", "choria.puppetdb_port" => "8081")
+          Config.instance.stubs(:pluginconf).returns("choria.puppetdb_host" => nil, "choria.puppetdb_port" => "8081")
           choria.expects(:try_srv).with(["_x-puppet-db._tcp"], nil, nil).returns(:target => nil, :port => nil)
           choria.expects(:try_srv).with(["_x-puppet._tcp"], "puppet", "8081").returns(:target => "puppet", :port => "8084")
 
