@@ -137,6 +137,8 @@ module MCollective
 
         raise('Identities can only match /\w\.\-/') unless @identity =~ /^[\w.\-]+$/
 
+        check_deprecations
+
         @configured = true
 
         libdirs.each do |dir|
@@ -252,6 +254,14 @@ module MCollective
           val = $2
           @pluginconf["#{plugin}.#{key}"] = val
         end
+      end
+    end
+
+    def check_deprecations
+      if @pluginconf["choria.use_srv_records"]
+        Log.warn("Configuration set 'choria.use_srv_records' which is deprecated in favor of 'choria.use_srv'.")
+        @pluginconf["choria.use_srv"] = @pluginconf["choria.use_srv_records"]
+        @pluginconf.delete("choria.use_srv_records")
       end
     end
   end
