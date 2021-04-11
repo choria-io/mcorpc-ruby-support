@@ -392,6 +392,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
             task_run_request_fixture["input_method"] = method
             task_run_request_fixture["input"] = '{"directory": "/tmp", "bool":true}'
             expect(ts.task_environment(task_run_request_fixture, "test_id", "caller=spec.mcollective")).to eq(
+              "PT__task" => "choria::ls",
               "PT__installdir" => File.join(cache, "test_1", "files"),
               "PT_directory" => "/tmp",
               "PT_bool" => "true",
