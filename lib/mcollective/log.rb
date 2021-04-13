@@ -96,9 +96,8 @@ module MCollective
         end
 
         @logger.start
-      rescue Exception => e # rubocop:disable Lint/RescueException
+      rescue Exception # rubocop:disable Lint/RescueException
         @configured = false
-        warn "Could not start logger: #{e.class} #{e}"
       end
 
       # figures out the filename that called us
