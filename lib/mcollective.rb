@@ -43,7 +43,6 @@ module MCollective
   require "mcollective/log"
   require "mcollective/message"
   require "mcollective/optionparser"
-  require "mcollective/generators"
   require "mcollective/pluginmanager"
   require "mcollective/pluginpackager"
   require "mcollective/rpc"
