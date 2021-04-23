@@ -1,5 +1,11 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/04/23|      |Release 2.24.3                                                                                           |
+|2021/04/16|155   |Remove Ruby based code generators                                                                        |
+|2021/04/13|153   |Avoid exceeding the stack when logging setup fails                                                       |
+|2021/04/09|151   |Set the environment variable PT__task                                                                    |
+|2021/04/06|149   |Improve UX for users of choria.use_srv_records                                                           |
+|2021/04/01|149   |Align MCollective::Util::Choria options processing with choria                                           |
 |2021/03/29|      |Release 2.24.2                                                                                           |
 |2021/03/18|146   |Drop dependency on win32-dir gem                                                                         |
 |2021/03/03|142   |Relocate task cache locations to improve multi script support                                            |
