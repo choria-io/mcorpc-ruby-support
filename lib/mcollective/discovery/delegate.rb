@@ -63,7 +63,6 @@ module MCollective
             Process.kill("KILL", wait_thr[:pid])
             raise("Choria failed to complete discovery within %d timeout" % timeout)
           end
-
         end
 
         nodes
