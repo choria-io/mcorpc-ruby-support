@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/06/19|      |Release 2.24.4                                                                                           |
+|2021/06/17|160   |Handle large delegated discovery replies correctly                                                       |
 |2021/04/23|      |Release 2.24.3                                                                                           |
 |2021/04/16|155   |Remove Ruby based code generators                                                                        |
 |2021/04/13|153   |Avoid exceeding the stack when logging setup fails                                                       |
