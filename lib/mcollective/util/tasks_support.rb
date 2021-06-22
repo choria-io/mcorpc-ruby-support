@@ -250,7 +250,7 @@ module MCollective
       # act on these tasks either by asking for their status or perhaps killing
       # them?
       #
-      # @param command [Array<String>] command to run
+      # @param command [String] command to run
       # @param environment [Hash] environment to run with
       # @param stdin [String] stdin to send to the command
       # @param spooldir [String] path to the spool for this specific request
@@ -291,7 +291,7 @@ module MCollective
             Process.exec(environment, command, options)
           end
         else
-          pid = Process.spawn(environment, command, options)
+          pid = Process.spawn(environment, [command, command], options)
         end
 
         sleep 0.1 until File.exist?(wrapper_stdout)
