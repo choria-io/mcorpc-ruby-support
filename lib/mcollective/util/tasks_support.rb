@@ -65,7 +65,7 @@ module MCollective
       # AIO path to binaries like wrappers etc
       def aio_bin_path
         if Util.windows?
-          'C:\Program Files\Puppet Labs\Puppet\bin'
+          'C:\Program Files\Puppet Labs\Puppet\puppet\bin'
         else
           "/opt/puppetlabs/puppet/bin"
         end
