@@ -176,7 +176,8 @@ module MCollective
         environment = {
           "_task" => task["task"],
           "_choria_task_id" => task_id,
-          "_choria_task_caller" => task_caller
+          "_choria_task_caller" => task_caller,
+          "PATH" => "#{aio_bin_path}#{File::PATH_SEPARATOR}#{ENV['PATH']}"
         }
 
         return environment unless task["input"]

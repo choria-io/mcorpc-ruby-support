@@ -13,6 +13,7 @@ module MCollective
       let(:task_fixture_rb) { File.read("spec/fixtures/tasks/choria_ls.rb") }
       let(:file) { task_fixture["files"].first }
       let(:task_run_request_fixture) { JSON.parse(File.read("spec/fixtures/tasks/task_run_request.json")) }
+      let(:path_with_aio_bin_prepended) { "/opt/puppetlabs/puppet/bin:#{ENV['PATH']}" }
 
       before(:each) do
         choria.stubs(:puppet_server).returns(:target => "stubpuppet", :port => 8140)
@@ -267,7 +268,8 @@ terminate called after throwing an instance of 'leatherman::json_container::data
             {
               "_task" => "choria::ls",
               "_choria_task_id" => "test_1",
-              "_choria_task_caller" => "choria=local.mcollective"
+              "_choria_task_caller" => "choria=local.mcollective",
+              "PATH" => path_with_aio_bin_prepended
             },
             instance_of(String),
             File.join(cache, "test_1"),
@@ -398,7 +400,8 @@ terminate called after throwing an instance of 'leatherman::json_container::data
               "PT_bool" => "true",
               "_task" => "choria::ls",
               "_choria_task_caller" => "caller=spec.mcollective",
-              "_choria_task_id" => "test_id"
+              "_choria_task_id" => "test_id",
+              "PATH" => path_with_aio_bin_prepended
             )
           end
         end
@@ -409,7 +412,8 @@ terminate called after throwing an instance of 'leatherman::json_container::data
             expect(ts.task_environment(task_run_request_fixture, "test_id", "caller=spec.mcollective")).to eq(
               "_task" => "choria::ls",
               "_choria_task_caller" => "caller=spec.mcollective",
-              "_choria_task_id" => "test_id"
+              "_choria_task_id" => "test_id",
+              "PATH" => path_with_aio_bin_prepended
             )
           end
         end
