@@ -262,6 +262,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           File.stubs(:exist?).with(ts.wrapper_path).returns(true)
           ts.stubs(:request_spooldir).returns(File.join(cache, "test_1"))
           ts.stubs(:populate_spooldir)
+          ts.stubs(:aio?).returns(true)
 
           ts.expects(:spawn_command).with(
             "/opt/puppetlabs/puppet/bin/task_wrapper",
@@ -391,6 +392,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
         it "should set the environment for both or environment methods" do
           ["both", "environment"].each do |method|
             ts.stubs(:request_spooldir).returns(File.join(cache, "test_1"))
+            ts.stubs(:aio?).returns(true)
             task_run_request_fixture["input_method"] = method
             task_run_request_fixture["input"] = '{"directory": "/tmp", "bool":true}'
             expect(ts.task_environment(task_run_request_fixture, "test_id", "caller=spec.mcollective")).to eq(
@@ -408,6 +410,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
 
         it "should not set it otherwise" do
           ["powershell", "stdin"].each do |method|
+            ts.stubs(:aio?).returns(true)
             task_run_request_fixture["input_method"] = method
             expect(ts.task_environment(task_run_request_fixture, "test_id", "caller=spec.mcollective")).to eq(
               "_task" => "choria::ls",
