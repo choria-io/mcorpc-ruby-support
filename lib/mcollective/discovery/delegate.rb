@@ -10,6 +10,9 @@ module MCollective
 
         cmd = [binary_name, "discover", "-j", "--silent"]
 
+        config = client.options.fetch(:config)
+        cmd << "--config" << config if config
+
         cmd << "-T" << filter["collective"] if filter["collective"]
 
         filter.fetch("identity", []).each do |i|

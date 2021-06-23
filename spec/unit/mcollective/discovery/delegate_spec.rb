@@ -5,7 +5,9 @@ module MCollective
     describe Delegate do
       describe "#discover" do
         before(:each) do
-          @options = {}
+          @options = {
+            config: '/tmp/client.conf',
+          }
           @client = mock
           @client.stubs(:options).returns(@options)
 
@@ -30,6 +32,7 @@ module MCollective
                                                 'discover',
                                                 '-j',
                                                 '--silent',
+                                                '--config', '/tmp/client.conf',
                                                 '-I', 'node.1',
                                                 '-I', '/2/',
                                                 '-C', 'one',
