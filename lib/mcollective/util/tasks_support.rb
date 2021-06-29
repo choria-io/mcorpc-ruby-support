@@ -88,6 +88,13 @@ module MCollective
         end
       end
 
+      # Is this an AIO install?
+      #
+      # @return [Boolean]
+      def aio?
+        File.directory?(aio_bin_path)
+      end
+
       # Path to the task wrapper executable
       #
       # @return [String]
@@ -178,6 +185,8 @@ module MCollective
           "_choria_task_id" => task_id,
           "_choria_task_caller" => task_caller
         }
+
+        environment["PATH"] = "#{aio_bin_path}#{File::PATH_SEPARATOR}#{ENV['PATH']}" if aio?
 
         return environment unless task["input"]
         return environment unless ["both", "environment"].include?(task_input_method(task))
