@@ -516,7 +516,7 @@ terminate called after throwing an instance of 'leatherman::json_container::data
       describe "#bin_path" do
         it "should support windows" do
           Util.stubs(:windows?).returns(true)
-          expect(ts.aio_bin_path).to eq('C:\Program Files\Puppet Labs\Puppet\bin')
+          expect(ts.aio_bin_path).to eq('C:\Program Files\Puppet Labs\Puppet\puppet\bin')
         end
 
         it "should support nix" do
