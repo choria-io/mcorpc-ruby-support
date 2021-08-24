@@ -1,5 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/08/24|      |Release 2.25.0                                                                                           |
+|2021/07/13|164   |Pass path to active configuration file to choria                                                         |
+|2021/07/01|98    |Fix running bolt tasks on Windows                                                                        |
+|2021/06/29|163   |Only add AIO bin directory to PATH if it exist                                                           |
 |2021/06/19|      |Release 2.24.4                                                                                           |
 |2021/06/17|160   |Handle large delegated discovery replies correctly                                                       |
 |2021/04/23|      |Release 2.24.3                                                                                           |
