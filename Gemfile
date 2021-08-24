@@ -1,6 +1,6 @@
 source ENV["GEM_SOURCE"] || "https://rubygems.org"
 
-gem "nats-pure", "~> 0.6"
+gem "nats-pure", "~> 0.6", "< 0.7.0"
 gem "systemu", "~> 2.6.4"
 
 group :development, :test do
