@@ -5,7 +5,7 @@
     "description": "Choria Provisioner",
     "author": "R.I.Pienaar <rip@devco.net>",
     "license": "Apache-2.0",
-    "version": "0.22.0",
+    "version": "0.23.0",
     "url": "https://choria.io",
     "timeout": 20
   },
@@ -47,7 +47,7 @@
           "default": null,
           "optional": true,
           "validation": "^-----BEGIN CERTIFICATE-----",
-          "maxlength": 10240
+          "maxlength": 20480
         },
         "ssldir": {
           "prompt": "SSL Dir",
@@ -57,12 +57,31 @@
           "optional": true,
           "validation": ".",
           "maxlength": 500
+        },
+        "key": {
+          "prompt": "PEM text block for the private key",
+          "type": "string",
+          "default": null,
+          "optional": true,
+          "validation": "-----BEGIN RSA PRIVATE KEY-----",
+          "maxlength": 10240
+        },
+        "ecdh_public": {
+          "prompt":  "ECDH Public Key",
+          "description": "Required when sending a private key",
+          "type": "string",
+          "default": "",
+          "optional": true,
+          "maxlength": 64,
+          "validation": "."
         }
+
       },
       "output": {
         "message": {
           "description": "Status message from the Provisioner",
           "display_as": "Message",
+          "type": "string",
           "default": null
         }
       },
@@ -140,11 +159,19 @@
         "csr": {
           "description": "PEM text block for the CSR",
           "display_as": "CSR",
+          "type": "string",
+          "default": null
+        },
+        "public_key": {
+          "description": "PEM text block of the public key that made the CSR",
+          "display_as": "Public Key",
+          "type": "string",
           "default": null
         },
         "ssldir": {
           "description": "SSL directory as determined by the server",
           "display_as": "SSL Dir",
+          "type": "string",
           "default": null
         }
       },
@@ -186,6 +213,7 @@
         "message": {
           "description": "Status message from the Provisioner",
           "display_as": "Message",
+          "type": "string",
           "default": null
         }
       },
@@ -209,11 +237,18 @@
         "jwt": {
           "description": "The contents of the JWT token",
           "display_as": "JWT Token",
+          "type": "string",
+          "default": ""
+        },
+        "ecdh_public": {
+          "description": "The ECDH public key for calculating shared secrets",
+          "display_as": "ECDH Public Key",
+          "type": "string",
           "default": ""
         }
       },
       "display": "always",
-      "description": "Reenable provision mode in a running Choria Server"
+      "description": "Re-enable provision mode in a running Choria Server"
     },
     {
       "action": "reprovision",
@@ -232,6 +267,7 @@
         "message": {
           "description": "Status message from the Provisioner",
           "display_as": "Message",
+          "type": "string",
           "default": null
         }
       },
@@ -262,6 +298,7 @@
         "message": {
           "description": "Status message from the Provisioner",
           "display_as": "Message",
+          "type": "string",
           "default": null
         }
       },

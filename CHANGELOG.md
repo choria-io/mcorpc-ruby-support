@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/08/24|      |Release 2.25.1                                                                                           |
+|2021/08/24|      |Update DDL files                                                                                         |
 |2021/08/24|      |Release 2.25.0                                                                                           |
 |2021/07/13|164   |Pass path to active configuration file to choria                                                         |
 |2021/07/01|98    |Fix running bolt tasks on Windows                                                                        |
