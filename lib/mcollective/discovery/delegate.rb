@@ -56,10 +56,12 @@ module MCollective
 
           begin
             Timeout.timeout(timeout + 0.5) do
-              nodes.concat(JSON.parse(stdout.read))
+              out = stdout.read
               status = wait_thr.value
 
               raise("Choria discovery failed: %s" % stderr.read) unless status.exitstatus == 0
+
+              nodes.concat(JSON.parse(out))
             end
           rescue Timeout::Error
             Log.warn("Timeout waiting for Choria to perform discovery")
