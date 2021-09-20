@@ -1,6 +1,6 @@
 require "rake"
 
-PROJ_VERSION = "2.25.1"
+PROJ_VERSION = "2.25.2"
 
 Gem::Specification.new do |s|
   s.name = "choria-mcorpc-support"
