@@ -2,13 +2,20 @@ metadata :name        => "choria_provision",
          :description => "Choria Provisioner",
          :author      => "R.I.Pienaar <rip@devco.net>",
          :license     => "Apache-2.0",
-         :version     => "0.23.0",
+         :version     => "0.24.0",
          :url         => "https://choria.io",
          :timeout     => 20
 
 
 action "configure", :description => "Configure the Choria Server" do
   display :failed
+
+  input :action_policies,
+        :prompt      => "Action Policy Documents",
+        :description => "Map of Action Policy documents indexed by file name",
+        :type        => :hash,
+        :optional    => true
+
 
   input :ca,
         :prompt      => "CA Bundle",
@@ -52,6 +59,13 @@ action "configure", :description => "Configure the Choria Server" do
         :type        => :string,
         :validation  => '-----BEGIN RSA PRIVATE KEY-----',
         :maxlength   => 10240,
+        :optional    => true
+
+
+  input :opa_policies,
+        :prompt      => "Open Policy Agent Policy Documents",
+        :description => "Map of Open Policy Agent Policy documents indexed by file name",
+        :type        => :hash,
         :optional    => true
 
 
