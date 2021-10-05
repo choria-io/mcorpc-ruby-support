@@ -12,7 +12,7 @@ module MCollective
         when :integer
           validator.is_a?(Integer)
         when :float
-          validator.is_a?(Float)
+          validator.is_a?(Float) || validator.is_a?(Integer)
         when :number
           validator.is_a?(Numeric)
         when :string
