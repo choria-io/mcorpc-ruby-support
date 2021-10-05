@@ -157,10 +157,7 @@ module MCollective
             @ddl.validate_input_argument(@ddl.entities[:test][:input], :float, "1")
           }.to raise_error("Cannot validate input float: value should be a float")
 
-          expect {
-            @ddl.validate_input_argument(@ddl.entities[:test][:input], :float, 1)
-          }.to raise_error("Cannot validate input float: value should be a float")
-
+          @ddl.validate_input_argument(@ddl.entities[:test][:input], :float, 1)
           @ddl.validate_input_argument(@ddl.entities[:test][:input], :float, 1.1)
         end
 

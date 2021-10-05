@@ -18,6 +18,10 @@ module MCollective
           TypecheckValidator.validate(*val)
         end
       end
+
+      it "should treat ints as floats for float type" do
+        TypecheckValidator.validate(200, :float)
+      end
     end
   end
 end
