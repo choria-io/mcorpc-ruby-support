@@ -847,6 +847,7 @@ module MCollective
             message.requestid = @stats.requestid
 
             message.discovered_hosts = hosts.clone.compact
+            message.type = :direct_request
 
             @client.req(message) do |resp|
               respcount += 1
