@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/10/15|      |Release 2.25.3                                                                                           |
+|2021/10/14|175   |Correctly handle non node discovery terms in batched direct requests                                     |
+|2021/10/05|173   |Correctly process JSON numbers as floats in cases where no decimal points are specified                  |
 |2021/09/20|      |Release 2.25.2                                                                                           |
 |2021/09/03|169   |Correctly handle non 0 exit code in delegated discovery                                                  |
 |2021/08/24|      |Release 2.25.1                                                                                           |
