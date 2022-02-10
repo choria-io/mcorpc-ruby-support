@@ -16,6 +16,34 @@ module MCollective
           }
         end
 
+        let(:good_bolt_result) do
+          {
+            "good.example" => {
+              "value" => {
+                "agent" => "bolt_tasks",
+                "action" => "run_and_wait",
+                "sender" => "desktop-6qqubu4.lan",
+                "statuscode" => 0,
+                "statusmsg" => "OK",
+                "data" => {
+                  "task_id" => "10e8921c912d5fe7bb87c6324ec6e9ae",
+                  "task" => "chocolatey::status",
+                  "callerid" => "choria=romain.mcollective",
+                  "exitcode" => 0,
+                  "stdout" => "{\"status\":[{\"package\":\"chocolatey\",\"version\":\"0.12.1\"},{\"package\":\"chocolatey-core.extension\",\"version\":\"1.3.5.1\"},{\"package\":\"GoogleChrome\",\"version\":\"98.0.4758.82\"}]}",
+                  "stderr" => "",
+                  "completed" => true,
+                  "runtime" => 1.632686,
+                  "start_time" => 1644527275
+                },
+                "requestid" => "10e8921c912d5fe7bb87c6324ec6e9ae"
+              },
+              "type" => "mcollective",
+              "fail_ok" => false
+            }
+          }
+        end
+
         let(:error_result) do
           {
             "error.example" => {
@@ -77,6 +105,15 @@ module MCollective
           it "should get the correct value" do
             tr = TaskResult.from_asserted_hash(good_result)
             expect(tr.value).to eq("stdout")
+          end
+        end
+
+        describe "#bolt_task_result" do
+          it "should get the correct value" do
+            tr = TaskResult.from_asserted_hash(good_bolt_result)
+            expect(tr.bolt_task_result).to be_a(Hash)
+            expect(tr.bolt_task_result["status"]).to be_an(Array)
+            expect(tr.bolt_task_result["status"][1]["version"]).to eq("1.3.5.1")
           end
         end
 
