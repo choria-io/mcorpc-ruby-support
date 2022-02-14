@@ -81,6 +81,13 @@ module MCollective
           @result["value"]
         end
 
+        # Access the value returned by a Bolt task
+        #
+        # @return [Object] The value returned by the bolt task
+        def bolt_task_result
+          @bolt_task_result ||= JSON.parse(@result["value"]["data"]["stdout"])
+        end
+
         def to_s
           if Object.const_defined?(:Puppet)
             Puppet::Pops::Types::StringConverter.convert(self, "%p")
