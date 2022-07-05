@@ -213,7 +213,9 @@ Examples:
             Util.colorize(:bold, bolt_tasks.ddl.meta[:timeout])
           ])
 
-          request_and_report(:run_and_wait, request)
+          success = request_and_report(:run_and_wait, request)
+
+          exit(success ? 0 : 1)
         end
       ensure
         reset_client!
@@ -273,11 +275,15 @@ Examples:
         else
           say("Requesting task status for request %s, showing failures only pass --verbose for all output" % Util.colorize(:bold, taskid)) unless options[:verbose]
 
-          request_and_report(:task_status, {:task_id => taskid}, taskid)
+          success = request_and_report(:task_status, {:task_id => taskid}, taskid)
+
+          exit(success ? 0 : 1)
         end
       end
 
       def request_and_report(action, arguments, taskid=nil) # rubocop:disable Metrics/MethodLength
+        res = true
+
         task_not_known_nodes = 0
         wrapper_failure = 0
         completed_nodes = 0
@@ -302,16 +308,24 @@ Examples:
           status = reply[:data]
 
           if reply[:statuscode] == 3
+            res = false
             fail_nodes += 1
             task_not_known_nodes += 1
           elsif [-1, 0].include?(status[:exitcode])
             status[:completed] ? completed_nodes += 1 : running_nodes += 1
             runtime += status[:runtime]
-            reply[:statuscode] == 0 ? success_nodes += 1 : fail_nodes += 1
+            if reply[:statuscode] == 0
+              success_nodes += 1
+            else
+              res = false
+              fail_nodes += 1
+            end
           elsif reply[:statuscode] == 5
+            res = false
             wrapper_failure += 1
             fail_nodes += 1
           else
+            res = false
             fail_nodes += 1
           end
 
@@ -351,6 +365,8 @@ Examples:
           runtime,
           bolt_tasks.stats
         )
+
+        res
       ensure
         reset_client!
       end
