@@ -1,7 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2022/11/07|      |Release 2.26.1                                                                                           |
+|2022/03/15|182   |Report failure with exit code in mco tasks                                                               |
 |2021/10/15|      |Release 2.26.0                                                                                           |
-|2022/02/10|179   |Add a Choria::TaskResult#bolt_task_result API                                                            |
+|2022/02/10|179   |Add a `Choria::TaskResult#bolt_task_result` API                                                          |
 |2021/10/15|      |Release 2.25.3                                                                                           |
 |2021/10/14|175   |Correctly handle non node discovery terms in batched direct requests                                     |
 |2021/10/05|173   |Correctly process JSON numbers as floats in cases where no decimal points are specified                  |
