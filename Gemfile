@@ -20,4 +20,5 @@ group :development, :test do
   gem "semantic_puppet"
   gem "webmock"
   gem "yard"
+  gem "google-protobuf", "3.17.3"
 end

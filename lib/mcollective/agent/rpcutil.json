@@ -5,7 +5,7 @@
     "description": "Utility actions that expose information about the state of the running Server",
     "author": "R.I.Pienaar <rip@devco.net>",
     "license": "Apache-2.0",
-    "version": "0.24.0",
+    "version": "0.27.0",
     "url": "https://choria.io/",
     "timeout": 2
   },
@@ -124,6 +124,11 @@
         "ttlexpired": {
           "description": "Count of messages that did pass TTL checks",
           "display_as": "TTL Expired",
+          "type": "integer"
+        },
+        "events": {
+          "description": "The number of lifecycle events that was published",
+          "display_as": "Events",
           "type": "integer"
         }
       },
@@ -306,6 +311,12 @@
           "description": "Autonomous Agents",
           "display_as": "Machines",
           "type": "hash"
+        },
+        "upgradable": {
+          "description": "Indicates if the server supports upgrades",
+          "display_as": "Upgradable",
+          "type": "boolean",
+          "default": false
         }
       },
       "display": "always",
@@ -319,7 +330,7 @@
         "pong": {
           "description": "The local Unix timestamp",
           "display_as": "Timestamp",
-          "type": "string"
+          "type": "number"
         }
       },
       "display": "always",

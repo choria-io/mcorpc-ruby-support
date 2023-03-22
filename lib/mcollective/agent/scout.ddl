@@ -2,7 +2,7 @@ metadata :name        => "scout",
          :description => "Choria Scout Agent Management API",
          :author      => "R.I.Pienaar <rip@devco.net>",
          :license     => "Apache-2.0",
-         :version     => "0.24.0",
+         :version     => "0.27.0",
          :url         => "https://choria.io",
          :provider    => "golang",
          :timeout     => 5
@@ -87,7 +87,7 @@ action "goss_validate", :description => "Performs a Goss validation using a spec
         :type        => :string,
         :validation  => '.+',
         :maxlength   => 256,
-        :optional    => false
+        :optional    => true
 
 
   input :vars,
@@ -96,6 +96,24 @@ action "goss_validate", :description => "Performs a Goss validation using a spec
         :type        => :string,
         :validation  => '.+',
         :maxlength   => 256,
+        :optional    => true
+
+
+  input :yaml_rules,
+        :prompt      => "Gossfile contents",
+        :description => "Contents of the Gossfile to validate",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 5120,
+        :optional    => true
+
+
+  input :yaml_vars,
+        :prompt      => "Variables YAML",
+        :description => "YAML data to use as variables",
+        :type        => :string,
+        :validation  => '.+',
+        :maxlength   => 5120,
         :optional    => true
 
 
@@ -116,9 +134,14 @@ action "goss_validate", :description => "Performs a Goss validation using a spec
          :type        => "integer",
          :display_as  => "Runtime"
 
+  output :skipped,
+         :description => "Indicates how many tests were skipped",
+         :type        => "integer",
+         :display_as  => "Skipped"
+
   output :success,
-         :description => "Indicates if the test passed",
-         :type        => "string",
+         :description => "Indicates how many tests passed",
+         :type        => "integer",
          :display_as  => "Success"
 
   output :summary,

@@ -2,7 +2,7 @@ metadata :name        => "rpcutil",
          :description => "Utility actions that expose information about the state of the running Server",
          :author      => "R.I.Pienaar <rip@devco.net>",
          :license     => "Apache-2.0",
-         :version     => "0.24.0",
+         :version     => "0.27.0",
          :url         => "https://choria.io/",
          :timeout     => 2
 
@@ -53,6 +53,11 @@ action "daemon_stats", :description => "Get statistics from the running daemon" 
          :description => "Config file used to start the daemon",
          :type        => "string",
          :display_as  => "Config File"
+
+  output :events,
+         :description => "The number of lifecycle events that was published",
+         :type        => "integer",
+         :display_as  => "Events"
 
   output :filtered,
          :description => "Count of message that didn't pass filter checks",
@@ -262,6 +267,11 @@ action "inventory", :description => "System Inventory" do
          :type        => "string",
          :display_as  => "Main Collective"
 
+  output :upgradable,
+         :description => "Indicates if the server supports upgrades",
+         :type        => "boolean",
+         :display_as  => "Upgradable"
+
   output :version,
          :description => "Choria Server Version",
          :type        => "string",
@@ -276,7 +286,7 @@ action "ping", :description => "Responds to requests for PING with PONG" do
 
   output :pong,
          :description => "The local Unix timestamp",
-         :type        => "string",
+         :type        => "number",
          :display_as  => "Timestamp"
 
 end
