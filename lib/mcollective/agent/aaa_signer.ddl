@@ -2,7 +2,7 @@ metadata :name        => "aaa_signer",
          :description => "Request Signer for Choria AAA Service",
          :author      => "R.I.Pienaar <rip@devco.net>",
          :license     => "Apache-2.0",
-         :version     => "0.24.0",
+         :version     => "0.27.0",
          :url         => "https://github.com/choria-io/aaasvc",
          :provider    => "golang",
          :service     => true,
@@ -18,6 +18,15 @@ action "sign", :description => "Signs a RPC Request on behalf of a user" do
         :type        => :string,
         :validation  => :shellsafe,
         :maxlength   => 100240,
+        :optional    => false
+
+
+  input :signature,
+        :prompt      => "Request Signature",
+        :description => "A signature produced using the ed25519 seed of the request, hex encoded",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 1024,
         :optional    => false
 
 

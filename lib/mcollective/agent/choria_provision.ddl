@@ -2,7 +2,7 @@ metadata :name        => "choria_provision",
          :description => "Choria Provisioner",
          :author      => "R.I.Pienaar <rip@devco.net>",
          :license     => "Apache-2.0",
-         :version     => "0.24.0",
+         :version     => "0.27.0",
          :url         => "https://choria.io",
          :timeout     => 20
 
@@ -55,7 +55,7 @@ action "configure", :description => "Configure the Choria Server" do
 
   input :key,
         :prompt      => "PEM text block for the private key",
-        :description => "",
+        :description => "A RSA private key",
         :type        => :string,
         :validation  => '-----BEGIN RSA PRIVATE KEY-----',
         :maxlength   => 10240,
@@ -66,6 +66,15 @@ action "configure", :description => "Configure the Choria Server" do
         :prompt      => "Open Policy Agent Policy Documents",
         :description => "Map of Open Policy Agent Policy documents indexed by file name",
         :type        => :hash,
+        :optional    => true
+
+
+  input :server_jwt,
+        :prompt      => "Server JWT",
+        :description => "JWT file used to identify the server to the broker for ed25519 based authentication",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 2048,
         :optional    => true
 
 
@@ -93,6 +102,46 @@ action "configure", :description => "Configure the Choria Server" do
          :description => "Status message from the Provisioner",
          :type        => "string",
          :display_as  => "Message"
+
+end
+
+action "gen25519", :description => "Generates a new ED25519 keypair" do
+  display :always
+
+  input :nonce,
+        :prompt      => "Nonce",
+        :description => "Single use token to be signed by the private key being generated",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 64,
+        :optional    => false
+
+
+  input :token,
+        :prompt      => "Token",
+        :description => "Authentication token to pass to the server",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 128,
+        :optional    => false
+
+
+
+
+  output :directory,
+         :description => "The directory where server.key and server.pub is written to",
+         :type        => "string",
+         :display_as  => "Directory"
+
+  output :public_key,
+         :description => "The ED255519 public key hex encoded",
+         :type        => "string",
+         :display_as  => "Public Key"
+
+  output :signature,
+         :description => "The signature of the nonce made using the new private key, hex encoded",
+         :type        => "string",
+         :display_as  => "Signature"
 
 end
 
@@ -159,7 +208,7 @@ action "gencsr", :description => "Request a CSR from the Choria Server" do
         :type        => :string,
         :validation  => '.',
         :maxlength   => 128,
-        :optional    => true
+        :optional    => false
 
 
 
@@ -181,45 +230,6 @@ action "gencsr", :description => "Request a CSR from the Choria Server" do
 
 end
 
-action "release_update", :description => "Performs an in-place binary update and restarts Choria" do
-  display :always
-
-  input :repository,
-        :prompt      => "Repository URL",
-        :description => "HTTP(S) server hosting the update repository",
-        :type        => :string,
-        :validation  => '^http(s*)://',
-        :maxlength   => 512,
-        :optional    => false
-
-
-  input :token,
-        :prompt      => "Token",
-        :description => "Authentication token to pass to the server",
-        :type        => :string,
-        :validation  => '.',
-        :maxlength   => 128,
-        :optional    => true
-
-
-  input :version,
-        :prompt      => "Version to update to",
-        :description => "Package version to update to",
-        :type        => :string,
-        :validation  => '.+',
-        :maxlength   => 32,
-        :optional    => false
-
-
-
-
-  output :message,
-         :description => "Status message from the Provisioner",
-         :type        => "string",
-         :display_as  => "Message"
-
-end
-
 action "jwt", :description => "Re-enable provision mode in a running Choria Server" do
   display :always
 
@@ -229,7 +239,7 @@ action "jwt", :description => "Re-enable provision mode in a running Choria Serv
         :type        => :string,
         :validation  => '.',
         :maxlength   => 128,
-        :optional    => true
+        :optional    => false
 
 
 
@@ -255,7 +265,7 @@ action "reprovision", :description => "Reenable provision mode in a running Chor
         :type        => :string,
         :validation  => '.',
         :maxlength   => 128,
-        :optional    => true
+        :optional    => false
 
 
 
@@ -283,7 +293,67 @@ action "restart", :description => "Restart the Choria Server" do
         :type        => :string,
         :validation  => '.',
         :maxlength   => 128,
-        :optional    => true
+        :optional    => false
+
+
+
+
+  output :message,
+         :description => "Status message from the Provisioner",
+         :type        => "string",
+         :display_as  => "Message"
+
+end
+
+action "release_update", :description => "Performs an in-place binary update and restarts Choria" do
+  display :always
+
+  input :repository,
+        :prompt      => "Repository URL",
+        :description => "HTTP(S) server hosting the update repository",
+        :type        => :string,
+        :validation  => '^http(s*)://',
+        :maxlength   => 512,
+        :optional    => false
+
+
+  input :token,
+        :prompt      => "Token",
+        :description => "Authentication token to pass to the server",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 128,
+        :optional    => false
+
+
+  input :version,
+        :prompt      => "Version to update to",
+        :description => "Package version to update to",
+        :type        => :string,
+        :validation  => '.+',
+        :maxlength   => 32,
+        :optional    => false
+
+
+
+
+  output :message,
+         :description => "Status message from the Provisioner",
+         :type        => "string",
+         :display_as  => "Message"
+
+end
+
+action "shutdown", :description => "Shut the Choria Server down cleanly" do
+  display :failed
+
+  input :token,
+        :prompt      => "Token",
+        :description => "Authentication token to pass to the server",
+        :type        => :string,
+        :validation  => '.',
+        :maxlength   => 128,
+        :optional    => false
 
 
 
