@@ -121,7 +121,6 @@ module MCollective
           Log.info("Unexpected exception received while waiting for child process: #{e.class}: #{e}")
         end
       end
-      @status.thread.kill
       @status
     end
   end
