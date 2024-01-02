@@ -127,12 +127,13 @@ module MCollective
 
       # Determines the domain to do SRV lookups in
       #
-      # This is settable using choria.srv_domain and defaults
+      # This is settable using the environment variable
+      # CHORIA_SRV_DOMAIN or choria.srv_domain and defaults
       # to the domain as reported by facter
       #
       # @return [String]
       def srv_domain
-        get_option("choria.srv_domain", nil) || facter_domain
+        env_fetch("CHORIA_SRV_DOMAIN", nil) || get_option("choria.srv_domain", nil) || facter_domain
       end
 
       # Determines the SRV records to look up
