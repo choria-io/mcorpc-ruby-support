@@ -1,0 +1,10 @@
+{
+  "CN": "Puppet CA: 1e7dffaab0c9.devco.net",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "ca": {
+    "expiry": "43800h"
+  }
+}

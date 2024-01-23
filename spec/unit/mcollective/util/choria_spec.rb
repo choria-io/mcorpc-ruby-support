@@ -182,7 +182,7 @@ module MCollective
       describe "#have_ssl_files?" do
         before(:each) do
           choria.stubs(:client_public_cert).returns(File.expand_path("spec/fixtures/rip.mcollective.pem"))
-          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective.key"))
+          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective-key.pem"))
           choria.stubs(:ca_path).returns(File.expand_path("spec/fixtures/ca_crt.pem"))
         end
 
@@ -252,14 +252,14 @@ module MCollective
         it "should create a valid ssl context" do
           choria.stubs(:ca_path).returns("spec/fixtures/ca_crt.pem")
           choria.stubs(:client_public_cert).returns("spec/fixtures/rip.mcollective.pem")
-          choria.stubs(:client_private_key).returns("spec/fixtures/rip.mcollective.key")
+          choria.stubs(:client_private_key).returns("spec/fixtures/rip.mcollective-key.pem")
 
           context = choria.ssl_context
 
           expect(context.verify_mode).to be(OpenSSL::SSL::VERIFY_PEER)
           expect(context.ca_file).to eq("spec/fixtures/ca_crt.pem")
           # expect(context.cert.subject.to_s).to eq("/CN=rip.mcollective")
-          # expect(context.key.to_pem).to eq(File.read("spec/fixtures/rip.mcollective.key"))
+          # expect(context.key.to_pem).to eq(File.read("spec/fixtures/rip.mcollective-key.pem"))
         end
 
         it "should create a valid ssl context with intermediate certs" do
@@ -804,7 +804,7 @@ module MCollective
 
         it "should support unverified connections" do
           choria.stubs(:client_public_cert).returns(File.expand_path("spec/fixtures/rip.mcollective.pem"))
-          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective.key"))
+          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective-key.pem"))
           choria.stubs(:has_ca?).returns(false)
 
           h = choria.https(:target => "puppet", :port => "8140")
@@ -817,7 +817,7 @@ module MCollective
 
         it "should create a valid http client" do
           choria.stubs(:client_public_cert).returns(File.expand_path("spec/fixtures/rip.mcollective.pem"))
-          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective.key"))
+          choria.stubs(:client_private_key).returns(File.expand_path("spec/fixtures/rip.mcollective-key.pem"))
           choria.stubs(:ca_path).returns(File.expand_path("spec/fixtures/ca_crt.pem"))
 
           h = choria.https(:target => "puppet", :port => "8140")

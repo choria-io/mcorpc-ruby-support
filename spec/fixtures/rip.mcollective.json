@@ -1,0 +1,8 @@
+{
+    "CN": "rip.mcollective",
+    "names": [],
+    "key": {
+        "algo": "rsa",
+        "size": 4096
+    }
+}

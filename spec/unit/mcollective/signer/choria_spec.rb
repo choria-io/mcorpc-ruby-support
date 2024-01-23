@@ -60,12 +60,12 @@ module MCollective
     describe "#local_sign" do
       it "should correctly sign the request" do
         security.initiated_by = :client
-        security.choria.expects(:client_private_key).returns("spec/fixtures/rip.mcollective.key").twice
+        security.choria.expects(:client_private_key).returns("spec/fixtures/rip.mcollective-key.pem").twice
         security.choria.expects(:client_public_cert).returns("spec/fixtures/rip.mcollective.pem")
 
         sr = {"message" => "too many secrets"}
         signer.local_sign!(sr)
-        expect(sr["signature"]).to eq(File.read("spec/fixtures/too_many_secrets.sig"))
+        expect(sr["signature"]).to eq(File.read("spec/fixtures/too_many_secrets.sig").chomp)
         expect(sr["pubcert"]).to eq(File.read("spec/fixtures/rip.mcollective.pem").chomp)
       end
     end
