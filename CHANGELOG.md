@@ -1,5 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2024/02/03|      |Release 2.26.3                                                                                           |
+|2023/12/18|190   |Allow setting SRV domain using environment variable                                                      |
+|2023/10/27|188   |Use named args in ERB.new                                                                                |
+|2023/10/27|186   |Remove `Thread.kill`                                                                                     |
 |2023/03/22|      |Release 2.26.2                                                                                           |
 |2023/03/22|      |Update embedded DDL files                                                                                |
 |2022/11/07|      |Release 2.26.1                                                                                           |
