@@ -15,6 +15,7 @@ module MCollective
         @config.loadconfig(options[:config]) unless @config.configured
         @options = options
         @connection_timeout = options[:connection_timeout]
+        @config.federations = options[:federations] if options[:federations]
       else
         raise "Invalid parameter passed to Client constructor. Valid types are Hash or String"
       end

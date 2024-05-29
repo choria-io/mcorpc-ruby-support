@@ -97,7 +97,9 @@ module MCollective
       #
       # @return [Array<String>]
       def federation_collectives
-        if override_networks = env_fetch("CHORIA_FED_COLLECTIVE", nil)
+        if (@config.federations.length > 0)
+          @config.federations
+        elsif (override_networks = env_fetch("CHORIA_FED_COLLECTIVE", nil))
           override_networks.split(",").map(&:strip).reject(&:empty?)
         else
           get_option("choria.federation.collectives", "").split(",").map(&:strip).reject(&:empty?)

@@ -12,7 +12,7 @@ group :development, :test do
   gem "listen", "~> 3"
   gem "mcollective-test"
   gem "mocha", "~> 0.12.2"
-  gem "puppet", "~> 6"
+  gem "puppet", "~> 8"
   gem "rake", ">= 12.3.3"
   gem "rdoc"
   gem "rspec", "~> 3.9.0"
@@ -20,5 +20,6 @@ group :development, :test do
   gem "semantic_puppet"
   gem "webmock"
   gem "yard"
-  gem "google-protobuf", "3.17.3"
+  gem "google-protobuf", "3.25"
+
 end

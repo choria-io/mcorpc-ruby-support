@@ -64,6 +64,17 @@ module MCollective
           # @param data [Hash] input data matching nodes.json schema
           # @return [McollectiveNodes]
           def from_hash(data)
+            @config = Config.instance
+
+            # Allow specifying federations at playbook execution time
+            if data["federations"]
+              if data["federations"].instance_of?(String)
+                @config.federations = [data["federations"]]
+              else
+                @config.federations = data["federations"]
+              end
+            end
+
             @discovery_method = data.fetch("discovery_method", "mc")
             @agents = data.fetch("agents", ["rpcutil"])
             @facts = data.fetch("facts", [])

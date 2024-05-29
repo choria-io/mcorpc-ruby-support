@@ -238,7 +238,7 @@ module MCollective
         empty_filter = Util.empty_filter
         config_file = Util.config_file_for_user
 
-        expect(Util.default_options).to eq({:verbose => false, :disctimeout => nil, :timeout => 5, :config => config_file, :filter => empty_filter, :collective => nil, :discovery_method => nil, :discovery_options => []})
+        expect(Util.default_options).to eq({:verbose => false, :disctimeout => nil, :timeout => 5, :config => config_file, :filter => empty_filter, :collective => nil, :discovery_method => nil, :discovery_options => [], :federations => []})
       end
     end
 

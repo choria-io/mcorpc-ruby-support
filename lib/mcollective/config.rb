@@ -3,7 +3,7 @@ module MCollective
   class Config
     include Singleton
 
-    attr_accessor :mode
+    attr_accessor :mode, :federations
 
     attr_reader :daemonize, :pluginconf, :configured, :logfile, :keeplogs, :max_log_size, :loglevel, :logfacility,
                 :identity, :connector, :securityprovider, :factsource, :registration, :registerinterval, :classesfile,
@@ -112,7 +112,7 @@ module MCollective
           when "default_batch_sleep_time"
             @default_batch_sleep_time = Float(val)
           else
-            # server config might now be choria config which will divirge from mcollective
+            # server config might now be choria config which will diverge from mcollective
             # in time, so we only raise this error when it looks like we aren't loading
             # a server config else we try our best to load as much as we can
             raise("Unknown config parameter '#{key}'") unless configfile =~ /server/
@@ -231,6 +231,7 @@ module MCollective
       @connection_timeout = nil
       @default_batch_size = 0
       @default_batch_sleep_time = 1
+      @federations = []
     end
 
     def libdir
