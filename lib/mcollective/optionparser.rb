@@ -186,6 +186,10 @@ module MCollective
       @parser.on("--connection-timeout TIMEOUT", Integer, "Set the timeout for establishing a connection to the middleware") do |v|
         @options[:connection_timeout] = Integer(v)
       end
+
+      @parser.on("--federations FEDERATIONS", String, "Target federations") do |v|
+        @options[:federations] = String(v).split(",")
+      end
     end
 
     private

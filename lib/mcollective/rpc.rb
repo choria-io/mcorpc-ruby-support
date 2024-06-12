@@ -26,6 +26,7 @@ module MCollective
 
         Helpers.add_simplerpc_options(parser, opts)
       end
+
     end
 
     # Wrapper to create clients, supposed to be used as
@@ -171,7 +172,7 @@ module MCollective
     def self.const_missing(const_name)
       super unless const_name == :DDL
 
-      Log.warn("MCollective::RPC::DDL is deprecatd, please use MCollective::DDL instead")
+      Log.warn("MCollective::RPC::DDL is deprecated, please use MCollective::DDL instead")
       MCollective::DDL
     end
   end
