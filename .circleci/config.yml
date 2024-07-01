@@ -9,7 +9,7 @@ jobs:
       - image: circleci/ruby:2.5-node
     steps:
       - checkout
-      - ruby/install-deps
+      - ruby/install:
           version: '3.2'
       - run: ruby --version
       - run: bundle install
