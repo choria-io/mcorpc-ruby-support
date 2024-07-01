@@ -603,8 +603,8 @@ module MCollective
           client = Client.new("foo", {:options => {:filter => Util.empty_filter, :config => "/nonexisting", :limit_seed => 5}})
           client.stubs(:discover).returns((1..10).map{|i| i.to_s})
           client.limit_method = :first
-          expect(client.pick_nodes_from_discovered(5)).to eq((1..5).map{|i| i.to_s})
-          expect(client.pick_nodes_from_discovered(5)).to eq((1..5).map{|i| i.to_s})
+          expect(client.pick_nodes_from_discovered("5")).to eq((1..5).map{|i| i.to_s})
+          expect(client.pick_nodes_from_discovered("5")).to eq((1..5).map{|i| i.to_s})
         end
       end
 

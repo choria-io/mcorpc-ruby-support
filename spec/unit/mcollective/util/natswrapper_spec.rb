@@ -57,10 +57,6 @@ module MCollective
       end
     end
 
-    describe "#start" do
-      it "should have tests"
-    end
-
     describe "#stop" do
       it "should stop NATS" do
         client.expects(:close)

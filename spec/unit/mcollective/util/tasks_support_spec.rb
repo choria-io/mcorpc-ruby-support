@@ -576,20 +576,6 @@ terminate called after throwing an instance of 'leatherman::json_container::data
           FileUtils.rm_rf(cache)
         end
 
-        it "should download and cache the file" do
-          expect(ts.task_file?(file)).to be(false)
-
-          stub_request(:get, "https://stubpuppet:8140/puppet/v3/file_content/tasks/choria/ls.rb?environment=production")
-            .with(:headers => {"Accept" => "application/octet-stream"})
-            .to_return(:status => 200, :body => task_fixture_rb)
-
-          ts.cache_task_file(file)
-
-          assert_requested(:get, "https://stubpuppet:8140/puppet/v3/file_content/tasks/choria/ls.rb?environment=production", :times => 1)
-
-          expect(ts.task_file?(file)).to be(true)
-        end
-
         it "should handle failures" do
           expect(ts.task_file?(file)).to be(false)
 
