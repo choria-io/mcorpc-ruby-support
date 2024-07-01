@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - ruby/install:
-          version: '3.2'
+          version: '3.2.3'
       - run: ruby --version
       - run: bundle install
       - run: bundle exec rake test
