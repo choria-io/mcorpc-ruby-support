@@ -10,6 +10,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+          version: '3.2'
       - run: ruby --version
       - run: bundle install
       - run: bundle exec rake test
