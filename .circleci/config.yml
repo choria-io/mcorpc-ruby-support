@@ -4,7 +4,13 @@ jobs:
     docker:
       - image: circleci/ruby:2.5-node
     steps:
+      - run:
+        name: Set ruby version to 3.2.3
+        command: |
+          rvm install 3.2.3
+          echo . $(rvm 3.2.3 do rvm env --path) >> $BASH_ENV
       - checkout
+      - run: ruby --version
       - run: bundle install
       - run: bundle exec rake test
 
