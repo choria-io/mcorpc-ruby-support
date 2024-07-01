@@ -1,15 +1,15 @@
-version: 2
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@2.1.3
+
 jobs:
   rspec_and_rubocop:
     docker:
       - image: circleci/ruby:2.5-node
     steps:
-      - run:
-          name: Set ruby version to 3.2.3
-          command: |
-            rvm install 3.2.3
-            echo . $(rvm 3.2.3 do rvm env --path) >> $BASH_ENV
       - checkout
+      - ruby/install-deps
       - run: ruby --version
       - run: bundle install
       - run: bundle exec rake test
