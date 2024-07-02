@@ -82,7 +82,7 @@ module MCollective
               "username" => @username,
               "channel" => @channel,
               "icon_url" => @icon,
-              "attachments" => attachments,
+              "attachments" => attachments
             }
             post = choria.http_post(path, headers)
             post.body = params.to_json

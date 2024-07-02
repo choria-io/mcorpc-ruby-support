@@ -26,7 +26,6 @@ module MCollective
 
         Helpers.add_simplerpc_options(parser, opts)
       end
-
     end
 
     # Wrapper to create clients, supposed to be used as

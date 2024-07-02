@@ -39,7 +39,7 @@ module MCollective
           cmd << "-S" << c.first["expr"]
         end
 
-        unless @config.federations.empty?
+        if !@config.federations.empty?
           cmd << "--federations" << @config.federations.join(",")
         end
 
