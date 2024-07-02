@@ -39,9 +39,7 @@ module MCollective
           cmd << "-S" << c.first["expr"]
         end
 
-        if !@config.federations.empty?
-          cmd << "--federations" << @config.federations.join(",")
-        end
+        cmd << "--federations" << @config.federations.join(",") unless @config.federations.empty?
 
         client.options.fetch(:discovery_options, []).each do |opt|
           cmd << "--do" << opt
