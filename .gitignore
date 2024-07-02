@@ -6,6 +6,5 @@ etc/ssl/clients/*pem
 plugins/mcollective/security/none.rb
 tags
 pkg
-Gemfile.lock
 .bundle
 .ruby-version
