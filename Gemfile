@@ -21,5 +21,4 @@ group :development, :test do
   gem "webmock"
   gem "yard"
   gem "google-protobuf", "3.25"
-
 end

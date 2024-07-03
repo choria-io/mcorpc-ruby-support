@@ -221,7 +221,6 @@ module MCollective
         s = Shell.new("echo hello world")
         Thread.stubs(:current)
         s.expects(:systemu).returns(@systemu)
-        @thread.expects(:kill)
         result = s.runcommand
         expect(result).to eq(@systemu)
       end

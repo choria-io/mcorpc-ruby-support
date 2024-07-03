@@ -7,10 +7,10 @@ require 'mcollective'
 require 'ostruct'
 require 'tmpdir'
 require 'tempfile'
-require 'fileutils'
 require 'mcollective/test'
 require "json-schema-rspec"
 require "webmock/rspec"
+require 'fileutils'
 
 require 'monkey_patches/instance_variable_defined'
 

@@ -218,7 +218,7 @@ module MCollective
       def create_request_spooldir(requestid, task)
         dir = request_spooldir(requestid)
 
-        FileUtils.mkdir_p(dir, :mode => 0o0750)
+        FileUtils.mkdir_p(dir, mode: 0o0750) # rubocop:disable Style/HashSyntax
 
         populate_spooldir(dir, task)
 
@@ -235,7 +235,7 @@ module MCollective
 
           spool_filename = File.join(spooldir, "files", filename)
 
-          FileUtils.mkdir_p(File.dirname(spool_filename), :mode => 0o0750)
+          FileUtils.mkdir_p(File.dirname(spool_filename), mode: 0o0750) # rubocop:disable Style/HashSyntax
           FileUtils.cp(task_file_name(file), spool_filename)
         end
       end
@@ -718,7 +718,7 @@ module MCollective
         http_get(path, "Accept" => "application/octet-stream") do |resp|
           raise("Failed to request task content %s: %s: %s" % [path, resp.code, resp.body]) unless resp.code == "200"
 
-          FileUtils.mkdir_p(cache_dir, :mode => 0o0750)
+          FileUtils.mkdir_p(cache_dir, mode: 0o0750) # rubocop:disable Style/HashSyntax
           FileUtils.rm_rf(file_name) if File.directory?(file_name)
 
           task_file = Tempfile.new("tasks_%s" % file["filename"])

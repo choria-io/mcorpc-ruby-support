@@ -176,6 +176,8 @@ module MCollective
       signature = base64_decode(signature) if base64
 
       @public_key.verify(OpenSSL::Digest.new("SHA1"), signature, string)
+    rescue
+      false
     end
 
     # base 64 encode a string

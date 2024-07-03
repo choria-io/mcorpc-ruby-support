@@ -95,10 +95,12 @@ module MCollective
               task.stubs(:choria).returns(choria = stub)
               choria.expects(:https).with(:target => "slack.com", :port => 443).returns(https = stub)
               task.expects(:attachments).returns([])
-              choria.expects(:http_get).with(
-                "/api/chat.postMessage?token=RSPEC_TOKEN&username=Rspec+Bot&channel=%23general&icon_url=https%3A%2F%2Fchoria.io%2Fimg%2Fslack-48x48.png&attachments=%5B%5D"
-              ).returns(get = stub)
-              https.expects(:request).with(get).returns([stub(:code => "200", :body => JSON.dump("ok" => true))])
+              choria.expects(:http_post).with(
+                "/api/chat.postMessage",
+                {"Content-type" => "application/json; charset=utf-8", "Authorization" => "Bearer RSPEC_TOKEN"}
+              ).returns(post = stub)
+              post.expects(:body=).with({"username":"Rspec Bot","channel":"#general","icon_url":"https://choria.io/img/slack-48x48.png","attachments":[]}.to_json)
+              https.expects(:request).with(post).returns([stub(:code => "200", :body => JSON.dump("ok" => true))])
 
               expect(task.run).to eq(
                 [
@@ -112,10 +114,13 @@ module MCollective
             it "should handle failures" do
               task.stubs(:choria).returns(choria = stub)
               choria.expects(:https).with(:target => "slack.com", :port => 443).returns(https = stub)
-              choria.expects(:http_get).with(
-                "/api/chat.postMessage?token=RSPEC_TOKEN&username=Rspec+Bot&channel=%23general&icon_url=https%3A%2F%2Fchoria.io%2Fimg%2Fslack-48x48.png&attachments=%5B%5D"
-              ).returns(get = stub)
-              https.expects(:request).with(get).returns([stub(:code => "500", :body => JSON.dump("ok" => false, "error" => "rspec error"))])
+              choria.expects(:http_post).with(
+                "/api/chat.postMessage",
+                {"Content-type" => "application/json; charset=utf-8", "Authorization" => "Bearer RSPEC_TOKEN"}
+              ).returns(post = stub)
+
+              post.expects(:body=).with({"username":"Rspec Bot","channel":"#general","icon_url":"https://choria.io/img/slack-48x48.png","attachments":[]}.to_json)
+              https.expects(:request).with(post).returns([stub(:code => "500", :body => JSON.dump("ok" => false, "error" => "rspec error"))])
 
               expect(task.run).to eq(
                 [

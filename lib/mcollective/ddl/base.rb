@@ -52,11 +52,11 @@ module MCollective
         unless template == "metadata-help.erb"
           metadata_template = Util.templatepath("metadata-help.erb")
           metadata_template = File.read(metadata_template)
-          metastring = ERB.new(metadata_template, 0, "%")
+          metastring = ERB.new(metadata_template, trim_mode: "%") # rubocop:disable Style/HashSyntax
           metastring = metastring.result(binding)
         end
 
-        erb = ERB.new(template, 0, "%")
+        erb = ERB.new(template, trim_mode: "%") # rubocop:disable Style/HashSyntax
         erb.result(binding)
       end
 
