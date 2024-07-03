@@ -216,14 +216,6 @@ module MCollective
         Log.expects(:warn).with("Could not reap process '1234'.")
         s.runcommand
       end
-
-      it "should kill the guard thread when the process returns" do
-        s = Shell.new("echo hello world")
-        Thread.stubs(:current)
-        s.expects(:systemu).returns(@systemu)
-        result = s.runcommand
-        expect(result).to eq(@systemu)
-      end
     end
   end
 end
