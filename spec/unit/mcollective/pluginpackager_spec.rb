@@ -21,7 +21,7 @@ module MCollective
       it "should do something else" do
         expect{
           PluginPackager["Bar"]
-        }.to raise_error(NameError, 'uninitialized constant MCollective::PluginPackager::Bar')
+        }.to raise_error(NameError, /uninitialized constant MCollective::PluginPackager::Bar/)
       end
     end
 
