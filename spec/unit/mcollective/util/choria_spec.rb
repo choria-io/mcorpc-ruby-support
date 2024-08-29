@@ -243,7 +243,7 @@ module MCollective
         end
 
         it "should pass for valid client cert w/intermediate CA/ca combos" do
-          choria.stubs(:ca_path).returns("spec/fixtures/intermediate/ca.pem")
+          choria.stubs(:ca_path).returns("spec/fixtures/intermediate/certs/ca_chain_ca.pem")
           expect(choria.valid_certificate?(File.read("spec/fixtures/intermediate/chain-rip.mcollective.pem"), "rip.mcollective")).to be_truthy
         end
       end

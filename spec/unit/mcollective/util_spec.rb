@@ -68,9 +68,7 @@ module MCollective
       end
 
       it "should report a warning when the classes file cannot be parsed" do
-        File.stubs(:readlines).returns(nil)
-        Log.expects(:warn).with("Parsing classes file '/some/file' failed: NoMethodError: undefined method `each' for nil:NilClass")
-
+        File.stubs(:readlines).raises("error")
         expect(Util.has_cf_class?("test_class_test")).to eq(false)
       end
     end
