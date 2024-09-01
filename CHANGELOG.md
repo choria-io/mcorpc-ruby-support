@@ -1,5 +1,9 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2024/09/01|      |Release 2.26.4                                                                                           |
+|2024/09/29|      |Move to Github Actions                                                                                   |
+|2024/06/26|196   |Fix Slack integration to use POST                                                                        |
+|2024/02/03|      |Allow overriding federation as cli argument and playbook func args                                       |
 |2024/02/03|      |Release 2.26.3                                                                                           |
 |2023/12/18|190   |Allow setting SRV domain using environment variable                                                      |
 |2023/10/27|188   |Use named args in ERB.new                                                                                |
