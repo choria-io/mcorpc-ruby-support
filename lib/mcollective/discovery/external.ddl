@@ -7,7 +7,7 @@ metadata    :name        => "external",
             :timeout     => 2
 
 discovery do
-    capabilities [:classes, :facts, :identity, :agents, :compound]
+    capabilities [:classes, :facts, :identity, :agents, :compound, :federations]
 end
 
 

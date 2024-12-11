@@ -9,6 +9,7 @@ module MCollective
             @facts = []
             @classes = []
             @identity = []
+            @federations = []
             @compound = nil
           end
 
