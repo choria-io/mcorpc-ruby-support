@@ -11,7 +11,7 @@ module MCollective
     #             :timeout     => 2
     #
     # discovery do
-    #     capabilities [:classes, :facts, :identity, :agents, :compound]
+    #     capabilities [:classes, :facts, :identity, :agents, :compound, :federations]
     # end
     class DiscoveryDDL < Base
       def discovery_interface
@@ -25,10 +25,10 @@ module MCollective
         raise "Discovery plugin capabilities can't be empty" if caps.empty?
 
         caps.each do |cap|
-          if [:classes, :facts, :identity, :agents, :compound].include?(cap)
+          if [:classes, :facts, :identity, :agents, :compound, :federations].include?(cap)
             @entities[:discovery][:capabilities] << cap
           else
-            raise "%s is not a valid capability, valid capabilities are :classes, :facts, :identity, :agents and :compound" % cap
+            raise "%s is not a valid capability, valid capabilities are :classes, :facts, :identity, :agents, :compound, and :federations" % cap
           end
         end
       end

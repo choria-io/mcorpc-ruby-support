@@ -217,7 +217,7 @@ module MCollective
         :discovery_method => nil,
         :discovery_options => Config.instance.default_discovery_options,
         :filter => empty_filter,
-        :federations => []
+        :federations => Config.instance.federations
       }
     end
 
