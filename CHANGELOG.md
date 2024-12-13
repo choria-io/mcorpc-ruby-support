@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2024/12/13|      |Release 2.26.5                                                                                           |
+|2024/12/10|202   |Pass federations properly down from choria playbooks                                                     |
 |2024/09/01|      |Release 2.26.4                                                                                           |
 |2024/09/29|      |Move to Github Actions                                                                                   |
 |2024/06/26|196   |Fix Slack integration to use POST                                                                        |
