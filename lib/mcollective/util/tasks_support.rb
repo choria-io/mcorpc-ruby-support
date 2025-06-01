@@ -294,6 +294,7 @@ module MCollective
 
           pid = Process.fork
           if pid.nil?
+            Process.initgroups(run_as, u.gid)
             Process.gid = Process.egid = u.gid
             Process.uid = Process.euid = u.uid
             ENV.delete_if { |name| name !~ /^LC_/ }
