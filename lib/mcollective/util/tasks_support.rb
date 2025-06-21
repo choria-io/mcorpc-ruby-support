@@ -167,8 +167,8 @@ module MCollective
         file_name = File.join(spooldir, "files", task_module(task["task"]), "tasks", file_spec["filename"])
 
         command = platform_specific_command(file_name)
-
-        command.unshift(ps_shim_path) if task_input_method(task) == "powershell"
+        # the ps_shim_path should be before the actual powershell task script instead of the front. 
+        command.insert(-2, ps_shim_path) if task_input_method(task) == "powershell"
 
         command
       end
