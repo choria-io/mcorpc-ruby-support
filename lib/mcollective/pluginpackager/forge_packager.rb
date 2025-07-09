@@ -191,7 +191,7 @@ module MCollective
       end
 
       def render_template(infile, outfile)
-        erb = ERB.new(File.read(infile), :safe_level => 0, :trim_mode => "-")
+        erb = ERB.new(File.read(infile), :trim_mode => "-")
         File.open(outfile, "w") do |f|
           f.puts erb.result(binding)
         end
