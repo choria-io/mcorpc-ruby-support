@@ -1,10 +1,9 @@
 source ENV["GEM_SOURCE"] || "https://rubygems.org"
 
-gem "nats-pure", "~> 0.6", "< 0.7.0"
-gem "systemu", "~> 2.6.4"
+# Specify your gem's dependencies in choria-mcorpc-support.gemspec
+gemspec
 
 group :development, :test do
-  gem "choria-mcorpc-support"
   gem "diplomat", "~> 2"
   gem "etcdv3"
   gem "jgrep", ">= 1.5.0"
