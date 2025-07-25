@@ -1,5 +1,3 @@
-require "rake"
-
 PROJ_VERSION = "2.26.5"
 
 Gem::Specification.new do |s|
