@@ -392,6 +392,17 @@ module MCollective
 
         wait_for_task_completion(requestid) if wait
 
+        # Redact inputs from choria.json
+        redacted_data = JSON.load File.open(File.join(spool, "choria.json"))
+        redacted_data["request"]["input"] = {}
+
+        File.open(File.join(spool, "choria.json"), "w") do |meta|
+          meta.print(redacted_data.to_json)
+        end
+
+        # Delete wrapper_stdin
+        File.delete(File.join(spool, "wrapper_stdin"))
+
         task_status(requestid)
       end
 
