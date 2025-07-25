@@ -9,7 +9,13 @@ Gem::Specification.new do |s|
   s.homepage = "https://choria.io/"
   s.summary = "Support libraries the Choria Server"
   s.description = "Libraries enabling Ruby support for the Choria Orchestration Server"
-  s.files = FileList["{lib,bin}/**/*"].to_a
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  s.files = Dir.chdir(__dir__) do
+    `git ls-files -z`.split("\x0").reject do |f|
+      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
+    end
+  end
   s.require_path = "lib"
   s.bindir = "bin"
   s.executables = ["mco"]
