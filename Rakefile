@@ -1,7 +1,7 @@
 require "rubygems"
 require "rubygems/package_task"
 
-spec = Gem::Specification.load('mcorpc-ruby-support.gemspec')
+spec = Gem::Specification.load('choria-mcorpc-support.gemspec')
 
 Gem::PackageTask.new(spec) do |pkg|
   pkg.need_tar = false
